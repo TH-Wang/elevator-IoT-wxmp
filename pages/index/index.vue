@@ -1,49 +1,72 @@
 <template>
-	<view class="container">
-		<swiper
-			class="swiper"
-			:indicator-dots="true"
-			indicator-color="rgba(255, 255, 255, .5)"
-			indicator-active-color="#4190F5"
-			:autoplay="true"
-			:circular="true"
-			:interval="3000"
-			:duration="500"
-		>
-			<swiper-item v-for="item in swiperList" :key="item">
-				<view class="swiper-item">
-					<image class="swper-image" src="../../static/image/index-swiper.jpg" mode />
-				</view>
-			</swiper-item>
-		</swiper>
-		
-		<view class="notice">
-			<image class="notice-image" src="../../static/icon/notice.png" mode />
+	<TabbarPage :header="{title: '首页', hasBack: false}" :tabbar="{active: 0}">
+		<view class="container" :style="height">
+			<!-- banner -->
 			<swiper
-				class="notice-swiper"
-				:vertical="true"
+				class="swiper"
+				:indicator-dots="true"
+				indicator-color="rgba(255, 255, 255, .5)"
+				indicator-active-color="#4190F5"
 				:autoplay="true"
 				:circular="true"
-				:interval="3000"
-				:duration="300"
+				:interval="5000"
+				:duration="500"
 			>
-				<swiper-item class="notice-swiper-item" v-for="(item, index) in noticeList" :key="index">
-					<text class="notice-title">{{item}}</text>
+				<swiper-item v-for="item in swiperList" :key="item">
+					<view class="swiper-item">
+						<image class="swper-image" src="../../static/image/index-swiper.jpg" mode />
+					</view>
 				</swiper-item>
 			</swiper>
-		</view>
-		
-		<view class="grid">
-			<view class="grid-item" v-for="(item, index) in gridList" :key="item">
-				<image class="grid-image" :src="`../../static/icon/grid/grid-${index+1}.png`" mode />
-				<text>{{item}}</text>
+			
+			<!-- 公告 -->
+			<view class="notice">
+				<image class="notice-image" src="../../static/icon/notice.png" mode />
+				<swiper
+					class="notice-swiper"
+					:vertical="true"
+					:autoplay="true"
+					:circular="true"
+					:interval="3000"
+					:duration="300"
+				>
+					<swiper-item class="notice-swiper-item" v-for="(item, index) in noticeList" :key="index">
+						<text class="notice-title">{{item}}</text>
+					</swiper-item>
+				</swiper>
 			</view>
+			
+			<!-- 导航菜单 -->
+			<view class="grid">
+				<view
+					class="grid-item"
+					v-for="(item, index) in gridConfig"
+					:key="item.text"
+					@click="handleNavigateLink(item.path)"
+				>
+					<image class="grid-image" :src="`../../static/icon/grid/grid-${index+1}.png`" mode />
+					<text>{{item.text}}</text>
+				</view>
+			</view>
+			
+			<!-- 待办事项 -->
+			<view class="todos-title">
+				<text>待办事项</text>
+				<text><text style="color: #4190F5;">2</text>项</text>
+			</view>
+			
 		</view>
-	</view>
+	</TabbarPage>
 </template>
 
 <script>
+	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
+	import gridConfig from './gridConfig.js'
+	
 	export default {
+		components: {
+			TabbarPage
+		},
 		data: () => ({
 			swiperList: ['1', '2', '3'],
 			noticeList: [
@@ -51,19 +74,34 @@
 				'这里是后台的系统公告',
 				'市规划局三个世界观和三个价值观'
 			],
-			gridList: ['电梯监控', 'GIS地图', '合同管理', '急修管理', '电梯保养', '故障上报', '档案资料', '设备调试']
+			gridConfig
 		}),
+		computed: {
+			height() {
+				return this.$store.getters.tabbarHeight
+			}
+		},
 		methods: {
-	
+			handleNavigateLink(path) {
+				uni.navigateTo({
+					url: path,
+				})
+			}
 		}
 	}
 </script>
 
+<style>
+	@import url("../../static/css/page.css");
+</style>
+
 <style scoped>
+	/* 页面容器 */
 	.container{
 		background-color: #f9f9f9;
 	}
 	
+	/* banner */
 	.swiper{
 		height: 345rpx;
 	}
@@ -76,9 +114,10 @@
 		height: 100%;
 	}
 	
+	/* 公告 */
 	.notice{
 		height: 100rpx;
-		margin-bottom: 10px;
+		margin-bottom: 20rpx;
 		display: flex;
 		flex-wrap: nowrap;
 		align-items: center;
@@ -105,12 +144,16 @@
 		text-overflow: ellipsis;
 		overflow: hidden;
 		word-break: break-all;
+		font-size: 26rpx;
+		color: #000000;
 	}
 	
+	/* 导航菜单 */
 	.grid{
 		width: 100%;
 		height: 378rpx;
 		padding: 30rpx 0;
+		margin-bottom: 20rpx;
 		background-color: #FFFFFF;
 		box-sizing: border-box;
 		display: flex;
@@ -130,5 +173,19 @@
 		width: 85rpx;
 		height: 85rpx;
 		margin-bottom: 21rpx;
+	}
+	
+	/* 待办事项 */
+	.todos-title{
+		height: 100rpx;
+		padding: 0 30rpx;
+		box-sizing: border-box;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 30rpx;
+		color: #000000;
+		background-color: #FFFFFF;
+		border-bottom: solid 1px #EEEEEE;
 	}
 </style>

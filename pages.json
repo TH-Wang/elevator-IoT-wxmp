@@ -1,11 +1,38 @@
 {
-	"pages": [{
-		"path": "pages/index/index",
-		"style": {
-			"navigationBarTitleText": "首页"
+	"pages": [
+		{
+			"path": "pages/index/index"					//首页
+		},
+		{
+			"path": "pages/login/login", 				//登录
+			"style": {
+				"navigationBarTextStyle": "white"
+			}
+		}, 
+		{
+			"path": "pages/findPass/findPass",	//找回密码
+			"style": {
+				"navigationBarTextStyle": "white"
+			}
+		}, 
+		{
+			"path": "pages/repair/repair"				//急修
+		},
+		{
+			"path": "pages/maintain/maintain"		//保养
+		},
+		{
+			"path": "pages/mine/mine"						//我的
+		},
+		{
+			"path": "pages/allMaintain/allMaintain"				//电梯保养
+		},
+		{
+			"path": "pages/record/record"				//档案资料
 		}
-	}],
+	],
 	"globalStyle": {
+		"navigationStyle": "custom",
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#FFFFFF",

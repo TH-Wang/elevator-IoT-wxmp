@@ -1,0 +1,16 @@
+.page-list-container{
+	height: calc(100% - 100rpx);
+}
+
+.swiper-item{
+	overflow-y: scroll;
+	box-sizing: border-box;
+	background-color: #F9F9F9;
+}
+
+.list-container{
+	margin-top: 20rpx;
+	padding: 1rpx 0rpx 30rpx 0rpx;
+	box-sizing: border-box;
+	background-color: #FFFFFF;
+}

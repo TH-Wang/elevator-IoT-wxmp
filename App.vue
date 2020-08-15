@@ -1,7 +1,11 @@
 <script>
 export default {
 	onLaunch: function() {
-		console.log('App Launch');
+		uni.getSystemInfo({
+			success: ({statusBarHeight}) => {
+				this.$store.commit("setStatusBarHeight", statusBarHeight)
+			}
+		})
 	},
 	onShow: function() {
 		console.log('App Show');
