@@ -1,18 +1,28 @@
 <template>
 	<TabbarPage :header="{title: '急修', hasBack: false}" :tabbar="{active: 2}">
 		<view :style="height">
+			<!-- 搜索框 -->
+			<Search button />
+			
+			<!-- 分类导航栏 -->
 			<Tabs
 				:tabs="tabs"
 				:active="active"
 				@switch="handleSwitchTab"
 			/>
+			
+			<!-- 列表 -->
 			<swiper
 				:current="active"
 				class="page-list-container"
-				:duration="400"
+				:duration="300"
 				@change="handleSwiperChange"
 			>
-				<swiper-item class="swiper-item" v-for="item in repairType" :key="item.code">
+				<swiper-item
+					class="swiper-item"
+					v-for="item in repairType"
+					:key="item.code"
+				>
 					<view class="list-container">
 						<List :dataSource="getList(item.code)" />
 					</view>
@@ -25,6 +35,7 @@
 <script>
 	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
 	import Tabs from '../../components/Tabs/Tabs.vue'
+	import Search from '../../components/Search/Search.vue'
 	import repairData from '../../data/repair.js'
 	import List from './list.vue'
 	
@@ -32,6 +43,7 @@
 		components: {
 			TabbarPage,
 			Tabs,
+			Search,
 			List
 		},
 		data: () => ({
@@ -51,7 +63,8 @@
 				}
 			],
 			active: 0,
-			dataSource: repairData
+			dataSource: repairData,
+			overflowStyle: ''
 		}),
 		computed: {
 			tabs() {

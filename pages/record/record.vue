@@ -8,6 +8,7 @@
 				v-for="item in gridConfig"
 				:key="item.text"
 				:style="'background-color:' + item.color"
+				@click="handleLink(item.path)"
 			>
 				<image class="grid-item-image" :src="item.image" />
 				<text class="grid-item-text">{{item.text}}</text>
@@ -26,7 +27,14 @@
 		},
 		data: () => ({
 			gridConfig
-		})
+		}),
+		methods: {
+			handleLink(path) {
+				uni.navigateTo({
+					url: path
+				})
+			}
+		}
 	}
 </script>
 

@@ -20,14 +20,14 @@
 						<image class="arrow-right" src="../../static/icon/right.png" />
 					</view>
 				</view>
+				
+				<!-- 退出登录按钮 -->
+				<CommonButton
+					class="singout-button"
+					text="退出登录"
+					@click="handleClickSingOutBtn"
+				/>
 			</view>
-		
-			<!-- 退出登录按钮 -->
-			<CommonButton
-				class="singout-button"
-				text="退出登录"
-				@click="handleClickSingOutBtn"
-			/>
 		</view>
 	</TabbarPage>
 </template>
@@ -67,6 +67,7 @@
 <style scoped>	
 	.list-container{
 		background-color: #F9F9F9;
+		padding-bottom: 1px;
 	}
 	.list-item{
 		height: 100rpx;

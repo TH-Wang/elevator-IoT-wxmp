@@ -19,8 +19,11 @@
 				</swiper-item>
 			</swiper>
 			
+			<!-- 搜索框 -->
+			<Search @click-button="handleClickButton" @change="handleSearchChange" button />
+			
 			<!-- 公告 -->
-			<view class="notice">
+			<view class="notice" @click="handleLinkNotice">
 				<image class="notice-image" src="../../static/icon/notice.png" mode />
 				<swiper
 					class="notice-swiper"
@@ -42,7 +45,7 @@
 					class="grid-item"
 					v-for="(item, index) in gridConfig"
 					:key="item.text"
-					@click="handleNavigateLink(item.path)"
+					@click="handleNavigateLink(item.path, item.isTabbarPage)"
 				>
 					<image class="grid-image" :src="`../../static/icon/grid/grid-${index+1}.png`" mode />
 					<text>{{item.text}}</text>
@@ -61,11 +64,14 @@
 
 <script>
 	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
+	import Search from '../../components/Search/Search.vue'
 	import gridConfig from './gridConfig.js'
+	import debounce from '../../utils/debounce.js'
 	
 	export default {
 		components: {
-			TabbarPage
+			TabbarPage,
+			Search
 		},
 		data: () => ({
 			swiperList: ['1', '2', '3'],
@@ -74,7 +80,8 @@
 				'这里是后台的系统公告',
 				'市规划局三个世界观和三个价值观'
 			],
-			gridConfig
+			gridConfig,
+			value: ''
 		}),
 		computed: {
 			height() {
@@ -82,10 +89,19 @@
 			}
 		},
 		methods: {
-			handleNavigateLink(path) {
-				uni.navigateTo({
-					url: path,
-				})
+			handleNavigateLink(path, isTabbarPage) {
+				const option = {url: path}
+				if(isTabbarPage) uni.reLaunch(option)
+				else uni.navigateTo(option)
+			},
+			handleSearchChange: debounce(function(value) {
+				console.log(value)
+			}, 300),
+			handleClickButton() {
+				console.log('点击了search-button')
+			},
+			handleLinkNotice(){
+				uni.navigateTo({url: '/pages/notice/notice'})
 			}
 		}
 	}

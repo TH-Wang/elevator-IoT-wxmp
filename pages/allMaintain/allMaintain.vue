@@ -1,6 +1,6 @@
 <template>
 	<view class="">
-		<NavHeader title="档案资料" />
+		<NavHeader title="电梯保养" />
 
 		<view :style="height">
 			<Tabs
@@ -11,7 +11,7 @@
 			<swiper
 				:current="active"
 				class="page-list-container"
-				:duration="400"
+				:duration="300"
 				@change="handleSwiperChange"
 			>
 				<swiper-item class="swiper-item" v-for="item in repairType" :key="item.code">
@@ -74,9 +74,6 @@
 				if(code === 3) return this.dataSource
 				else return this.dataSource.filter(i => i.code === code)
 			}
-		},
-		onLoad() {
-			console.log(this.height)
 		}
 	}
 </script>

@@ -22,8 +22,14 @@
 			<input type="password" value="" placeholder="请输入密码" />
 		</IconInput>
 		
-		<view class="bottom-button">
-			<view class="remember-password-button">
+		<view class="bottom-button" @click="handleCheck">
+			<!-- 选中 -->
+			<view v-if="checked" class="remember-password-button">
+				<image class="remember-password-icon" src="../../static/icon/login/checked.png" mode />
+				<text class="remember-password-text" style="color: #4190F5">记住密码</text>
+			</view>
+			<!-- 未选中 -->
+			<view v-else class="remember-password-button">
 				<image class="remember-password-icon" src="../../static/icon/login/unchecked.png" mode />
 				<text class="remember-password-text">记住密码</text>
 			</view>
@@ -32,7 +38,7 @@
 			</view>
 		</view>
 		
-		<button type="primary" class="submit-button">登录</button>
+		<button type="primary" class="submit-button" @click="handleLogin">登录</button>
 		
 		<view class="scan-button">
 			<image src="../../static/icon/login/scan.png" mode=""></image>
@@ -45,17 +51,52 @@
 
 <script>
 	import IconInput from '../../components/IconInput/IconInput.vue'
+	// import request from '../../service/request.js'
 	
 	export default {
 		components: {
 			IconInput
 		},
+		data: () => ({
+			checked: false
+		}),
 		methods: {
+			handleCheck() {
+				this.checked = !this.checked
+			},
 			handleLinkFindPass() {
 				uni.navigateTo({
 					url: '../findPass/findPass'
 				})
+			},
+			handleLogin() {
+				uni.reLaunch({
+					url: '/pages/index/index'
+				})
 			}
+		},
+		mounted() {
+			// uni.login({
+			// 	success(res) {
+			// 		var code = res.code
+			// 		uni.request({
+			// 			url: 'https://xdkj.xdiot.net/wx/get_url',
+			// 			method: 'POST',
+			// 			data: {
+			// 				channel_number: 2302,
+			// 				name: 'heling',
+			// 				password: 'fc7fc678608590b123692867f176fe63',
+			// 				code
+			// 			},
+			// 			success: res => {
+			// 				console.log(res)
+			// 			},
+			// 			fail: (err) => {
+			// 				console.log(err)
+			// 			}
+			// 		});
+			// 	}
+			// })
 		}
 	}
 </script>

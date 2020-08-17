@@ -27,14 +27,6 @@
 			}
 		},
 		methods: {
-			getButtonStyle() {
-				switch(this.record.code) {
-					case 0: return 'background-color: #4190F5';
-					case 1: return 'background-color: #FD9026';
-					case 2: return 'background-color: #EEEEEE; color: #FFFFFF';
-					default: return 'background-color: #EEEEEE; color: #FFFFFF';
-				}
-			},
 			getButtonText() {
 				switch(this.record.code) {
 					case 0: return '待处理';
@@ -58,7 +50,7 @@
 	/* 按钮 */
 	.button-0{background-color: #4190F5}
 	.button-1{background-color: #FD9026}
-	.button-2{background-color: #EEEEEE; color: #FFFFFF}
+	.button-2{background-color: #EEEEEE; color: #999999}
 	
 	.container{
 		width: 690rpx;

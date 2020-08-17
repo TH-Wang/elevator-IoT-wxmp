@@ -1,7 +1,9 @@
 <template>
 	<TabbarPage :header="{title: '保养', hasBack: false}" :tabbar="{active: 1}">
 		<view :style="height">
-			保养
+			<view class="main">
+				正在努力开发中...
+			</view>
 		</view>
 	</TabbarPage>
 </template>
@@ -21,6 +23,14 @@
 	}
 </script>
 
-<style>
+<style scoped>
 	@import url("../../static/css/page.css");
+	
+	.main{
+		padding-top: 100px;
+		display: flex;
+		justify-content: center;
+		align-items: flex-end;
+		color: #666666;
+	}
 </style>

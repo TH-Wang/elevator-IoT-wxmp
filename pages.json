@@ -1,9 +1,6 @@
 {
 	"pages": [
 		{
-			"path": "pages/index/index"					//首页
-		},
-		{
 			"path": "pages/login/login", 				//登录
 			"style": {
 				"navigationBarTextStyle": "white"
@@ -14,7 +11,10 @@
 			"style": {
 				"navigationBarTextStyle": "white"
 			}
-		}, 
+		},
+		{
+			"path": "pages/index/index"					//首页
+		},
 		{
 			"path": "pages/repair/repair"				//急修
 		},
@@ -25,12 +25,45 @@
 			"path": "pages/mine/mine"						//我的
 		},
 		{
-			"path": "pages/allMaintain/allMaintain"				//电梯保养
+			"path": "pages/contract/contract"	//合同管理
+		},
+		{
+			"path": "pages/allMaintain/allMaintain"	//电梯保养
+		},
+		{
+			"path": "pages/faultReport/faultReport"				//故障上报
 		},
 		{
 			"path": "pages/record/record"				//档案资料
+		},
+		{
+			"path": "pages/test/test"				//测试
+		},
+		{
+			"path": "pages/notice/notice"		//公告
+		},
+		{
+			"path": "pages/noticeDetail/noticeDetail"		//公告详情、工作规范详情
+		},
+		{
+			"path": "pages/evaFiles/evaFiles"			//电梯档案
+		},
+		{
+			"path": "pages/evaDetail/evaDetail"		//电梯详细信息
+		},
+		{
+			"path": "pages/peopleFiles/peopleFiles"				//人员档案
+		},
+		{
+			"path" : "pages/peopleDetail/peopleDetail"	//人员详细信息
+		},
+		{
+			"path": "pages/worknorm/worknorm"		//工作规范
+		},
+		{
+			"path": "pages/null/null"		//空页面
 		}
-	],
+   ],
 	"globalStyle": {
 		"navigationStyle": "custom",
 		"navigationBarTextStyle": "white",

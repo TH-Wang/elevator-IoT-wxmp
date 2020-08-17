@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view class="container">
 		<view
 			class="status-bar"
 			:style="'height:' + height + 'px'"
@@ -12,7 +12,7 @@
 			>
 				<image class="icon" src="../../static/icon/back.png" />
 			</view>
-			<view class="title">{{title}}</view>
+			<view class="title ellipsis">{{title}}</view>
 		</view>
 	</view>
 </template>
@@ -44,6 +44,18 @@
 </script>
 
 <style scoped>
+	/* 单行省略号 */
+	.ellipsis{
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		word-break: break-all;
+	}
+	
+	.container{
+		background-color: #FFFFFF;
+	}
+	
 	.status-bar {
 		width: 100%;
 	}
@@ -70,6 +82,8 @@
 	}
 	
 	.title{
+		width: 50%;
+		margin: 0 auto;
 		text-align: center;
 		height: 88rpx;
 		line-height: 88rpx;

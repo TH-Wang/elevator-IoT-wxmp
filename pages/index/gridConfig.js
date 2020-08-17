@@ -1,27 +1,35 @@
 export default [
 	{
 		text: '电梯监控',
-		path: ''
+		path: '/pages/null/null',
+		isTabbarPage: false
 	}, {
 		text: 'GIS地图',
-		path: ''
+		path: '/pages/null/null',
+		isTabbarPage: false
 	}, {
 		text: '合同管理',
-		path: ''
+		path: '/pages/contract/contract',
+		isTabbarPage: false
 	}, {
 		text: '急修管理',
-		path: ''
+		path: '/pages/repair/repair',
+		isTabbarPage: true
 	}, {
 		text: '电梯保养',
-		path: '/pages/allMaintain/allMaintain'
+		path: '/pages/allMaintain/allMaintain',
+		isTabbarPage: false
 	}, {
 		text: '故障上报',
-		path: ''
+		path: '/pages/faultReport/faultReport',
+		isTabbarPage: false
 	}, {
 		text: '档案资料',
-		path: '/pages/record/record'
+		path: '/pages/record/record',
+		isTabbarPage: false
 	}, {
 		text: '设备调试',
-		path: ''
+		path: '/pages/null/null',
+		isTabbarPage: false
 	}
 ]
