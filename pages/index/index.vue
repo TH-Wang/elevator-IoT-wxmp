@@ -98,11 +98,17 @@
 				console.log(value)
 			}, 300),
 			handleClickButton() {
-				console.log('点击了search-button')
+				uni.navigateTo({
+					url: '/pages/searchPage/searchPage'
+				})
 			},
 			handleLinkNotice(){
 				uni.navigateTo({url: '/pages/notice/notice'})
 			}
+		},
+		mounted() {
+			console.log(this.$store.state.request.url)
+			console.log(this.$store.state.user.info)
 		}
 	}
 </script>

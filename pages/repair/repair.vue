@@ -1,6 +1,14 @@
 <template>
 	<TabbarPage :header="{title: '急修', hasBack: false}" :tabbar="{active: 2}">
-		<view :style="height">
+		<scroll-view
+			:style="tabbarHeight"
+			:scroll-y="true"
+			:show-scrollbar="false"
+			upper-threshold="5"
+			lower-threshold="5"
+			@scrolltoupper="handleScrollToUpper"
+			@scrolltolower="handleScrollToLower"
+		>
 			<!-- 搜索框 -->
 			<Search button />
 			
@@ -16,6 +24,7 @@
 				:current="active"
 				class="page-list-container"
 				:duration="300"
+				:style="mainheight"
 				@change="handleSwiperChange"
 			>
 				<swiper-item
@@ -23,12 +32,12 @@
 					v-for="item in repairType"
 					:key="item.code"
 				>
-					<view class="list-container">
+					<scroll-view class="list-container" :scroll-y="listScroll">
 						<List :dataSource="getList(item.code)" />
-					</view>
+					</scroll-view>
 				</swiper-item>
 			</swiper>
-		</view>
+		</scroll-view>
 	</TabbarPage>
 </template>
 
@@ -36,6 +45,7 @@
 	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
 	import Tabs from '../../components/Tabs/Tabs.vue'
 	import Search from '../../components/Search/Search.vue'
+	import pageScrollMixin from '../../mixin/pageScroll.js'
 	import repairData from '../../data/repair.js'
 	import List from './list.vue'
 	
@@ -46,6 +56,7 @@
 			Search,
 			List
 		},
+		mixins: [pageScrollMixin],
 		data: () => ({
 			repairType: [
 				{
@@ -62,16 +73,12 @@
 					label: '全部'
 				}
 			],
-			active: 0,
 			dataSource: repairData,
 			overflowStyle: ''
 		}),
 		computed: {
 			tabs() {
 				return this.repairType.map(i=>i.label)
-			},
-			height() {
-				return this.$store.getters.tabbarHeight
 			}
 		},
 		methods: {
@@ -89,7 +96,21 @@
 	}
 </script>
 
-<style>
-	@import url("../../static/css/page.css");
-	@import url("../../static/css/list-page.css");
+<style scoped>
+/* 	.page-list-container{
+		padding-top: 1px;
+		background-color: #F9F9F9;
+	} */
+	.swiper-item{
+		padding-top: 1px;
+		background-color: #F9F9F9;
+	}
+	.list-container{
+		height: 100%;
+		margin-top: 20rpx;
+		padding: 1rpx 0 30rpx 0;
+		box-sizing: border-box;
+		background-color: #FFFFFF;
+	}
+	
 </style>

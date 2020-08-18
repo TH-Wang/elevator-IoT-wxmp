@@ -1,5 +1,5 @@
 <template>
-	<view class="card">
+	<view class="card" @click="$emit('click')">
 		<view class="header">
 			<view class="title ellipsis">{{record.name}}</view>
 			<view :class="'type-button ' + 'button-' + record.code">{{getButtonText()}}</view>

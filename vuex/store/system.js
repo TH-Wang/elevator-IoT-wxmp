@@ -21,6 +21,9 @@ export default {
 		},
 		hasLargeSearchHeight(state) {
 			return 'height: calc(100vh - 230rpx - ' + state.statusBarHeight + 'px);'
+		},
+		hasPersonCardHeight(state) {
+			return 'height: calc(100vh + 357rpx - ' + state.statusBarHeight + 'px);'
 		}
 	}
 }

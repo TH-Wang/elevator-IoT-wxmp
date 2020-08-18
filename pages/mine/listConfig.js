@@ -16,15 +16,15 @@ export default [
 		iconImage: '../../static/icon/mine/device.png',
 		label: '调试工具'
 	}, {
-		path: '',
+		path: '/pages/aboutus/aboutus',
 		iconImage: '../../static/icon/mine/about.png',
 		label: '关于我们'
 	}, {
-		path: '',
+		path: '/pages/version/version',
 		iconImage: '../../static/icon/mine/update.png',
 		label: '版本更新'
 	}, {
-		path: '',
+		path: '/pages/updatePassword/updatePassword',
 		iconImage: '../../static/icon/mine/password.png',
 		label: '修改密码',
 		space: true

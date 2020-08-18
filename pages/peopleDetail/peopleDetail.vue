@@ -2,19 +2,36 @@
 	<view class="">
 		<NavHeader title="山川皆无恙" />
 		
-		<view class="container" :style="height">
-			
+		<scroll-view
+			class="hidden-scroll"
+			:style="height"
+			:scroll-y="true"
+			:show-scrollbar="false"
+			upper-threshold="5"
+			lower-threshold="5"
+			@scrolltoupper="handleScrollToUpper"
+			@scrolltolower="handleScrollToLower"
+		>
 			<PersonCard />
 			
 			<Tabs :tabs="tabs" :active="active" @switch="handleTabsSwitch" />
 			
-			<view :style="mainheight">
-				<view v-for="item in dataSource" :key="item.id">
-					<RepairCard :record="item" />
-				</view>
-			</view>
+			<swiper
+				:current="active"
+				:duration="300"
+				:style="mainheight"
+				@change="handleSwiperChange"
+			>
+				<swiper-item v-for="(tab, index) in tabs" :key="index">
+					<scroll-view class="list-container" :scroll-y="listScroll">
+						<view v-for="item in dataSource" :key="item.id">
+							<RepairCard :record="item" />
+						</view>
+					</scroll-view>
+				</swiper-item>
+			</swiper>
 			
-		</view>
+		</scroll-view>
 		
 	</view>
 </template>
@@ -25,6 +42,7 @@
 	import Tabs from '../../components/Tabs/Tabs.vue'
 	import RepairCard from '../../components/RepairCard/RepairCard.vue'
 	import repairData from '../../data/repair.js'
+	import pageScrollMixin from '../../mixin/pageScroll.js'
 	
 	export default {
 		components: {
@@ -33,24 +51,18 @@
 			Tabs,
 			RepairCard
 		},
+		mixins: [pageScrollMixin],
 		data: () => ({
-			active: 0,
 			tabs: ['维保工单', '急修工单', '上报故障'],
 			dataSource: repairData,
 			// record
 		}),
-		computed: {
-			height() {
-				return this.$store.getters.commonHeight
-			},
-			mainheight() {
-				return this.$store.getters.hasSearchHeight
-			}
-		},
 		methods: {
 			handleTabsSwitch(idx) {
-				console.log(idx)
 				this.active = idx
+			},
+			handleSwiperChange(e) {
+				this.active = e.detail.current
 			}
 		},
 		onLoad(option) {
@@ -61,7 +73,10 @@
 </script>
 
 <style scoped>
-	.container{
-		overflow-y: scroll;
+	/* 隐藏滚动条 */
+	scroll-view::-webkit-scrollbar{
+		width: 0;
+		height: 0;
+		color: transparent;
 	}
 </style>

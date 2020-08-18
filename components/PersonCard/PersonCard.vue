@@ -3,7 +3,10 @@
 		<view class="avatar">
 			<image class="avatar-image" src="../../static/image/avatar.png" mode="aspectFill" />
 		</view>
-		<view class="realname">山川皆无恙</view>
+		<view class="realname" @click="handleLinkEditInfo">
+			<text>山川皆无恙</text>
+			<image v-if="allowEidt" class="edit-icon" src="../../static/icon/mine/edit.png" />
+		</view>
 		<view class="detail">
 			<text>维保员</text>
 			<text class="line"></text>
@@ -18,6 +21,21 @@
 </template>
 
 <script>
+	export default{
+		props: {
+			allowEidt: {
+				type: Boolean,
+				default: false
+			}
+		},
+		methods: {
+			handleLinkEditInfo() {
+				uni.navigateTo({
+					url: '/pages/editInfo/editInfo'
+				})
+			}
+		}
+	}
 </script>
 
 <style scoped>
@@ -44,10 +62,17 @@
 	
 	.realname{
 		margin-bottom: 20rpx;
-		text-align: center;
 		color: #000000;
 		font-size: 31rpx;
 		font-weight: bold;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.edit-icon{
+		width: 30rpx;
+		height: 30rpx;
+		margin-left: 32rpx;
 	}
 	
 	.detail{

@@ -4,7 +4,7 @@ export default {
 	}),
 	
 	mutations: {
-		setUrl(state, url) {
+		setBaseUrl(state, url) {
 			state.url = url
 		}
 	},

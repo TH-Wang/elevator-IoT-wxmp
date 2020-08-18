@@ -10,16 +10,40 @@
 		
 		<view class="title">账号登录</view>
 		
-		<IconInput iconImage="../../static/icon/login/code.png">
-			<input type="text" value="" placeholder="通道号" />
+		<IconInput
+			iconImage="../../static/icon/login/code.png"
+			:tip="errTip.channel_number"
+		>
+			<input
+				type="text"
+				v-model="form.channel_number"
+				@blur="validateCNumber"
+				placeholder="通道号"
+			/>
 		</IconInput>
 		
-		<IconInput iconImage="../../static/icon/login/tel.png">
-			<input type="text" value="" placeholder="请输入账号" />
+		<IconInput
+			iconImage="../../static/icon/login/tel.png"
+			:tip="errTip.name"
+		>
+			<input
+				type="text"
+				v-model="form.name"
+				@blur="validateName"
+				placeholder="请输入账号"
+			/>
 		</IconInput>
 		
-		<IconInput iconImage="../../static/icon/login/password.png">
-			<input type="password" value="" placeholder="请输入密码" />
+		<IconInput
+			iconImage="../../static/icon/login/password.png"
+			:tip="errTip.password"
+		>
+			<input
+				type="password"
+				v-model="form.password"
+				@blur="validatePassword"
+				placeholder="请输入密码"
+			/>
 		</IconInput>
 		
 		<view class="bottom-button" @click="handleCheck">
@@ -50,14 +74,31 @@
 </template>
 
 <script>
+	import md5 from 'md5'
 	import IconInput from '../../components/IconInput/IconInput.vue'
-	// import request from '../../service/request.js'
+	import request from '../../service/request.js'
+	import rules from './rules.js'
 	
 	export default {
 		components: {
 			IconInput
 		},
 		data: () => ({
+			form: {
+				channel_number: '',
+				name: '',
+				password: ''
+			},
+			success: {
+				channel_number: false,
+				name: false,
+				password: false
+			},
+			errTip: {
+				channel_number: '',
+				name: '',
+				password: ''
+			},
 			checked: false
 		}),
 		methods: {
@@ -69,34 +110,94 @@
 					url: '../findPass/findPass'
 				})
 			},
-			handleLogin() {
+			async handleLogin() {
+				// // 表单校验
+				// var result = await this.validateForm()
+				// // 验证失败则发送请求
+				// if(!result) return
+				// console.log(md5(this.form.password))
+				
+				// // 发送请求
+				// var res = await request.login(this.form)
+				// console.log(res)
+				// // 保存用户信息
+				// this.$store.commit('setUserInfo', res)
+				// // 保存请求地址
+				// this.$store.commit('setBaseUrl', res.request_url)
+				// 跳转到首页
 				uni.reLaunch({
 					url: '/pages/index/index'
 				})
+			},
+			// 表单所有字段的验证
+			validateForm() {
+				return new Promise((resolve, reject) => {
+					// 验证失败的数量
+					var errCount = 0
+					// 逐一校验
+					if(!this.validateCNumber()) errCount++
+					// if(!this.validateName()) errCount++
+					// if(!this.validatePassword()) errCount++
+					
+					// 返回结果：是否全部通过验证
+					resolve(errCount === 0)
+				})
+			},
+			// 通道号验证
+			validateCNumber() {
+				if(rules.channel_number.rule.test(this.form.channel_number)){
+					this.success.channel_number = true
+					this.errTip.channel_number = ''
+					return true
+				}
+				else {
+					this.success.channel_number = false
+					this.errTip.channel_number = rules.channel_number.msg
+					return false
+				}
+			},
+			// 用户名验证
+			validateName() {
+				if(rules.name.rule.test(this.form.name)){
+					this.success.name = true
+					this.errTip.name = ''
+					return true
+				}
+				else {
+					this.success.name = false
+					this.errTip.name = rules.name.msg
+					return false
+				}
+			},
+			// 密码验证
+			validatePassword() {
+				// 长度不够
+				if(!/^[\s\S]{6,18}$/.test(this.form.password)) {
+					this.errTip.password = rules.password.msg
+					this.success.name = false
+					return false
+				}
+				// 安全级别
+				else {
+					var psdLevel = 0
+					rules.password.rule.forEach(reg => {
+						if(reg.test(this.form.password)) psdLevel++
+					})
+					if(psdLevel < 2) {
+						this.success.password = false
+						this.errTip.password = rules.password.msg
+						return false
+					}
+					else {
+						this.success.password = true
+						this.errTip.password = ''
+						return true
+					}
+				}
 			}
 		},
 		mounted() {
-			// uni.login({
-			// 	success(res) {
-			// 		var code = res.code
-			// 		uni.request({
-			// 			url: 'https://xdkj.xdiot.net/wx/get_url',
-			// 			method: 'POST',
-			// 			data: {
-			// 				channel_number: 2302,
-			// 				name: 'heling',
-			// 				password: 'fc7fc678608590b123692867f176fe63',
-			// 				code
-			// 			},
-			// 			success: res => {
-			// 				console.log(res)
-			// 			},
-			// 			fail: (err) => {
-			// 				console.log(err)
-			// 			}
-			// 		});
-			// 	}
-			// })
+			
 		}
 	}
 </script>
@@ -143,6 +244,7 @@
 	.bottom-button{
 		width: 600rpx;
 		margin: 0 auto;
+		margin-top: 15rpx;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;

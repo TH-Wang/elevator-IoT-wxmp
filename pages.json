@@ -25,7 +25,22 @@
 			"path": "pages/mine/mine"						//我的
 		},
 		{
+			"path": "pages/editInfo/editInfo"		//编辑资料
+		},
+		{
+			"path": "pages/updatePassword/updatePassword"		//修改密码
+		},
+		{
+			"path": "pages/aboutus/aboutus"		//关于我们
+		},
+		{
+			"path": "pages/version/version"		//版本更新
+		},
+		{
 			"path": "pages/contract/contract"	//合同管理
+		},
+		{
+			"path": "pages/contractDetail/contractDetail"		//合同详情
 		},
 		{
 			"path": "pages/allMaintain/allMaintain"	//电梯保养
@@ -38,6 +53,9 @@
 		},
 		{
 			"path": "pages/test/test"				//测试
+		},
+		{
+			"path": "pages/searchPage/searchPage"		//搜索页
 		},
 		{
 			"path": "pages/notice/notice"		//公告

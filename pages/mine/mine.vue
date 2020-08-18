@@ -1,8 +1,8 @@
 <template>
 	<TabbarPage :header="{title: '我的', hasBack: false}" :tabbar="{active: 3}">
-		<view class="main" :style="height">
+		<scroll-view :scroll-y="true" class="main" :style="height">
 			<!-- 用户信息卡片 -->
-			<PersonCard />
+			<PersonCard allowEidt />
 			
 			<!-- 功能列表 -->
 			<view class="list-container">
@@ -11,6 +11,7 @@
 					v-for="(item, index) in list"
 					:key="index"
 					:style="item.space ? 'margin-top:20rpx' : ''"
+					@click="handleLink(item.path)"
 				>
 					<view class="list-item-box">
 						<view class="icon-box">
@@ -28,7 +29,7 @@
 					@click="handleClickSingOutBtn"
 				/>
 			</view>
-		</view>
+		</scroll-view>
 	</TabbarPage>
 </template>
 
@@ -55,17 +56,19 @@
 		methods: {
 			handleClickSingOutBtn() {
 				console.log('退出登录')
+			},
+			handleLink(path) {
+				uni.navigateTo({
+					url: path
+				})
 			}
 		}
 	}
 </script>
 
-<style>
-	@import url("../../static/css/page.css");
-</style>
-
 <style scoped>	
 	.list-container{
+		height: auto;
 		background-color: #F9F9F9;
 		padding-bottom: 1px;
 	}
