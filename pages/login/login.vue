@@ -155,16 +155,16 @@
 						tip: '正在跳转首页'
 					}
 					
-					console.log('保存')
 					// 保存用户信息
 					this.$store.commit('setUserInfo', res)
 					// 保存请求地址
 					this.$store.commit('setBaseUrl', res.request_url)
-					console.log('跳转')
 					// 跳转到首页
-					uni.reLaunch({
-						url: '/pages/index/index'
-					})
+					setTimeout(() => {
+						uni.reLaunch({
+							url: '/pages/index/index'
+						})
+					}, 300)
 				}
 				catch(err){
 					if(err){

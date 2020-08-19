@@ -1,16 +1,16 @@
 <template>
 	<view class="card" @click="$emit('click')">
 		<view class="header">
-			<view class="title ellipsis">{{record.name}}</view>
+			<view class="title ellipsis">{{record.company_name}}</view>
 			<view :class="'type-button ' + 'button-' + record.code">{{getButtonText()}}</view>
 		</view>
 		
 		<view class="detail ellipsis-twolines">
-			{{record.detail}}
+			合同编号： {{record.unmber}}
 		</view>
 		
 		<view class="time-range">
-			{{record.time}}
+			{{record.start_time + '-' + record.end_time}}
 		</view>
 	</view>
 </template>
@@ -29,7 +29,7 @@
 		},
 		methods: {
 			getButtonStyle() {
-				switch(this.record.code) {
+				switch(this.record.type) {
 					case 0: return 'background-color: #4190F5';
 					case 1: return 'background-color: #FD9026';
 					case 2: return 'background-color: #EEEEEE; color: #FFFFFF';
@@ -37,7 +37,7 @@
 				}
 			},
 			getButtonText() {
-				switch(this.record.code) {
+				switch(this.record.type) {
 					case 1: return '待付款';
 					case 2: return '待续签';
 					case 3: return '已完成';

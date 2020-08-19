@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<NavHeader title="桥通目前已拥有成熟稳定的物联网方案框架" />
+		<NavHeader :title="dataSource.title" />
 		
 		<view class="main" :style="height">
 			
@@ -9,7 +9,7 @@
 					{{dataSource.title}}
 				</view>
 				<view class="time">
-					{{dataSource.time}}
+					{{dataSource.add_time}}
 				</view>
 			</view>
 			
@@ -24,6 +24,7 @@
 
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -35,11 +36,16 @@
 			}
 		},
 		data: () => ({
-			dataSource: null
+			dataSource: {
+				title: '',
+				add_time: '',
+				content: ''
+			}
 		}),
-		onLoad(option) {
-			var detail = JSON.parse(decodeURIComponent(option.d));
-			this.dataSource = detail
+		onLoad: async function(option) {
+			var { id } = option;
+			var res = await request.post(this.$store.state.request.url + '/api/jobs/one_info', { id })
+			if(res.data) this.dataSource = res.data
 		}
 	}
 </script>

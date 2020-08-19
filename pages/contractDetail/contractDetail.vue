@@ -9,11 +9,11 @@
 				
 				<view class="item">
 					<text>合同编号</text>
-					<text>545645156465</text>
+					<text>{{dataSource.unmber}}</text>
 				</view>
 				<view class="item">
 					<text>合同金额</text>
-					<text class="price">$3000.00</text>
+					<text class="price">￥{{dataSource.money}}</text>
 				</view>
 				<view class="item">
 					<text>合同状态</text>
@@ -21,29 +21,29 @@
 				</view>
 				<view class="item">
 					<text>签署时间</text>
-					<text>2010-06-16</text>
+					<text>{{dataSource.collection_time}}</text>
 				</view>
 				<view class="item">
 					<text>合同期限</text>
-					<text>2010·06·16 - 2020·06·16</text>
+					<text>{{dataSource.start_time}} - {{dataSource.end_time}}</text>
 				</view>
 				
 				
 				<view class="item space-item">
 					<text>物业单位</text>
-					<text>范德萨关键是感觉到付款国际化分</text>
+					<text>{{dataSource.real_company}}</text>
 				</view>
 				<view class="item">
 					<text>维保单位</text>
-					<text>十多个技术犯规时间过得好</text>
+					<text>{{dataSource.maint_company}}</text>
 				</view>
 				<view class="item">
 					<text>联系人</text>
-					<text>张梵蒂</text>
+					<text>{{dataSource.linkman}}</text>
 				</view>
 				<view class="item">
 					<text>联系电话</text>
-					<text>15233654584</text>
+					<text>{{dataSource.phone}}</text>
 				</view>
 			</view>
 			
@@ -51,26 +51,10 @@
 				<Title title="合同信息" />
 				
 				<view class="file-item">
-					<image class="file-icon" src="../../static/icon/file/pdf.png" />
+					<image class="file-icon" :src="'../../static/icon/file/'+ filetype + '.png'" />
 					<view class="file-info">
 						<text class="file-name">这里是上传的文件名字但是噶</text>
-						<text class="file-type">PDF文档</text>
-					</view>
-					<view class="file-size">15.3M</view>
-				</view>
-				<view class="file-item">
-					<image class="file-icon" src="../../static/icon/file/word.png" />
-					<view class="file-info">
-						<text class="file-name">这里是上传的文件名字但是噶</text>
-						<text class="file-type">Word文档</text>
-					</view>
-					<view class="file-size">15.3M</view>
-				</view>
-				<view class="file-item">
-					<image class="file-icon" src="../../static/icon/file/excel.png" />
-					<view class="file-info">
-						<text class="file-name">这里是上传的文件名字但是噶</text>
-						<text class="file-type">Excel文档</text>
+						<text class="file-type">{{filetype.toUpperCase()}} 文档</text>
 					</view>
 					<view class="file-size">15.3M</view>
 				</view>
@@ -83,16 +67,28 @@
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Title from '../../components/Title/Title.vue'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
 			NavHeader,
 			Title
 		},
+		data: () => ({
+			dataSource: {}
+		}),
 		computed: {
 			height() {
 				return this.$store.getters.commonHeight
+			},
+			filetype() {
+				return this.dataSource.accessory.split('.').slice(-1)[0]
 			}
+		},
+		onLoad: async function(option) {
+			var { id } = option
+			var res = request.post(this.$store.state.request.url + '/api/contracts/con_info', {id})
+			this.dataSource = res.data
 		}
 	}
 	

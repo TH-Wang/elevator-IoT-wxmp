@@ -2,13 +2,15 @@
 	<view class="container">
 		<NavHeader title="工作规范" />
 		
+		<Empty v-if="dataSource.length === 0" title="未发布过工作规范" />
+		
 		<!-- 列表 -->
 		<view class="list-container" :style="height">
 			<view
 				class="card"
 				v-for="item in dataSource"
 				:key="item.id"
-				@click="handleLinkDetail(item)"
+				@click="handleLinkDetail(item.id)"
 			>
 				
 				<view class="header">
@@ -25,15 +27,18 @@
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Search from '../../components/Search/Search.vue'
-	import worknormData from '../../data/worknorm'
+	import Empty from '../../components/Empty/Empty.vue'
+	// import worknormData from '../../data/worknorm'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
 			NavHeader,
-			Search
+			Search,
+			Empty
 		},
 		data: () => ({
-			dataSource: worknormData
+			dataSource: []
 		}),
 		computed: {
 			height() {
@@ -41,10 +46,18 @@
 			}
 		},
 		methods: {
-			handleLinkDetail(detail) {
-				var url = '/pages/noticeDetail/noticeDetail?d=' +  encodeURIComponent(JSON.stringify(detail))
+			handleLinkDetail(id) {
+				var url = '/pages/noticeDetail/noticeDetail?id=' + id
 				uni.navigateTo({ url })
 			}
+		},
+		onLoad: async function() {
+			var res = request.post(this.$store.state.request.url + '/api/jobs/lists', {
+				limit: 10,
+				page: 1,
+				type: 1
+			})
+			this.dataSource = res.data
 		}
 	}
 </script>

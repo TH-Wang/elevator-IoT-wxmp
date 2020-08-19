@@ -107,8 +107,8 @@
 			}
 		},
 		mounted() {
-			console.log(this.$store.state.request.url)
-			console.log(this.$store.state.user.info)
+			// console.log(this.$store.state.request.url)
+			// console.log(this.$store.state.user.info)
 		}
 	}
 </script>

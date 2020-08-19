@@ -2,16 +2,18 @@
 	<view class="container">
 		<NavHeader title="系统公告" />
 		
-		<view class="list-container" :style="height">
+		<Empty v-if="dataSource.length === 0" title="暂无公告" />
+		
+		<view v-else class="list-container" :style="height">
 			<view
 				class="card"
 				v-for="item in dataSource"
 				:key="item.id"
-				@click="handleLinkDetail(item)"
+				@click="handleLinkDetail(item.id)"
 			>
 				<view class="title">{{item.title}}</view>
 				<view class="content ellipsis-twolines">{{item.content}}</view>
-				<view class="time">系统公告 | {{item.time}}</view>
+				<view class="time">系统公告 | {{item.add_time}}</view>
 			</view>
 		</view>
 	</view>
@@ -19,12 +21,14 @@
 
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
-	import noticeData from '../../data/notice.js'
+	import Empty from '../../components/Empty/Empty.vue'
+	// import noticeData from '../../data/notice.js'
 	import request from '../../service/request.js'
 	
 	export default {
 		components: {
-			NavHeader
+			NavHeader,
+			Empty
 		},
 		computed: {
 			height() {
@@ -32,23 +36,21 @@
 			}
 		},
 		data: () => ({
-			dataSource: noticeData
+			dataSource: []
 		}),
 		methods: {
-			handleLinkDetail(detail) {
-				var url = '/pages/noticeDetail/noticeDetail?d=' +  encodeURIComponent(JSON.stringify(detail))
+			handleLinkDetail(id) {
+				var url = '/pages/noticeDetail/noticeDetail?id=' + id
 				uni.navigateTo({ url })
 			}
 		},
-		onLoad() {
-			request.post(this.$store.state.request.url + '/api/jobs/lists', {
+		onLoad: async function() {
+			var res = await request.post(this.$store.state.request.url + '/api/jobs/lists', {
 				limit: 10,
 				page: 1,
 				type: 0
 			})
-			.then(res => {
-				console.log(res)
-			})
+			this.dataSource = res.data
 		}
 	}
 </script>
