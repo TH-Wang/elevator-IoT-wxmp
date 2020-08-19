@@ -2,7 +2,14 @@
 	<TabbarPage :header="{title: '我的', hasBack: false}" :tabbar="{active: 3}">
 		<scroll-view :scroll-y="true" class="main" :style="height">
 			<!-- 用户信息卡片 -->
-			<PersonCard allowEidt />
+			<PersonCard allowEidt :user="{
+				realname: user.realname,
+				jobs: user.jobs,
+				sex: user.sex,
+				phone: user.phone,
+				email: user.email,
+				company_name: user.company_name
+			}" />
 			
 			<!-- 功能列表 -->
 			<view class="list-container">
@@ -46,6 +53,7 @@
 			CommonButton
 		},
 		data: () => ({
+			user: {},
 			list: listConfig
 		}),
 		computed: {
@@ -62,6 +70,9 @@
 					url: path
 				})
 			}
+		},
+		onLoad() {
+			this.user = this.$store.state.user.info
 		}
 	}
 </script>

@@ -4,18 +4,19 @@
 			<image class="avatar-image" src="../../static/image/avatar.png" mode="aspectFill" />
 		</view>
 		<view class="realname" @click="handleLinkEditInfo">
-			<text>山川皆无恙</text>
+			<text>{{user.realname}}</text>
 			<image v-if="allowEidt" class="edit-icon" src="../../static/icon/mine/edit.png" />
 		</view>
 		<view class="detail">
-			<text>维保员</text>
+			<text>{{alias.jobs[user.jobs]}}</text>
 			<text class="line"></text>
-			<text>男</text>
+			<text>{{alias.sex[user.sex]}}</text>
 			<text class="line"></text>
-			<text>12345678954</text>
+			<text>{{user.phone}}</text>
 		</view>
 		<view class="email">
-			15568985474@163.com   ·   维修部
+			<text>{{user.email}}</text>
+			<text style="margin-left: 20rpx">{{user.company_name}}</text>
 		</view>
 	</view>
 </template>
@@ -26,8 +27,25 @@
 			allowEidt: {
 				type: Boolean,
 				default: false
+			},
+			user: {
+				type: Object,
+				default: () => ({
+					realname: '真实姓名',
+					jobs: 3,
+					sex: 0,
+					phone: "",
+					email: "",
+					company_name: ""
+				})
 			}
 		},
+		data: () => ({
+			alias: {
+				jobs: ['', '作用人员', '管理人员', '普通人员'],
+				sex: ['保密', '男', '女']
+			}
+		}),
 		methods: {
 			handleLinkEditInfo() {
 				uni.navigateTo({

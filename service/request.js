@@ -1,5 +1,7 @@
 import md5 from 'md5'
 
+const app = getApp()
+
 const request = {
 	// 登录
 	login: (data) => {
@@ -21,14 +23,14 @@ const request = {
 						data: reqData,
 						success: res => {
 							console.log(res)
-							if(res.data.code === 1){
+							if(res.data.code == 1){
 								var token = res.data.data.token
 								// 存储token
 								uni.setStorageSync('token', token)
-								resolve(res.data)
+								resolve(res.data.data)
 							}
 							else {
-								reject(res.data.msg)
+								reject(res.data.content || res.data.msg)
 							}
 						},
 						fail: (err) => {
@@ -64,7 +66,7 @@ const request = {
 	},
 	
 	// GET
-	post: (url, data) => {
+	get: (url, data) => {
 		return new Promise((resolve, reject) => {
 			// 取出token
 			var token = uni.getStorageSync('token')

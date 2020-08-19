@@ -70,18 +70,29 @@
 		<view class="scan-text">
 			扫一扫，了解电梯详情
 		</view>
+		
+		<!-- 反馈 -->
+		<Feedback
+			:visible="feedback.visible"
+			@close="feedback.visible = false"
+			:title="feedback.title"
+			:mode="feedback.mode"
+			:tip="feedback.tip"
+		/>
 	</view>
 </template>
 
 <script>
 	import md5 from 'md5'
 	import IconInput from '../../components/IconInput/IconInput.vue'
+	import Feedback from '../../components/Feedback/Feedback.vue'
 	import request from '../../service/request.js'
 	import rules from './rules.js'
 	
 	export default {
 		components: {
-			IconInput
+			IconInput,
+			Feedback
 		},
 		data: () => ({
 			form: {
@@ -99,6 +110,12 @@
 				name: '',
 				password: ''
 			},
+			feedback: {
+				visible: false,
+				title: '',
+				mode: '',
+				tip: ''
+			},
 			checked: false
 		}),
 		methods: {
@@ -111,23 +128,56 @@
 				})
 			},
 			async handleLogin() {
-				// // 表单校验
-				// var result = await this.validateForm()
-				// // 验证失败则发送请求
-				// if(!result) return
-				// console.log(md5(this.form.password))
-				
-				// // 发送请求
-				// var res = await request.login(this.form)
-				// console.log(res)
-				// // 保存用户信息
-				// this.$store.commit('setUserInfo', res)
-				// // 保存请求地址
-				// this.$store.commit('setBaseUrl', res.request_url)
-				// 跳转到首页
-				uni.reLaunch({
-					url: '/pages/index/index'
-				})
+				try{
+					// 表单校验
+					var result = await this.validateForm()
+					// 验证失败则发送请求
+					if(!result) return
+					console.log(md5(this.form.password))
+					
+					// 反馈框: 加载
+					this.feedback = {
+						visible: true,
+						title: '正在登录',
+						mode: 'loading',
+						tip: '拼命加载中...'
+					}
+					
+					// 发送请求
+					var res = await request.login(this.form)
+					console.log(res)
+					
+					// 反馈框: 成功
+					this.feedback = {
+						visible: true,
+						title: '登录成功',
+						mode: 'success',
+						tip: '正在跳转首页'
+					}
+					
+					console.log('保存')
+					// 保存用户信息
+					this.$store.commit('setUserInfo', res)
+					// 保存请求地址
+					this.$store.commit('setBaseUrl', res.request_url)
+					console.log('跳转')
+					// 跳转到首页
+					uni.reLaunch({
+						url: '/pages/index/index'
+					})
+				}
+				catch(err){
+					if(err){
+						// 反馈框: 失败
+						this.feedback = {
+							visible: true,
+							title: '登录失败',
+							mode: 'error',
+							tip: err
+						}
+					}
+					console.log(err)
+				}
 			},
 			// 表单所有字段的验证
 			validateForm() {

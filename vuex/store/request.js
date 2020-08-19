@@ -1,10 +1,11 @@
 export default {
 	state: () => ({
-		url: 'http://jiujiu.xdiot.net'
+		url: ''
 	}),
 	
 	mutations: {
 		setBaseUrl(state, url) {
+			console.log(url)
 			state.url = url
 		}
 	},

@@ -1,5 +1,8 @@
 <script>
 export default {
+	globalData: {
+		url: 'http://jiujiu.xdiot.net'
+	},
 	onLaunch: function() {
 		uni.getSystemInfo({
 			success: ({statusBarHeight}) => {

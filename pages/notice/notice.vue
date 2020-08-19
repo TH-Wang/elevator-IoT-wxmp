@@ -20,6 +20,7 @@
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import noticeData from '../../data/notice.js'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -38,6 +39,16 @@
 				var url = '/pages/noticeDetail/noticeDetail?d=' +  encodeURIComponent(JSON.stringify(detail))
 				uni.navigateTo({ url })
 			}
+		},
+		onLoad() {
+			request.post(this.$store.state.request.url + '/api/jobs/lists', {
+				limit: 10,
+				page: 1,
+				type: 0
+			})
+			.then(res => {
+				console.log(res)
+			})
 		}
 	}
 </script>
