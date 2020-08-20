@@ -75,7 +75,9 @@
 			Title
 		},
 		data: () => ({
-			dataSource: {}
+			dataSource: {
+				accessory: ''
+			}
 		}),
 		computed: {
 			height() {

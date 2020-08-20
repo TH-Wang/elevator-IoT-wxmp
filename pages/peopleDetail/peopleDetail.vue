@@ -1,6 +1,6 @@
 <template>
 	<view class="">
-		<NavHeader title="山川皆无恙" />
+		<NavHeader :title="dataSource.realname" />
 		
 		<scroll-view
 			class="hidden-scroll"
@@ -12,11 +12,20 @@
 			@scrolltoupper="handleScrollToUpper"
 			@scrolltolower="handleScrollToLower"
 		>
-			<PersonCard />
+			<PersonCard :user="{
+				realname: dataSource.realname,
+				head_img: dataSource.head_img,
+				jobs: dataSource.jobs,
+				sex: dataSource.sex,
+				phone: dataSource.phone,
+				email: dataSource.email,
+				company_name: dataSource.company_name
+			}" />
 			
 			<Tabs :tabs="tabs" :active="active" @switch="handleTabsSwitch" />
 			
 			<swiper
+				v-if="false"
 				:current="active"
 				:duration="300"
 				:style="mainheight"
@@ -41,8 +50,9 @@
 	import PersonCard from '../../components/PersonCard/PersonCard.vue'
 	import Tabs from '../../components/Tabs/Tabs.vue'
 	import RepairCard from '../../components/RepairCard/RepairCard.vue'
-	import repairData from '../../data/repair.js'
+	// import repairData from '../../data/repair.js'
 	import pageScrollMixin from '../../mixin/pageScroll.js'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -54,7 +64,7 @@
 		mixins: [pageScrollMixin],
 		data: () => ({
 			tabs: ['维保工单', '急修工单', '上报故障'],
-			dataSource: repairData,
+			dataSource: {},
 			// record
 		}),
 		methods: {
@@ -65,9 +75,10 @@
 				this.active = e.detail.current
 			}
 		},
-		onLoad(option) {
-			// var detail = JSON.parse(decodeURIComponent(option.d));
-			// this.record = detail
+		onLoad: async function(option) {
+			var { id } = option
+			var res = await request.post('/users/one_info', { id })
+			this.dataSource = res.data
 		}
 	}
 </script>

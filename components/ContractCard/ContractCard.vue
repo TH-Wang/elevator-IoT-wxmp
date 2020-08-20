@@ -6,7 +6,7 @@
 		</view>
 		
 		<view class="detail ellipsis-twolines">
-			合同编号： {{record.unmber}}
+			{{record.syn}}
 		</view>
 		
 		<view class="time-range">
@@ -38,10 +38,9 @@
 			},
 			getButtonText() {
 				switch(this.record.type) {
-					case 1: return '待付款';
-					case 2: return '待续签';
+					case 1: return '待收款';
+					case 2: return '执行中';
 					case 3: return '已完成';
-					case 4: return '已过期';
 					default: return '已完成';
 				}
 			}

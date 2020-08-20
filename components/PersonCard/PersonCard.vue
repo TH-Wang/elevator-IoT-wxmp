@@ -1,16 +1,16 @@
 <template>
 	<view class="container">
 		<view class="avatar">
-			<image class="avatar-image" src="../../static/image/avatar.png" mode="aspectFill" />
+			<image class="avatar-image" :src="'http://'+user.head_img" mode="aspectFill" />
 		</view>
 		<view class="realname" @click="handleLinkEditInfo">
 			<text>{{user.realname}}</text>
 			<image v-if="allowEidt" class="edit-icon" src="../../static/icon/mine/edit.png" />
 		</view>
 		<view class="detail">
-			<text>{{alias.jobs[user.jobs]}}</text>
+			<text>{{jobs}}</text>
 			<text class="line"></text>
-			<text>{{alias.sex[user.sex]}}</text>
+			<text>{{sex}}</text>
 			<text class="line"></text>
 			<text>{{user.phone}}</text>
 		</view>
@@ -46,6 +46,14 @@
 				sex: ['保密', '男', '女']
 			}
 		}),
+		computed: {
+			jobs() {
+				return typeof this.user.jobs === 'number' ? this.alias.jobs[this.user.jobs] : this.user.jobs
+			},
+			sex() {
+				return typeof this.user.sex === 'number' ? this.alias.sex[this.user.sex] : this.user.sex
+			}
+		},
 		methods: {
 			handleLinkEditInfo() {
 				uni.navigateTo({

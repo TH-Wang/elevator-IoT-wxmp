@@ -9,31 +9,31 @@
 			<view class="card-container">
 				<view
 					class="card"
-					v-for="item in dataSource"
+					v-for="(item, index) in dataSource"
 					:key="item.id"
-				>
-					
-					<view class="avatar-container">
-						<image class="avatar" :src="item.avatar" />
+					@click="handleLinkDetail(dataSource[index].user_id)"
+				>	
+						<view class="avatar-container">
+							<image class="avatar" :src="'http://'+item.head_img" />
+						</view>
+						
+						<view class="info">
+							<view class="header">
+								<text class="name">{{item.realname}}</text>
+								<text class="identity">{{item.role}}</text>
+							</view>
+							<view class="tel" @longpress="handlePhoneCall(item.phone)">
+								<image class="icon-small" src="../../static/icon/info/tel.png" />
+								<text class="detail-info">{{item.phone}}</text>
+							</view>
+							<view class="email">
+								<image class="icon-small" src="../../static/icon/info/email.png" />
+								<text class="detail-info">{{item.email}}</text>
+							</view>
+						</view>
+						
+						<image class="icon-right" src="../../static/icon/right.png" />
 					</view>
-					
-					<view class="info">
-						<view class="header">
-							<text class="name">{{item.realname}}</text>
-							<text class="identity">{{item.role}}</text>
-						</view>
-						<view class="tel" @longpress="handlePhoneCall(item.phone)">
-							<image class="icon-small" src="../../static/icon/info/tel.png" />
-							<text class="detail-info">{{item.phone}}</text>
-						</view>
-						<view class="email">
-							<image class="icon-small" src="../../static/icon/info/email.png" />
-							<text class="detail-info">{{item.email}}</text>
-						</view>
-					</view>
-					
-					<image class="icon-right" src="../../static/icon/right.png" />
-					
 				</view>
 			</view>
 		</view>
@@ -60,8 +60,8 @@
 			}
 		},
 		methods: {
-			handleLinkDetail(detail) {
-				var url = '/pages/peopleDetail/peopleDetail?d=' +  encodeURIComponent(JSON.stringify(detail))
+			handleLinkDetail(id) {
+				var url = '/pages/peopleDetail/peopleDetail?id=' + id
 				uni.navigateTo({ url })
 			},
 			handlePhoneCall(phone) {

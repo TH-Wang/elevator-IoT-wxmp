@@ -55,24 +55,21 @@
 		data: () => ({
 			repairType: [
 				{
-					code: 0,
 					label: '全部合同',
 					key: 'all'
 				}, {
-					code: 1,
 					label: '待收款',
 					key: 'pay'
 				}, {
-					code: 2,
-					label: '待续签',
-					key: 'renew'
+					label: '执行中',
+					key: 'doing'
 				}
 			],
 			active: 0,
 			dataSource: {
 				all: [],
 				pay: [],
-				renew: []
+				doing: []
 			}
 		}),
 		computed: {
@@ -81,11 +78,6 @@
 			},
 			height() {
 				return this.$store.getters.commonHeight
-			},
-			handleLinkDetail(id) {
-				uni.navigateTo({
-					url: '/pages/contractDetail/contractDetail?id=' + id
-				})
 			}
 		},
 		methods: {
@@ -94,6 +86,11 @@
 			},
 			handleSwiperChange(e) {
 				this.active = e.detail.current
+			},
+			handleLinkDetail(id) {
+				uni.navigateTo({
+					url: '/pages/contractDetail/contractDetail?id=' + id
+				})
 			}
 		},
 		onLoad: async function() {
@@ -108,7 +105,7 @@
 			this.dataSource = {
 				all: data[0],
 				pay: data[1],
-				renew: data[2]
+				doing: data[2]
 			}
 		}
 	}

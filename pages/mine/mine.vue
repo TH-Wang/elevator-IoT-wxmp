@@ -4,6 +4,7 @@
 			<!-- 用户信息卡片 -->
 			<PersonCard allowEidt :user="{
 				realname: user.realname,
+				head_img: user.head_img,
 				jobs: user.jobs,
 				sex: user.sex,
 				phone: user.phone,
