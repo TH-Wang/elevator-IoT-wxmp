@@ -48,7 +48,7 @@
 			</view>
 			
 			<view class="file-container">
-				<Title title="合同信息" />
+				<Title title="附件" />
 				
 				<view class="file-item">
 					<image class="file-icon" :src="'../../static/icon/file/'+ filetype + '.png'" />
@@ -87,7 +87,7 @@
 		},
 		onLoad: async function(option) {
 			var { id } = option
-			var res = request.post(this.$store.state.request.url + '/api/contracts/con_info', {id})
+			var res = request.post('/contracts/con_info', {id})
 			this.dataSource = res.data
 		}
 	}
@@ -124,9 +124,12 @@
 		height: 120rpx;
 		padding: 20rpx;
 		margin: 0 auto;
+		margin-bottom: 20rpx;
 		box-sizing: border-box;
 		display: flex;
 		align-items: center;
+		border: solid 1px #F9F9F9;
+		border-radius: 10rpx;
 	}
 	
 	.file-icon{

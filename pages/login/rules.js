@@ -1,6 +1,6 @@
 export default {
 	channel_number: {
-		rule: /^\d{4}$/,
+		rule: /^\d+$/,
 		msg: '通道码必须由4位数字组成'
 	},
 	name: {

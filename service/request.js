@@ -1,4 +1,5 @@
 import md5 from 'md5'
+import store from '../vuex/index.js'
 
 const app = getApp()
 
@@ -45,11 +46,12 @@ const request = {
 	// POST
 	post: (url, data) => {
 		return new Promise((resolve, reject) => {
+			var reqUrl = store.state.request.url + '/api' + url
 			// 取出token
 			var token = uni.getStorageSync('token')
 			// 发送请求
 			uni.request({
-				url,
+				url: reqUrl,
 				method: 'POST',
 				header: {
 					"token": token
@@ -68,9 +70,10 @@ const request = {
 	// GET
 	get: (url, data) => {
 		return new Promise((resolve, reject) => {
+			var baseUrl = store.state.request.url + '/api'
 			// 取出token
 			var token = uni.getStorageSync('token')
-			var queryUrl = url
+			var queryUrl = baseUrl + url
 			if(data) {
 				queryUrl = url + '?'
 				Object.entries(data).forEach(([key, value]) => {

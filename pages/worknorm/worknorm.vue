@@ -52,7 +52,7 @@
 			}
 		},
 		onLoad: async function() {
-			var res = request.post(this.$store.state.request.url + '/api/jobs/lists', {
+			var res = request.post('/jobs/lists', {
 				limit: 10,
 				page: 1,
 				type: 1

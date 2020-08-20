@@ -97,7 +97,7 @@
 			}
 		},
 		onLoad: async function() {
-			var url = this.$store.state.request.url + '/api/jobs/lists'
+			var url = '/jobs/lists'
 			var option = { limit: 100, page: 1 }
 			var res = await Promise.all([
 				request.post(url, {...option, type: 0}),

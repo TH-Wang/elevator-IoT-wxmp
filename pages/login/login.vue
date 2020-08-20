@@ -41,7 +41,6 @@
 			<input
 				type="password"
 				v-model="form.password"
-				@blur="validatePassword"
 				placeholder="请输入密码"
 			/>
 		</IconInput>

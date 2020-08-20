@@ -1,7 +1,10 @@
 export default [
 	{
+		// 名称
 		text: '电梯监控',
+		// 跳转路径
 		path: '/pages/null/null',
+		// 是否是tabbar页面
 		isTabbarPage: false
 	}, {
 		text: 'GIS地图',

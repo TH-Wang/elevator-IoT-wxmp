@@ -45,7 +45,7 @@
 			}
 		},
 		onLoad: async function() {
-			var res = await request.post(this.$store.state.request.url + '/api/jobs/lists', {
+			var res = await request.post('/jobs/lists', {
 				limit: 10,
 				page: 1,
 				type: 0

@@ -44,7 +44,7 @@
 		}),
 		onLoad: async function(option) {
 			var { id } = option;
-			var res = await request.post(this.$store.state.request.url + '/api/jobs/one_info', { id })
+			var res = await request.post('/jobs/one_info', { id })
 			if(res.data) this.dataSource = res.data
 		}
 	}

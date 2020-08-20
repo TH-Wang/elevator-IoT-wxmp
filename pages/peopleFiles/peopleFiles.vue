@@ -11,7 +11,6 @@
 					class="card"
 					v-for="item in dataSource"
 					:key="item.id"
-					@click="handleLinkDetail"
 				>
 					
 					<view class="avatar-container">
@@ -20,12 +19,12 @@
 					
 					<view class="info">
 						<view class="header">
-							<text class="name">{{item.name}}</text>
-							<text class="identity">{{item.identity}}</text>
+							<text class="name">{{item.realname}}</text>
+							<text class="identity">{{item.role}}</text>
 						</view>
-						<view class="tel">
+						<view class="tel" @longpress="handlePhoneCall(item.phone)">
 							<image class="icon-small" src="../../static/icon/info/tel.png" />
-							<text class="detail-info">{{item.tel}}</text>
+							<text class="detail-info">{{item.phone}}</text>
 						</view>
 						<view class="email">
 							<image class="icon-small" src="../../static/icon/info/email.png" />
@@ -44,7 +43,8 @@
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Search from '../../components/Search/Search.vue'
-	import peopleData from '../../data/people'
+	// import peopleData from '../../data/people'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -52,7 +52,7 @@
 			Search
 		},
 		data: () => ({
-			dataSource: peopleData
+			dataSource: []
 		}),
 		computed: {
 			height() {
@@ -63,7 +63,24 @@
 			handleLinkDetail(detail) {
 				var url = '/pages/peopleDetail/peopleDetail?d=' +  encodeURIComponent(JSON.stringify(detail))
 				uni.navigateTo({ url })
+			},
+			handlePhoneCall(phone) {
+				uni.showActionSheet({
+					itemList: ['复制手机号', '拨打号码'],
+					success(res) {
+						var { tapIndex } = res
+						if(tapIndex === 1) {
+							uni.makePhoneCall({
+								phoneNumber: phone
+							})
+						}
+					}
+				})
 			}
+		},
+		onLoad: async function() {
+			var res = await request.post('/users/lists')
+			this.dataSource = res.data
 		}
 	}
 </script>
@@ -106,10 +123,18 @@
 	.info{
 		height: 120rpx;
 		flex: 1;
-		display: flex;
+		/* display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		justify-content: space-between;
+		justify-content: space-between; */
+	}
+	
+	.header, .tel, .email{
+		height: 40rpx;
+	}
+	
+	.tel:active{
+		color: #999999;
 	}
 	
 	.name{
