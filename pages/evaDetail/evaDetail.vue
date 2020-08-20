@@ -40,6 +40,7 @@
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Tabs from '../../components/Tabs/Tabs.vue'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -65,8 +66,12 @@
 				this.active = idx
 			}
 		},
-		onLoad(option) {
-			this.id = option.id
+		onLoad: async function(option) {
+			var {id} = option
+			var res = await request.post('/lift/one_info', {
+				elevator_id: id
+			})
+			console.log(res.data)
 		}
 	}
 </script>

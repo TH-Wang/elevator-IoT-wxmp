@@ -17,23 +17,23 @@
 					<view class="header">
 						<view class="name ellipsis">{{item.name}}</view>
 						<!-- 在线 -->
-						<view v-if="item.state === 1" class="state">
+						<view v-if="item.is_online === 1" class="state">
 							<image class="state-icon" src="../../static/icon/state/online.png" />
 							<text class="state-text" style="color: #4190F5;">在线</text>
 						</view>
 						<!-- 故障 -->
-						<view v-else-if="item.state === 2" class="state">
+						<view v-else-if="item.is_online === 2" class="state">
 							<image class="state-icon" src="../../static/icon/state/fault.png" />
 							<text class="state-text" style="color: #FF3B30;">故障</text>
 						</view>
 						<!-- 检修 -->
-						<view v-else-if="item.state === 3" class="state">
+						<view v-else-if="item.is_online === 3" class="state">
 							<image class="state-icon" src="../../static/icon/state/overhaul.png" />
 							<text class="state-text" style="color: #FD9026;">检修</text>
 						</view>
 					</view>
 					
-					<view class="info ellipsis">电梯编号：{{item.code}}</view>
+					<view class="info ellipsis">电梯编号：{{item.elevator_number}}</view>
 					<view class="info ellipsis">使用单位：{{item.company}}</view>
 					<view class="info ellipsis">
 						维保人员：{{item.people}}
@@ -52,6 +52,7 @@
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Search from '../../components/Search/Search.vue'
 	import elevatorData from '../../data/elevator'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -59,7 +60,7 @@
 			Search
 		},
 		data: () => ({
-			dataSource: elevatorData
+			dataSource: []
 		}),
 		computed: {
 			height() {
@@ -72,6 +73,13 @@
 				console.log(url)
 				uni.navigateTo({ url })
 			}
+		},
+		onLoad: async function() {
+			var res = await request.post('/lift/list_info', {
+				limit: 100,
+				page: 1
+			})
+			this.dataSource = res.data
 		}
 	}
 </script>

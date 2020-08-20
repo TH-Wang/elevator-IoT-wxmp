@@ -33,7 +33,12 @@
 					:key="item.code"
 				>
 					<scroll-view class="list-container" :scroll-y="listScroll">
-						<List :dataSource="getList(item.code)" />
+						<RepairCard
+							v-for="record in dataSource"
+							:key="record.id"
+							:record="record"
+							@click="handleLinkDetail"
+						/>
 					</scroll-view>
 				</swiper-item>
 			</swiper>
@@ -45,6 +50,7 @@
 	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
 	import Tabs from '../../components/Tabs/Tabs.vue'
 	import Search from '../../components/Search/Search.vue'
+	import RepairCard from '../../components/RepairCard/RepairCard.vue'
 	import pageScrollMixin from '../../mixin/pageScroll.js'
 	import repairData from '../../data/repair.js'
 	import List from './list.vue'
@@ -54,26 +60,37 @@
 			TabbarPage,
 			Tabs,
 			Search,
+			RepairCard,
 			List
 		},
 		mixins: [pageScrollMixin],
 		data: () => ({
 			repairType: [
 				{
-					code: 0,
-					label: '待处理'
-				}, {
-					code: 1,
-					label: '进行中'
-				}, {
 					code: 2,
-					label: '已完成'
+					label: '待处理',
+					key: 'pending'
 				}, {
 					code: 3,
-					label: '全部'
+					label: '进行中',
+					key: 'doing'
+				}, {
+					code: 4,
+					label: '已完成',
+					key: 'finish'
+				}, {
+					code: 0,
+					label: '全部',
+					key: 'all'
 				}
 			],
 			dataSource: repairData,
+			// dataSource: {
+			// 	pending: [],
+			// 	doing: [],
+			// 	finish: [],
+			// 	all: []
+			// },
 			overflowStyle: ''
 		}),
 		computed: {
@@ -91,7 +108,28 @@
 			getList(code) {
 				if(code === 3) return this.dataSource
 				else return this.dataSource.filter(i => i.code === code)
+			},
+			handleLinkDetail() {
+				uni.navigateTo({
+					url: '/pages/repairDetail/repairDetail'
+				})
 			}
+		},
+		onLoad: async function() {
+			// var option = {page: 1, limit: 100}
+			// var url = '/maint/fault_order'
+			// var res = Promise.all([
+			// 	request.post(url, {...option, type: 2}),
+			// 	request.post(url, {...option, type: 3}),
+			// 	request.post(url, {...option, type: 4}),
+			// 	request.post(url, {...option, type: 0})
+			// ])
+			// this.dataSource = {
+			// 	pending: item[0],
+			// 	doing: item[2],
+			// 	finish: item[3],
+			// 	all: item[4]
+			// }
 		}
 	}
 </script>

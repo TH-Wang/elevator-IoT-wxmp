@@ -1,7 +1,13 @@
 {
 	"pages": [
 		{
-			"path": "pages/login/login", 				//登录
+			"path": "pages/repairDetail/repairDetail"		//急修详情
+		},
+		{
+			"path": "pages/index/index"					//首页
+		},
+		{
+			"path": "pages/login/login", 				//账号绑定
 			"style": {
 				"navigationBarTextStyle": "white"
 			}
@@ -11,9 +17,6 @@
 			"style": {
 				"navigationBarTextStyle": "white"
 			}
-		},
-		{
-			"path": "pages/index/index"					//首页
 		},
 		{
 			"path": "pages/repair/repair"				//急修

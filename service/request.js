@@ -4,8 +4,38 @@ import store from '../vuex/index.js'
 const app = getApp()
 
 const request = {
-	// 登录
-	login: (data) => {
+	login: () => {
+		return new Promise((resolve, reject) => {
+			uni.login({
+				success(res) {
+					var { code } = res
+					console.log('code:'+code)
+					uni.request({
+						url: 'https://xdkj.xdiot.net/wx/get_url/login',
+						method: 'POST',
+						data: {code},
+						success: res => {
+							console.log(res)
+							if(res.data.code == 1){
+								var token = res.data.data.token
+								// 存储token
+								uni.setStorageSync('token', token)
+								resolve(res.data.data)
+							}
+							else {
+								reject(res.data.content || res.data.msg)
+							}
+						},
+						fail: (err) => {
+							reject(err)
+						}
+					});
+				}
+			})
+		})
+	},
+	// 绑定
+	bind: (data) => {
 		return new Promise((resolve, reject) => {
 			uni.login({
 				success(res) {
@@ -19,7 +49,7 @@ const request = {
 						code
 					}
 					uni.request({
-						url: 'https://xdkj.xdiot.net/wx/get_url',
+						url: 'https://xdkj.xdiot.net/wx/get_url/bind',
 						method: 'POST',
 						data: reqData,
 						success: res => {

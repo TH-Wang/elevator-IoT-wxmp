@@ -1,5 +1,5 @@
 <template>
-	<view class="container" :style="'background-color:' + background">
+	<view class="container" :style="'background-color:' + background" @click="$emit('click')">
 		<view class="header">
 			<text class="title ellipsis">{{record.name}}</text>
 			<text class="time">{{record.time}}</text>

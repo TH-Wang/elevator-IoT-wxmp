@@ -34,27 +34,29 @@
 			<view class="form-item">
 				<view class="label">故障描述</view>
 			</view>
-			<textarea class="textarea"></textarea>
+			<textarea class="textarea" v-model="describe"></textarea>
 		</view>
 		
-		<CommonButton text="确认提交" />
+		<CommonButton text="确认提交" @click="handleSubmit" />
 	</view>
 </template>
 
 <script>
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
 			CommonButton
 		},
 		data: () => ({
-			propRange: ['硬件故障', '软件故障', '系统故障'],
+			propRange: [],
 			porpPickerIndex: 0,
-			safeRange: ['房层会受到', '方层安全', '楼栋会受到', '非常安全'],
+			safeRange: ['一级', '二级', '三级', '四级', '五级'],
 			safePickerIndex: 0,
-			trappedRange: ['否', '是'],
-			trappedPickerIndex: 0
+			trappedRange: ['是', '否'],
+			trappedPickerIndex: 0,
+			describe: ''
 		}),
 		methods: {
 			handlePropPickerChange(e) {
@@ -65,7 +67,23 @@
 			},
 			handleTrappedPickerChange(e) {
 				this.trappedPickerIndex = e.target.value
+			},
+			async handleSubmit() {
+				var _this_ = this
+				var data = {
+					security_level: _this_.safePickerIndex,
+					// attr: _this_.propRange[_this_.porpPickerIndex],
+					is_tiring: _this_.security_level,
+					describe: _this_.describe
+				}
+				// 发送请求
+				var res = await request.post('/maint/fault_report', data)
+				console.log(res)
 			}
+		},
+		onLoad: async function() {
+			var res = await request.post('/maint/fault_attr')
+			this.propRange = res.data.map(item => item.name)
 		}
 	}
 </script>

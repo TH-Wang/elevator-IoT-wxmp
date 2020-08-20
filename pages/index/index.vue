@@ -104,6 +104,9 @@
 			},
 			handleLinkNotice(){
 				uni.navigateTo({url: '/pages/notice/notice'})
+			},
+			getUserInfo() {
+				
 			}
 		},
 		mounted() {

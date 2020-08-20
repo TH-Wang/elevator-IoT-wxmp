@@ -8,7 +8,7 @@
 			<image src="../../static/image/logo.png" mode=""></image>
 		</view>
 		
-		<view class="title">账号登录</view>
+		<view class="title">账号绑定</view>
 		
 		<IconInput
 			iconImage="../../static/icon/login/code.png"
@@ -61,7 +61,7 @@
 			</view>
 		</view>
 		
-		<button type="primary" class="submit-button" @click="handleLogin">登录</button>
+		<button type="primary" class="submit-button" @click="handleBind">绑定</button>
 		
 		<view class="scan-button">
 			<image src="../../static/icon/login/scan.png" mode=""></image>
@@ -126,7 +126,7 @@
 					url: '../findPass/findPass'
 				})
 			},
-			async handleLogin() {
+			async handleBind() {
 				try{
 					// 表单校验
 					var result = await this.validateForm()
@@ -143,7 +143,7 @@
 					}
 					
 					// 发送请求
-					var res = await request.login(this.form)
+					var res = await request.bind(this.form)
 					console.log(res)
 					
 					// 反馈框: 成功
