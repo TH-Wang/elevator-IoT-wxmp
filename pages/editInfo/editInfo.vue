@@ -1,8 +1,5 @@
 <template>
 	<view class="container">
-		<NavHeader title="编辑资料" />
-		
-		<scroll-view :scroll-y="true" class="main" :style="height">
 			<!-- 头像 -->
 			<view class="avatar">
 				<image class="avatar-image" src="../../static/image/avatar.png" />
@@ -39,7 +36,6 @@
 			
 			<!-- 提交按钮 -->
 			<CommonButton text="保存资料" @click="handleSubmit" />
-		</scroll-view>
 	</view>
 </template>
 

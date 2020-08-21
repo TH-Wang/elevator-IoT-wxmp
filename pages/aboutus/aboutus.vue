@@ -1,10 +1,8 @@
 <template>
 	<view class="container">
-		<!-- 标题导航栏 -->
-		<NavHeader title="关于我们" />
 		
 		<!-- 页面主体 -->
-		<scroll-view :scroll-y="true" class="main" :style="height">
+		<scroll-view :scroll-y="true" class="main">
 			
 			<view class="main-info">
 				<!-- 公司图片 -->
@@ -72,11 +70,6 @@
 	export default {
 		components: {
 			NavHeader
-		},
-		computed: {
-			height() {
-				return this.$store.getters.commonHeight
-			}
 		}
 	}
 </script>

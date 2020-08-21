@@ -1,10 +1,8 @@
 <template>
 	<view class="container">
-		<NavHeader title="系统公告" />
-		
 		<Empty v-if="dataSource.length === 0" title="暂无公告" />
 		
-		<view v-else class="list-container" :style="height">
+		<view v-else class="list-container">
 			<view
 				class="card"
 				v-for="item in dataSource"
@@ -68,7 +66,6 @@
 	}
 	
 	.list-container{
-		overflow-y: scroll;
 		padding: 1rpx 30rpx 30rpx 30rpx;
 		background-color: #F9F9F9;
 		box-sizing: border-box;

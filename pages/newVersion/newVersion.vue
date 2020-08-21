@@ -1,10 +1,5 @@
 <template>
 	<view class="container">
-		<!-- 标题导航栏 -->
-		<NavHeader title="版本更新" />
-		
-		<!-- 页面主体 -->
-		<scroll-view :scroll-y="true" class="main" :style="height">
 			
 			<!-- 上方卡片 -->
 			<view class="header">
@@ -28,7 +23,6 @@
 			</view>
 			
 			<CommonButton text="下载最新版" />
-		</scroll-view>
 	</view>
 </template>
 
@@ -50,7 +44,8 @@
 </script>
 
 <style scoped>
-	.main{
+	.container{
+		height: 100vh;
 		background-color: #F9F9F9;
 	}
 	

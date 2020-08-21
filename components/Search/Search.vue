@@ -15,7 +15,7 @@
 					type="text"
 					v-model="value"
 					:placeholder="placeholder"
-					@input="handleInput"
+					@confirm="handleInput"
 				/>
 			</view>
 			
@@ -32,6 +32,8 @@
 </template>
 
 <script>
+	import debounce from '../../utils/debounce.js'
+	
 	export default {
 		props: {
 			placeholder: {
@@ -60,12 +62,12 @@
 			}
 		},
 		methods: {
-			handleInput(e) {
-				this.$emit('change', value)
-			},
+			handleInput: debounce(function(e){
+				this.$emit('search', this.value)
+			}),
 			handleClearValue() {
 				this.value = ''
-				this.$emit('change', value)
+				this.$emit('search', '')
 			}
 		}
 	}

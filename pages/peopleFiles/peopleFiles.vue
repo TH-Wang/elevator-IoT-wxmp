@@ -1,11 +1,10 @@
 <template>
 	<view class="container">
-		<NavHeader title="人员档案" />
 		<!-- 搜索框 -->
-		<Search button paddingBottom />
+		<Search paddingBottom @search="handleSearch" />
 		
 		<!-- 列表 -->
-		<view class="list-container" :style="height">
+		<scroll-view :scroll-y="true" class="list-container">
 			<view class="card-container">
 				<view
 					class="card"
@@ -13,37 +12,36 @@
 					:key="item.id"
 					@click="handleLinkDetail(dataSource[index].user_id)"
 				>	
-						<view class="avatar-container">
-							<image class="avatar" :src="'http://'+item.head_img" />
-						</view>
-						
-						<view class="info">
-							<view class="header">
-								<text class="name">{{item.realname}}</text>
-								<text class="identity">{{item.role}}</text>
-							</view>
-							<view class="tel" @longpress="handlePhoneCall(item.phone)">
-								<image class="icon-small" src="../../static/icon/info/tel.png" />
-								<text class="detail-info">{{item.phone}}</text>
-							</view>
-							<view class="email">
-								<image class="icon-small" src="../../static/icon/info/email.png" />
-								<text class="detail-info">{{item.email}}</text>
-							</view>
-						</view>
-						
-						<image class="icon-right" src="../../static/icon/right.png" />
+					<view class="avatar-container">
+						<image class="avatar" :src="'http://'+item.head_img" />
 					</view>
+					
+					<view class="info">
+						<view class="header">
+							<text class="name">{{item.realname}}</text>
+							<text class="identity">{{item.role}}</text>
+						</view>
+						<view class="tel" @longpress="handlePhoneCall(item.phone)">
+							<image class="icon-small" src="../../static/icon/info/tel.png" />
+							<text class="detail-info">{{item.phone}}</text>
+						</view>
+						<view class="email">
+							<image class="icon-small" src="../../static/icon/info/email.png" />
+							<text class="detail-info">{{item.email}}</text>
+						</view>
+					</view>
+					
+					<image class="icon-right" src="../../static/icon/right.png" />
 				</view>
 			</view>
-		</view>
+		</scroll-view>
 	</view>
 </template>
 
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Search from '../../components/Search/Search.vue'
-	// import peopleData from '../../data/people'
+	import peopleData from '../../data/people'
 	import request from '../../service/request.js'
 	
 	export default {
@@ -54,15 +52,14 @@
 		data: () => ({
 			dataSource: []
 		}),
-		computed: {
-			height() {
-				return this.$store.getters.hasLargeSearchHeight
-			}
-		},
 		methods: {
 			handleLinkDetail(id) {
 				var url = '/pages/peopleDetail/peopleDetail?id=' + id
 				uni.navigateTo({ url })
+			},
+			handleSearch: async function (value) {
+				var res = await request.post('/users/lists', {vaill_name: value})
+				this.dataSource = res.data
 			},
 			handlePhoneCall(phone) {
 				uni.showActionSheet({
@@ -86,11 +83,14 @@
 </script>
 
 <style scoped>
-	@import url("../../static/css/ellipsis.css");
+	.container{
+		height: 100vh;
+	}
 	
 	.list-container{
+		height: calc(100% - 130rpx);
+		box-sizing: border-box;
 		background-color: #F9F9F9;
-		overflow-y: scroll;
 	}
 	
 	.card-container{

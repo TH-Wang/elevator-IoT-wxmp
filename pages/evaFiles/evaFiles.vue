@@ -1,33 +1,37 @@
 <template>
 	<view class="container">
-		<NavHeader title="电梯档案" />
 		<!-- 搜索框 -->
-		<Search button paddingBottom />
+		<Search paddingBottom @search="handleSearch" />
 		
 		<!-- 列表 -->
-		<view class="list-container" :style="height">
-			<view class="card-container">
-				<view
-					class="card"
-					v-for="item in dataSource"
-					:key="item.id"
-					@click="handleLinkDetail(item.id)"
-				>
-					
+		<scroll-view :scroll-y="true" class="card-container">
+			<view style="height: 30rpx" />
+			<view
+				class="card"
+				v-for="(item, index) in dataSource"
+				:key="item.id"
+				@click="handleLinkDetail(dataSource[index].elevator_id)"
+			>
+				<view class="inner">
 					<view class="header">
 						<view class="name ellipsis">{{item.name}}</view>
+						<!-- 离线 -->
+						<view v-if="item.is_online == 0" class="state">
+							<image class="state-icon" src="../../static/icon/state/online.png" />
+							<text class="state-text" style="color: #CCCCCC;">离线</text>
+						</view>
 						<!-- 在线 -->
-						<view v-if="item.is_online === 1" class="state">
+						<view v-if="item.is_online == 1" class="state">
 							<image class="state-icon" src="../../static/icon/state/online.png" />
 							<text class="state-text" style="color: #4190F5;">在线</text>
 						</view>
 						<!-- 故障 -->
-						<view v-else-if="item.is_online === 2" class="state">
+						<view v-else-if="item.is_online == 2" class="state">
 							<image class="state-icon" src="../../static/icon/state/fault.png" />
 							<text class="state-text" style="color: #FF3B30;">故障</text>
 						</view>
 						<!-- 检修 -->
-						<view v-else-if="item.is_online === 3" class="state">
+						<view v-else-if="item.is_online == 3" class="state">
 							<image class="state-icon" src="../../static/icon/state/overhaul.png" />
 							<text class="state-text" style="color: #FD9026;">检修</text>
 						</view>
@@ -41,10 +45,10 @@
 						{{item.tel}}
 					</view>
 					<view class="info ellipsis">电梯地址：{{item.address}}</view>
-					
 				</view>
+				
 			</view>
-		</view>
+		</scroll-view>
 	</view>
 </template>
 
@@ -70,8 +74,15 @@
 		methods: {
 			handleLinkDetail(id) {
 				var url = '/pages/evaDetail/evaDetail?id=' + id
-				console.log(url)
 				uni.navigateTo({ url })
+			},
+			handleSearch: async function(value) {
+				var res = await request.post('/lift/list_info', {
+					lift_name: value,
+					limit: 100,
+					page: 1
+				})
+				this.dataSource = res.data
 			}
 		},
 		onLoad: async function() {
@@ -86,23 +97,28 @@
 
 <style scoped>
 	@import url("../../static/css/ellipsis.css");
-	
-	.list-container{
+	.container{
+		height: 100vh;
 		background-color: #F9F9F9;
+	}
+	.list-container{
 		overflow-y: scroll;
 	}
 	
 	.card-container{
-		margin-top: 22rpx;
-		padding: 1rpx 30rpx 30rpx 30rpx;
+		height: calc(100% - 100rpx);
 		box-sizing: border-box;
-		background-color: #FFFFFF;
+		background-color: #F9F9F9;
 	}
 	
 	.card{
+		padding: 30rpx;
+		box-sizing: border-box;
+		background-color: #FFFFFF;
+	}
+	.inner{
 		height: 303rpx;
 		padding: 30rpx;
-		margin-top: 30rpx;
 		box-sizing: border-box;
 		border: solid 1px #EEEEEE;
 		border-radius: 3px;

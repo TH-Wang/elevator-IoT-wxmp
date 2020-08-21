@@ -1,8 +1,8 @@
 <template>
 	<view class="card" @click="$emit('click')">
 		<view class="header">
-			<view class="title ellipsis">{{record.company_name}}</view>
-			<view :class="'type-button ' + 'button-' + record.code">{{getButtonText()}}</view>
+			<view class="title ellipsis">{{record.name}}</view>
+			<view :class="'type-button ' + 'button-' + record.type">{{getButtonText()}}</view>
 		</view>
 		
 		<view class="detail ellipsis-twolines">
@@ -30,10 +30,10 @@
 		methods: {
 			getButtonStyle() {
 				switch(this.record.type) {
-					case 0: return 'background-color: #4190F5';
-					case 1: return 'background-color: #FD9026';
-					case 2: return 'background-color: #EEEEEE; color: #FFFFFF';
-					default: return 'background-color: #EEEEEE; color: #FFFFFF';
+					case 0: return 'background-color: #4190F5; color: #FFFFFF';
+					case 1: return 'background-color: #FD9026; color: #FFFFFF';
+					case 2: return 'background-color: #EEEEEE; color: #999999';
+					default: return 'background-color: #EEEEEE; color: #999999';
 				}
 			},
 			getButtonText() {
@@ -73,7 +73,6 @@
 	
 	.card{
 		width: 690rpx;
-		height: 258rpx;
 		padding: 30rpx;
 		box-sizing: border-box;
 		border-radius: 10rpx;
