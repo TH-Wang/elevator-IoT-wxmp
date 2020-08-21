@@ -48,9 +48,9 @@
 		{
 			"path": "pages/aboutus/aboutus"		//关于我们 
 		},
-		{
-			"path": "pages/newVersion/newVersion"		//版本更新
-		},
+		// {
+		// 	"path": "pages/newVersion/newVersion"		//版本更新
+		// },
 		{
 			"path": "pages/contract/contract"	//合同管理
 		},
@@ -102,7 +102,6 @@
 	 	"selectedColor": "#4190F5",
 	 	"borderStyle": "white",
 	 	"backgroundColor": "#f8f8f8",
-	 	"iconWidth":"36px",
 	 		"list": [{
 	 				"pagePath": "pages/index/index",
 	 				"iconPath": "static/icon/tabbar/home.png",
@@ -129,10 +128,9 @@
 	 },
 	"globalStyle": {
 		// "navigationStyle": "custom",
-		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#FFFFFF",
 		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "梯联宝",
+		"navigationBarBackgroundColor": "#FFFFFF",
 		"backgroundColor": "#FFFFFF"
 	}
 }
