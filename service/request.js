@@ -77,6 +77,7 @@ const request = {
 	post: (url, data) => {
 		return new Promise((resolve, reject) => {
 			var reqUrl = store.state.request.url + '/api' + url
+			console.log('发送请求：' + reqUrl)
 			// 取出token
 			var token = uni.getStorageSync('token')
 			// 发送请求

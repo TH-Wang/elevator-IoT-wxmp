@@ -1,5 +1,5 @@
 <template>
-	<TabbarPage :header="{title: '首页', hasBack: false}" :tabbar="{active: 0}">
+	<!-- <TabbarPage :header="{title: '首页', hasBack: false}" :tabbar="{active: 0}"> -->
 		<view class="container" :style="height">
 			<!-- banner -->
 			<swiper
@@ -59,7 +59,7 @@
 			</view>
 			
 		</view>
-	</TabbarPage>
+	<!-- </TabbarPage> -->
 </template>
 
 <script>

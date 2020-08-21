@@ -1,5 +1,5 @@
 <template>
-	<TabbarPage :header="{title: '急修', hasBack: false}" :tabbar="{active: 2}">
+	<!-- <TabbarPage :header="{title: '急修', hasBack: false}" :tabbar="{active: 2}"> -->
 		<scroll-view
 			:style="tabbarHeight"
 			:scroll-y="true"
@@ -34,16 +34,16 @@
 				>
 					<scroll-view class="list-container" :scroll-y="listScroll">
 						<RepairCard
-							v-for="record in dataSource"
+							v-for="record in dataSource[item.key]"
 							:key="record.id"
 							:record="record"
-							@click="handleLinkDetail"
+							@click="handleLinkDetail(record.id)"
 						/>
 					</scroll-view>
 				</swiper-item>
 			</swiper>
 		</scroll-view>
-	</TabbarPage>
+	<!-- </TabbarPage> -->
 </template>
 
 <script>
@@ -53,6 +53,7 @@
 	import RepairCard from '../../components/RepairCard/RepairCard.vue'
 	import pageScrollMixin from '../../mixin/pageScroll.js'
 	import repairData from '../../data/repair.js'
+	import request from '../../service/request.js'
 	import List from './list.vue'
 	
 	export default {
@@ -84,13 +85,12 @@
 					key: 'all'
 				}
 			],
-			dataSource: repairData,
-			// dataSource: {
-			// 	pending: [],
-			// 	doing: [],
-			// 	finish: [],
-			// 	all: []
-			// },
+			dataSource: {
+				pending: [],
+				doing: [],
+				finish: [],
+				all: []
+			},
 			overflowStyle: ''
 		}),
 		computed: {
@@ -109,27 +109,27 @@
 				if(code === 3) return this.dataSource
 				else return this.dataSource.filter(i => i.code === code)
 			},
-			handleLinkDetail() {
+			handleLinkDetail(id) {
 				uni.navigateTo({
-					url: '/pages/repairDetail/repairDetail'
+					url: '/pages/repairDetail/repairDetail?id=' + id
 				})
 			}
 		},
 		onLoad: async function() {
-			// var option = {page: 1, limit: 100}
-			// var url = '/maint/fault_order'
-			// var res = Promise.all([
-			// 	request.post(url, {...option, type: 2}),
-			// 	request.post(url, {...option, type: 3}),
-			// 	request.post(url, {...option, type: 4}),
-			// 	request.post(url, {...option, type: 0})
-			// ])
-			// this.dataSource = {
-			// 	pending: item[0],
-			// 	doing: item[2],
-			// 	finish: item[3],
-			// 	all: item[4]
-			// }
+			var option = {page: 1, limit: 100}
+			var url = '/maint/fault_order'
+			var res = await Promise.all([
+				request.post(url, {...option, type: 2}),
+				request.post(url, {...option, type: 3}),
+				request.post(url, {...option, type: 4}),
+				request.post(url, {...option, type: 0})
+			])
+			this.dataSource = {
+				pending: item[0],
+				doing: item[2],
+				finish: item[3],
+				all: item[4]
+			}
 		}
 	}
 </script>

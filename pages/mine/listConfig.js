@@ -20,7 +20,7 @@ export default [
 		iconImage: '../../static/icon/mine/about.png',
 		label: '关于我们'
 	}, {
-		path: '/pages/version/version',
+		path: '/pages/newVersion/newVersion',
 		iconImage: '../../static/icon/mine/update.png',
 		label: '版本更新'
 	}, {

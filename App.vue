@@ -1,16 +1,21 @@
 <script>
+import store from 'vuex/index.js'
 import request from 'service/request.js'
 	
 export default {
 	globalData: {
 		url: 'http://jiujiu.xdiot.net'
 	},
-	onLaunch: function() {
+	onLaunch: async function() {
 		uni.getSystemInfo({
 			success: ({statusBarHeight}) => {
 				this.$store.commit("setStatusBarHeight", statusBarHeight)
 			}
 		})
+		var res = await request.login()
+		store.commit('setBaseUrl', res.request_url)
+		store.commit('setUserInfo', res)
+		console.log(res)
 	},
 	onShow: function() {
 		console.log('App Show');
