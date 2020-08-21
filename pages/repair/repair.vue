@@ -1,13 +1,6 @@
 <template>
-	<!-- <TabbarPage :header="{title: '急修', hasBack: false}" :tabbar="{active: 2}"> -->
 		<scroll-view
-			:style="tabbarHeight"
 			:scroll-y="true"
-			:show-scrollbar="false"
-			upper-threshold="5"
-			lower-threshold="5"
-			@scrolltoupper="handleScrollToUpper"
-			@scrolltolower="handleScrollToLower"
 		>
 			<!-- 搜索框 -->
 			<Search button />
@@ -32,7 +25,7 @@
 					v-for="item in repairType"
 					:key="item.code"
 				>
-					<scroll-view class="list-container" :scroll-y="listScroll">
+					<scroll-view class="list-container">
 						<RepairCard
 							v-for="record in dataSource[item.key]"
 							:key="record.id"
@@ -43,7 +36,6 @@
 				</swiper-item>
 			</swiper>
 		</scroll-view>
-	<!-- </TabbarPage> -->
 </template>
 
 <script>

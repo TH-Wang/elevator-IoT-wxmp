@@ -1,6 +1,6 @@
 <template>
 	<!-- <TabbarPage :header="{title: '我的', hasBack: false}" :tabbar="{active: 3}"> -->
-		<scroll-view :scroll-y="true" class="main" :style="height">
+		<scroll-view :scroll-y="true" class="main">
 			<!-- 用户信息卡片 -->
 			<PersonCard allowEidt :user="user" />
 			

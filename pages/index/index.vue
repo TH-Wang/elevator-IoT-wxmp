@@ -1,6 +1,5 @@
 <template>
-	<!-- <TabbarPage :header="{title: '首页', hasBack: false}" :tabbar="{active: 0}"> -->
-		<view class="container" :style="height">
+		<view class="container">
 			<!-- banner -->
 			<swiper
 				class="swiper"
@@ -59,7 +58,6 @@
 			</view>
 			
 		</view>
-	<!-- </TabbarPage> -->
 </template>
 
 <script>
@@ -83,11 +81,6 @@
 			gridConfig,
 			value: ''
 		}),
-		computed: {
-			height() {
-				return this.$store.getters.tabbarHeight
-			}
-		},
 		methods: {
 			handleNavigateLink(path, isTabbarPage) {
 				const option = {url: path}
