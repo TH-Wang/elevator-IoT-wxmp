@@ -58,7 +58,29 @@
 			"path": "pages/contractDetail/contractDetail"		//合同详情
 		},
 		{
-			"path": "pages/allMaintain/allMaintain"	//电梯保养
+			"path": "pages/maintainList/maintainList",
+			"style": {
+				"navigationBarTitleText": "电梯保养",
+				"enablePullDownRefresh":true,//开启下拉刷新
+				"onReachBottomDistance": 100,	
+				"usingComponents":{
+					"van-button": "/wxcomponents/vant/dist/button/index",
+					"van-tab": "/wxcomponents/vant/dist/tab/index",
+					"van-tabs": "/wxcomponents/vant/dist/tabs/index"
+				}
+			}
+		},
+		{
+			"path": "pages/gisMap/gisMap",
+			"style": {
+				"navigationBarTitleText": "GIS地图"
+			}
+		},
+		{
+			"path": "pages/elevatorMonitor/elevatorMonitor",
+			"style": {
+				"navigationBarTitleText": "电梯监控"
+			}
 		},
 		{
 			"path": "pages/faultReport/faultReport"				//故障上报
@@ -96,7 +118,7 @@
 		{
 			"path": "pages/null/null"		//空页面
 		}
-   ],
+    ],
 	 "tabBar": {
 	 	"color": "#7A7E83",
 	 	"selectedColor": "#4190F5",
