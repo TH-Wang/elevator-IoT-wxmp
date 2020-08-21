@@ -2,7 +2,7 @@
 	<view>
 		<NavHeader :title="dataSource.title" />
 		
-		<view class="main" :style="height">
+		<scroll-view scroll-y class="main" :style="height">
 			
 			<view class="header">
 				<view class="title ellipsis-twolines">
@@ -14,11 +14,9 @@
 			</view>
 			
 			<view class="content">
-				<text class="p">
-					{{dataSource.content}}
-				</text>
+					<rich-text :nodes="dataSource.content"></rich-text>
 			</view>
-		</view>
+		</scroll-view>
 	</view>
 </template>
 
@@ -62,12 +60,13 @@
 		-webkit-box-orient: vertical;
 	}
 	.main{
-		padding: 1rpx 30rpx 30rpx 30rpx;
+		padding-top: 30rpx;
 		background-color: #FFFFFF;
+		box-sizing: border-box;
 	}
 	
 	.header{
-		margin-top: 30rpx;
+		margin: 0 30rpx 30rpx 30rpx;
 		padding: 30rpx;
 		border-radius: 3px;
 		box-sizing: border-box;
@@ -86,6 +85,8 @@
 	}
 	
 	.content{
+		padding: 0 30rpx 30rpx 30rpx;
+		box-sizing: border-box;
 		font-size: 24rpx;
 		color: #000000;
 	}

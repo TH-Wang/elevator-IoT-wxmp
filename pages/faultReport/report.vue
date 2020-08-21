@@ -72,7 +72,7 @@
 				var _this_ = this
 				var data = {
 					security_level: _this_.safePickerIndex,
-					// attr: _this_.propRange[_this_.porpPickerIndex],
+					attr: _this_.propRange[_this_.porpPickerIndex],
 					is_tiring: _this_.security_level,
 					describe: _this_.describe
 				}
@@ -81,9 +81,14 @@
 				console.log(res)
 			}
 		},
-		onLoad: async function() {
-			var res = await request.post('/maint/fault_attr')
-			this.propRange = res.data.map(item => item.name)
+		mounted: async function() {
+			try{
+				var res = await request.post('/maint/fault_attr')
+				console.log(res)
+				this.propRange = res.data.map(item => item.name)
+			}catch(err){
+				console.log(err)
+			}
 		}
 	}
 </script>

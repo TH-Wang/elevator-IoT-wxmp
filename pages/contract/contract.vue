@@ -94,7 +94,7 @@
 			}
 		},
 		onLoad: async function() {
-			var url = '/jobs/lists'
+			var url = '/contracts/con_list'
 			var option = { limit: 100, page: 1 }
 			var res = await Promise.all([
 				request.post(url, {...option, type: 0}),
