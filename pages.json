@@ -83,6 +83,12 @@
 			}
 		},
 		{
+			"path": "pages/eleInfo/eleInfo",
+			"style": {
+				"navigationBarTitleText": "电梯监控详情"
+			}
+		},
+		{
 			"path": "pages/faultReport/faultReport"				//故障上报
 		},
 		{
