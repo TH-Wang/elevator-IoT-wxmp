@@ -1,8 +1,5 @@
 <template>
 	<view>
-		<NavHeader :title="dataSource.title" />
-		
-		<scroll-view scroll-y class="main" :style="height">
 			
 			<view class="header">
 				<view class="title ellipsis-twolines">
@@ -14,9 +11,8 @@
 			</view>
 			
 			<view class="content">
-					<rich-text :nodes="dataSource.content"></rich-text>
+				<rich-text :nodes="dataSource.content"></rich-text>
 			</view>
-		</scroll-view>
 	</view>
 </template>
 

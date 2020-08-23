@@ -41,10 +41,10 @@
 			type: {
 				type: Number,
 				default: 2
-			}
+			},
+			steps: Array
 		},
 		data: () => ({
-			number: 1,
 			steps: [
 				{
 					type: 1,

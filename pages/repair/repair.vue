@@ -17,7 +17,6 @@
 				:current="active"
 				class="page-list-container"
 				:duration="300"
-				:style="mainheight"
 				@change="handleSwiperChange"
 			>
 				<swiper-item
@@ -25,14 +24,14 @@
 					v-for="item in repairType"
 					:key="item.code"
 				>
-					<scroll-view class="list-container">
+					<!-- <scroll-view :scroll-y="true" class="list-container"> -->
 						<RepairCard
 							v-for="record in dataSource[item.key]"
 							:key="record.id"
 							:record="record"
 							@click="handleLinkDetail(record.id)"
 						/>
-					</scroll-view>
+					<!-- </scroll-view> -->
 				</swiper-item>
 			</swiper>
 		</scroll-view>
@@ -77,13 +76,13 @@
 					key: 'all'
 				}
 			],
-			dataSource: {
-				pending: [],
-				doing: [],
-				finish: [],
-				all: []
-			},
-			overflowStyle: ''
+			// dataSource: {
+			// 	pending: [],
+			// 	doing: [],
+			// 	finish: [],
+			// 	all: []
+			// },
+			dataSource: repairData
 		}),
 		computed: {
 			tabs() {
@@ -110,30 +109,34 @@
 		onLoad: async function() {
 			var option = {page: 1, limit: 100}
 			var url = '/maint/fault_order'
-			var res = await Promise.all([
-				request.post(url, {...option, type: 2}),
-				request.post(url, {...option, type: 3}),
-				request.post(url, {...option, type: 4}),
-				request.post(url, {...option, type: 0})
-			])
-			this.dataSource = {
-				pending: item[0],
-				doing: item[2],
-				finish: item[3],
-				all: item[4]
-			}
+			// var res = await Promise.all([
+			// 	request.post(url, {...option, type: 2}),
+			// 	request.post(url, {...option, type: 3}),
+			// 	request.post(url, {...option, type: 4}),
+			// 	request.post(url, {...option, type: 0})
+			// ])
+			// this.dataSource = {
+			// 	pending: item[0],
+			// 	doing: item[2],
+			// 	finish: item[3],
+			// 	all: item[4]
+			// }
 		}
 	}
 </script>
 
 <style scoped>
-/* 	.page-list-container{
+	.page-list-container{
+		height: calc(100vh - 200rpx);
 		padding-top: 1px;
+		box-sizing: border-box;
 		background-color: #F9F9F9;
-	} */
+	}
 	.swiper-item{
+		overflow-y: scroll;
+		height: 100%;
 		padding-top: 1px;
-		background-color: #F9F9F9;
+		background-color: #FFFFFF;
 	}
 	.list-container{
 		height: 100%;

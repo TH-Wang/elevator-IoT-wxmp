@@ -5,7 +5,6 @@ export default {
 	
 	mutations: {
 		setBaseUrl(state, url) {
-			console.log(url)
 			state.url = url
 		}
 	},

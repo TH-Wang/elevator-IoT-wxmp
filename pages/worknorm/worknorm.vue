@@ -1,11 +1,10 @@
 <template>
 	<view class="container">
-		<NavHeader title="工作规范" />
 		
 		<Empty v-if="dataSource.length === 0" title="未发布过工作规范" />
 		
 		<!-- 列表 -->
-		<view class="list-container" :style="height">
+		<view class="list-container">
 			<view
 				class="card"
 				v-for="item in dataSource"
@@ -28,7 +27,7 @@
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Search from '../../components/Search/Search.vue'
 	import Empty from '../../components/Empty/Empty.vue'
-	// import worknormData from '../../data/worknorm'
+	import worknormData from '../../data/worknorm'
 	import request from '../../service/request.js'
 	
 	export default {
@@ -69,7 +68,6 @@
 		padding: 0rpx 30rpx;
 		box-sizing: border-box;
 		background-color: #FFFFFF;
-		overflow-y: scroll;
 	}
 	
 	.card{

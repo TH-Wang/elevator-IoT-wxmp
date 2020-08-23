@@ -1,37 +1,33 @@
 <template>
-	<view class="">
-		<NavHeader title="合同管理" />
-	
-		<view :style="height">
-			<Tabs
-				:tabs="tabs"
-				:active="active"
-				@switch="handleSwitchTab"
-			/>
-			
-			<Empty v-if="dataSource.all.length === 0" title="暂无合同信息" />
-			
-			<swiper
-				v-else
-				:current="active"
-				class="page-list-container"
-				:duration="300"
-				@change="handleSwiperChange"
-			>
-				<swiper-item class="swiper-item" v-for="item in repairType" :key="item.code">
-					<view class="list-container">
-						<ContractCard
-							v-for="record in dataSource[item.key]"
-							:key="record.id"
-							:record="record"
-							background="rgba(253, 144, 38, .05)"
-							@click="handleLinkDetail(record.id)"
-						/>
-						<!-- <List :dataSource="dataSource[item.key]" /> -->
-					</view>
-				</swiper-item>
-			</swiper>
-		</view>
+	<view class="container">
+		<Tabs
+			:tabs="tabs"
+			:active="active"
+			@switch="handleSwitchTab"
+		/>
+		
+		<Empty v-if="dataSource.all.length === 0" title="暂无合同信息" />
+		
+		<swiper
+			v-else
+			:current="active"
+			class="page-list-container"
+			:duration="300"
+			@change="handleSwiperChange"
+		>
+			<swiper-item class="swiper-item" v-for="item in repairType" :key="item.code">
+				<scroll-view scroll-y class="list-container">
+					<ContractCard
+						v-for="record in dataSource[item.key]"
+						:key="record.id"
+						:record="record"
+						background="rgba(253, 144, 38, .05)"
+						@click="handleLinkDetail(record.id)"
+					/>
+					<!-- <List :dataSource="dataSource[item.key]" /> -->
+				</scroll-view>
+			</swiper-item>
+		</swiper>
 	</view>
 </template>
 
@@ -75,9 +71,6 @@
 		computed: {
 			tabs() {
 				return this.repairType.map(i=>i.label)
-			},
-			height() {
-				return this.$store.getters.commonHeight
 			}
 		},
 		methods: {
@@ -107,13 +100,19 @@
 				pay: data[1],
 				doing: data[2]
 			}
+			console.log(this.dataSource)
 		}
 	}
 </script>
 
 <style scoped>
+	.container{
+		height: 100vh;
+		background-color: #F9F9F9;
+	}
+	
 	.page-list-container{
-		height: calc(100% - 100rpx);
+		height: calc(100vh - 100rpx);
 	}
 	
 	.swiper-item{
@@ -121,5 +120,8 @@
 		padding: 30rpx 30rpx 0 30rpx;
 		box-sizing: border-box;
 		background-color: #F9F9F9;
+	}
+	.list-container{
+		height: 100%;
 	}
 </style>

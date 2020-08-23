@@ -1,8 +1,5 @@
 <template>
 	<view class="container">
-		<NavHeader title="绿色空间1号梯" />
-		
-		<scroll-view :scroll-y="true" class="main" :style="height">
 			
 			<view class="list-container">
 				<Title title="合同信息" />
@@ -56,11 +53,9 @@
 						<text class="file-name">这里是上传的文件名字但是噶</text>
 						<text class="file-type">{{filetype.toUpperCase()}} 文档</text>
 					</view>
-					<view class="file-size">15.3M</view>
+					<!-- <view class="file-size">15.3M</view> -->
 				</view>
 			</view>
-			
-		</scroll-view>
 	</view>
 </template>
 
@@ -75,21 +70,19 @@
 			Title
 		},
 		data: () => ({
-			dataSource: {
-				accessory: ''
-			}
+			dataSource: {}
 		}),
 		computed: {
 			height() {
 				return this.$store.getters.commonHeight
 			},
 			filetype() {
-				return this.dataSource.accessory.split('.').slice(-1)[0]
+				return this.dataSource.accessory ? this.dataSource.accessory.split('.').slice(-1)[0] : ''
 			}
 		},
 		onLoad: async function(option) {
 			var { id } = option
-			var res = request.post('/contracts/con_info', {id})
+			var res = await request.post('/contracts/con_info', {id})
 			this.dataSource = res.data
 		}
 	}
@@ -119,6 +112,10 @@
 	}
 	.space-item{
 		margin-top: 50rpx;
+	}
+	
+	.price{
+		color: #4190F5;
 	}
 	
 	.file-item{

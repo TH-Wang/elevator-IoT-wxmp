@@ -1,47 +1,54 @@
 <template>
-	<scroll-view
-		:scroll-y="true"
-		class="container"
-		:style="height"
-	>
+	<view class="container" >
 		<view class="list-container">
-			
 			<view
 				class="list-item"
 				v-for="item in dataSource"
 				:key="item.id"
 			>
 				<view class="header">
-					<view class="title ellipsis">{{item.prop}}</view>
-					<view class="time">{{item.time}}</view>
+					<view class="title ellipsis">{{item.fautlt_attr}}</view>
+					<view class="time">{{item.fault_start_time}}</view>
 				</view>
 				
-				<view class="detail ellipsis">{{item.detail}}</view>
+				<view class="detail ellipsis">{{item.fault_syn}}</view>
 				
 				<view class="info">
 					<view class="info-item">
-						安全等级: {{item.safe}}
+						安全等级: {{item.security_level}}
 					</view>
 					<view class="info-item">
-						是否困人: {{item.trapped}}
+						是否困人: {{item.is_tiring}}
 					</view>
 				</view>
 			</view>
 			
 		</view>
-	</scroll-view>
+	</view>
 </template>
 
 <script>
 	import faultData from '../../data/fault.js'
+	import request from '../../service/request.js'
 	
 	export default {
+		props: {
+			active: Boolean
+		},
 		data: () => ({
-			dataSource: faultData
+			dataSource: []
 		}),
 		computed: {
 			height() {
 				return this.$store.getters.hasSearchHeight
+			}
+		},
+		watch: {
+			active: async function(newValue, oldValue) {
+				if(newValue){
+					var res = await request.post('/maint/fault_report_list')
+					this.dataSource = res.data.reverse()
+				}
 			}
 		}
 	}
@@ -51,7 +58,9 @@
 	@import url("../../static/css/ellipsis.css");
 	
 	.container{
+		height: 100%;
 		background-color: #F9F9F9;
+		overflow-y: scroll;
 	}
 	.list-container{
 		margin-top: 20rpx;

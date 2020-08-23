@@ -1,10 +1,5 @@
 <template>
 	<view class="container">
-		<!-- 标题导航栏 -->
-		<NavHeader title="搜索" />
-		
-		<!-- 页面主体 -->
-		<scroll-view :scroll-y="false" class="main" :style="height">
 			<!-- 搜索框 -->
 			<Search paddingBottom />
 			
@@ -41,7 +36,6 @@
 					</view>
 				</view>
 			</view>
-		</scroll-view>
 	</view>
 </template>
 
@@ -73,12 +67,7 @@
 				}
 			],
 			historyList: ['今日洪水过境','今日洪水过境','今日洪水过境']
-		}),
-		computed: {
-			height() {
-				return this.$store.getters.commonHeight
-			}
-		}
+		})
 	}
 </script>
 

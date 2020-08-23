@@ -1,6 +1,5 @@
 <template>
 	<view class="">
-		<NavHeader :title="dataSource.realname" />
 		
 		<scroll-view
 			class="hidden-scroll"
