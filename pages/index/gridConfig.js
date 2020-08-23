@@ -3,12 +3,12 @@ export default [
 		// 名称
 		text: '电梯监控',
 		// 跳转路径
-		path: '/pages/null/null',
+		path: '/pages/elevatorMonitor/elevatorMonitor',
 		// 是否是tabbar页面
 		isTabbarPage: false
 	}, {
 		text: 'GIS地图',
-		path: '/pages/null/null',
+		path: '/pages/gisMap/gisMap',
 		isTabbarPage: false
 	}, {
 		text: '合同管理',
@@ -20,7 +20,7 @@ export default [
 		isTabbarPage: true
 	}, {
 		text: '电梯保养',
-		path: '/pages/allMaintain/allMaintain',
+		path: '/pages/maintainList/maintainList',
 		isTabbarPage: false
 	}, {
 		text: '故障上报',

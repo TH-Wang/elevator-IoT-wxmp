@@ -27,6 +27,7 @@ export default {
 </script>
 
 <style>
+	@import "/wxcomponents/vant/dist/common/index.wxss";
 /* 解决头条小程序组件内引入字体不生效的问题 */
 /* #ifdef MP-TOUTIAO */
 @font-face {
@@ -66,5 +67,9 @@ export default {
 /* 列表容器 */
 .list-container{
 	height: 100%;
+}
+.van-tab--active{
+	font-weight: bold !important;
+	color: #4190F5 !important;
 }
 </style>
