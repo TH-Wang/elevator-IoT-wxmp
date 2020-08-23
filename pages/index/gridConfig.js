@@ -32,7 +32,7 @@ export default [
 		isTabbarPage: false
 	}, {
 		text: '设备调试',
-		path: '/pages/null/null',
+		path: '/pages/deviceDebug/deviceDebug',
 		isTabbarPage: false
 	}
 ]

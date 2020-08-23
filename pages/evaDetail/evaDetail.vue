@@ -1,23 +1,20 @@
 <template>
 	<view class="container">
-		<NavHeader title="绿色空间1号梯" />
-		
-		<view :style="height" class="page-container">
 			
 			<view class="base-info-container">
 				<view class="item">
 					<text>电梯名称</text>
-					<text>奔力绿色空间{{id}}号梯</text>
+					<text>{{info.name}}</text>
 				</view>
 				
 				<view class="item">
 					<text>电梯编号</text>
-					<text>545645156465</text>
+					<text>{{info.elevator_number}}</text>
 				</view>
 				
 				<view class="item">
-					<text>电梯名称</text>
-					<text>奔力绿色空间1号梯</text>
+					<text>电梯类型</text>
+					<text>{{info.variety}}</text>
 				</view>
 				
 				<view class="item">
@@ -33,7 +30,6 @@
 					<text>奔力绿色空间{{id}}号梯</text>
 				</view>
 			</view>
-		</view>
 	</view>
 </template>
 
@@ -51,7 +47,8 @@
 			id: 0,
 			active: 0,
 			tabs: ['出厂', '安装', '维保', '故障', '部件'],
-			dataSource: [0, 1, 2, 3, 4]
+			dataSource: [0, 1, 2, 3, 4],
+			info: {}
 		}),
 		computed: {
 			height() {
@@ -71,16 +68,12 @@
 			var res = await request.post('/lift/one_info', {
 				elevator_id: id
 			})
-			console.log(res.data)
+			this.info = res.data
 		}
 	}
 </script>
 
 <style scoped>
-	.page-container{
-		overflow-y: scroll;
-	}
-	
 	.base-info-container{
 		padding-bottom: 20rpx;
 		background-color: #F9F9F9;

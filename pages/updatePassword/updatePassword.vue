@@ -1,10 +1,5 @@
 <template>
 	<view class="container">
-		<!-- 标题导航栏 -->
-		<NavHeader title="修改密码" />
-		
-		<!-- 页面主体 -->
-		<scroll-view :scroll-y="true" class="main" :style="height">
 			<!-- 头部文本 -->
 			<view class="header">
 				<text>请为你的账号</text>
@@ -36,7 +31,7 @@
 				mode="loading"
 				tip="为您拼命加载中..."
 			/>
-		</scroll-view>
+			
 	</view>
 </template>
 
@@ -70,7 +65,7 @@
 </script>
 
 <style scoped>
-	.main{
+	.container{
 		background-color: #F9F9F9;
 	}
 	.header{

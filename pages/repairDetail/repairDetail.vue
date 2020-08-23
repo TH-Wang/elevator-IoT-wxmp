@@ -1,24 +1,20 @@
 <template>
 	<view class="container">
-		<!-- 标题导航栏 -->
-		<NavHeader title="" />
-		
-		<!-- 页面主体 -->
-		<scroll-view :scroll-y="true" class="main" :style="height">
-			<Steps />
+			<!-- 步骤条 -->
+			<Steps :steps="steps" :type="record.repair_type" />
 			
 			<!-- 处理卡片 -->
 			<view class="handle-card">
 				<!-- 左侧信息 -->
 				<view class="handle-info">
-					<text class="title">故障简短</text>
+					<text class="title">{{record.fault_attr}}</text>
 					<view class="info">
 						<image src="../../static/icon/repair/time.png" />
-						<text>故障时间：2020-04-15 14:21:01</text>
+						<text>故障时间：{{record.fault_start_time}}</text>
 					</view>
 					<view class="info">
 						<image src="../../static/icon/repair/address.png" />
-						<text>故障地址：粉红色觉得感觉坚实的合格</text>
+						<text>故障地址：{{record.address}}</text>
 					</view>
 				</view>
 				<!-- 右侧按钮 -->
@@ -33,24 +29,24 @@
 				
 				<view class="baseinfo-item">
 					<text>电梯名称</text>
-					<text>电梯1号</text>
+					<text>{{record.ele_name}}</text>
 				</view>
 				<view class="baseinfo-item">
-					<text>电梯名称</text>
-					<text>电梯1号</text>
+					<text>工单编号</text>
+					<text>{{record.repair_sn}}</text>
 				</view>
 				<view class="baseinfo-item">
-					<text>电梯名称</text>
-					<text>电梯1号</text>
+					<text>故障来源</text>
+					<text>{{record.fault_source}}</text>
 				</view>
 				<view class="baseinfo-item">
-					<text>电梯名称</text>
-					<text>电梯1号</text>
+					<text>故障描述</text>
+					<text>{{record.fault_syn}}</text>
 				</view>
 			</view>
 			
-			<CommonButton text="去处理" />
-		</scroll-view>
+			<CommonButton text="去处理" @click="handleLinkHandlePage" />
+			
 	</view>
 </template>
 
@@ -58,6 +54,7 @@
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Steps from '../../components/Steps/Steps.vue'
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import repairData from '../../data/repair.js'
 	
 	export default {
 		components: {
@@ -65,10 +62,44 @@
 			Steps,
 			CommonButton
 		},
+		data: () => ({
+			repairId: null,
+			steps: [
+				{
+					type: 1,
+					title: '待接警',
+					time: '4-11 15:11:23'
+				},
+				{
+					type: 2,
+					title: '待处理',
+					time: '4-11 15:11:23'
+				},
+				{
+					type: 3,
+					title: '已到达',
+					time: '4-11 15:11:23'
+				},
+				{
+					type: 4,
+					title: '已完成'
+				}
+			]
+		}),
 		computed: {
-			height() {
-				return this.$store.getters.commonHeight
+			record() {
+				return repairData.all.find(i=>i.id === this.repairId)
 			}
+		},
+		methods: {
+			handleLinkHandlePage() {
+				uni.navigateTo({
+					url: '/pages/repairHandle/repairHandle'
+				})
+			}
+		},
+		onLoad(option) {
+			this.repairId = option.id
 		}
 	}
 </script>

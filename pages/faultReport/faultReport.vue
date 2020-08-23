@@ -1,22 +1,20 @@
 <template>
 	<view class="container">
-		<NavHeader title="故障上报" />
-		
 		<Tabs
 			:tabs="tabs"
 			:active="active"
 			@switch="handleSwitchTab"
 		/>
 		
-		<view class="main" :style="height">
+		<view class="main">
 			<view class="swiper-container" :style="transform">
 				
 				<view class="main-item">
-					<Report />
+					<Report @success="active = 1" />
 				</view>
 				
 				<view class="main-item">
-					<History />
+					<History :active="active == 1" />
 				</view>
 				
 			</view>
@@ -43,9 +41,6 @@
 			active: 0
 		}),
 		computed: {
-			height() {
-				return this.$store.getters.hasSearchHeight
-			},
 			transform() {
 				return 'transform: translateX(' + (this.active * -100) + 'vw)'
 			}
@@ -66,6 +61,7 @@
 	
 	.main{
 		width: 100vw;
+		height: calc(100vh - 100rpx);
 	}
 	
 	.swiper-container{
@@ -79,6 +75,8 @@
 	
 	.main-item{
 		width: 100vw;
+		height: 100%;
+		overflow-y: scroll;
 		display: inline-block;
 		font-size: 32rpx;
 		vertical-align: top;

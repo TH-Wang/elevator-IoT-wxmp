@@ -1,6 +1,5 @@
 <template>
 	<view>
-		<NavHeader title="档案资料" />
 		
 		<view class="grid">
 			<view
@@ -18,13 +17,9 @@
 </template>
 
 <script>
-	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import gridConfig from './gridConfig.js'
 	
 	export default {
-		components: {
-			NavHeader
-		},
 		data: () => ({
 			gridConfig
 		}),
