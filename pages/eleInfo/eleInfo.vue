@@ -695,24 +695,4 @@
 
 <style scoped>
 	@import "/static/css/wxj.css";
-	.menu-yx-oi-li-top{
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 20rpx 20rpx;
-		box-sizing: border-box;
-	}
-	.menu-yx-oi-li-top-title{
-		font-size: 26rpx;
-		color: #333;
-		border-bottom: 2rpx solid #eee;
-	}
-	.menu-yx-oi-li-cont{
-		padding: 0rpx 30rpx 40rpx;
-		box-sizing: border-box;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		flex-wrap: wrap;
-	}
 </style>
