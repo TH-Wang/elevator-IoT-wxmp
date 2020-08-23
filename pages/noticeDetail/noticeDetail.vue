@@ -11,7 +11,7 @@
 			</view>
 			
 			<view class="content">
-					<rich-text :nodes="dataSource.content"></rich-text>
+				<rich-text :nodes="dataSource.content"></rich-text>
 			</view>
 	</view>
 </template>

@@ -27,12 +27,34 @@
 			}
 		},
 		{
-			"path": "pages/repairDetail/repairDetail"		//急修详情
+			"path": "pages/repairDetail/repairDetail",		//急修工单详情
+			"style": {
+				"navigationBarTitleText": "工单详情"
+			}
+		},
+		{
+			"path": "pages/repairHandle/repairHandle",		//急修工单处理
+			"style": {
+				"navigationBarTitleText": "工单处理"
+			}
 		},
 		{
 			"path": "pages/maintain/maintain",
 			"style": {
 				"navigationBarTitleText": "保养"
+			}
+		},
+		{
+			"path": "pages/deviceDebug/deviceDebug",
+			"style": {
+				"navigationBarTitleText": "设备调试",
+				"backgroundColor": "#F9F9F9"
+			}
+		},
+		{
+			"path": "pages/bluetoothConnect/bluetoothConnect",
+			"style": {
+				"navigationBarTitleText": "蓝牙连接"
 			}
 		},
 		{

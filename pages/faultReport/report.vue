@@ -65,7 +65,7 @@
 					<view class="eva-list">
 						<Empty
 							v-if="liftList.length === 0"
-							title="可通过电梯编码、名称、地址进行搜索"
+							:title="loadingText"
 							style="font-size: 24rpx;"
 						/>
 						
@@ -110,6 +110,7 @@
 			Empty
 		},
 		data: () => ({
+			loadingText: '可通过电梯编码、名称、地址进行搜索',
 			liftList: [],
 			liftId: null,
 			modalVisible: false,
@@ -129,12 +130,14 @@
 		methods: {
 			// 搜索电梯
 			async handleSearchLift(value) {
+				this.loadingText = '搜索中...'
 				var res = await request.post('/lift/list_info', {
 					limit: 100,
 					page: 1,
 					lift_name: value
 				})
 				this.liftList = res.data
+				this.loadingText = '可通过电梯编码、名称、地址进行搜索'
 			},
 			// 选择电梯
 			handleSelectLift(id) {

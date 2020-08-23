@@ -1,15 +1,15 @@
 <template>
 	<view class="container" :style="'background-color:' + background" @click="$emit('click')">
 		<view class="header">
-			<text class="title ellipsis">{{record.name}}</text>
-			<text class="time">{{record.time}}</text>
+			<text class="title ellipsis">{{record.ele_name}}</text>
+			<text class="time">{{record.fault_start_time}}</text>
 		</view>
 		<view class="detail ellipsis">
-			{{record.detail}}
+			{{record.fault_syn}}
 		</view>
 		<view class="footer">
-			<text class="address ellipsis">{{record.address}}126号</text>
-			<view :class="'type-button ' + 'button-' + record.code">{{getButtonText()}}</view>
+			<text class="address ellipsis">{{record.address}}</text>
+			<view :class="'type-button ' + 'button-' + record.repair_type">{{getButtonText()}}</view>
 		</view>
 	</view>
 </template>
@@ -28,10 +28,10 @@
 		},
 		methods: {
 			getButtonText() {
-				switch(this.record.code) {
-					case 0: return '待处理';
-					case 1: return '进行中';
-					case 2: return '已完成';
+				switch(this.record.repair_type) {
+					case 2: return '待处理';
+					case 3: return '进行中';
+					case 4: return '已完成';
 					default: return '已完成';
 				}
 			}
@@ -47,10 +47,6 @@
 		overflow: hidden;
 		word-break: break-all;
 	}
-	/* 按钮 */
-	.button-0{background-color: #4190F5}
-	.button-1{background-color: #FD9026}
-	.button-2{background-color: #EEEEEE; color: #999999}
 	
 	.container{
 		width: 690rpx;
@@ -79,7 +75,6 @@
 	
 	.time, .type-button{
 		width: 22%;
-		color: #999999;
 		font-size: 22rpx;
 	}
 	
@@ -98,6 +93,9 @@
 		line-height: 50rpx;
 		border-radius: 25rpx;
 		text-align: center;
-		color: #FFFFFF;
 	}
+	/* 按钮 */
+	.button-2{background-color: #4190F5; color: #FFFFFF}
+	.button-3{background-color: #FD9026; color: #FFFFFF}
+	.button-4{background-color: #EEEEEE; color: #999999}
 </style>
