@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<NavHeader title="人员档案" />
+		<!-- <NavHeader title="人员档案" /> -->
 		<!-- 搜索框 -->
 		<Search button paddingBottom />
 		
@@ -80,6 +80,7 @@
 		},
 		onLoad: async function() {
 			var res = await request.post('/users/lists')
+			console.log(res)
 			this.dataSource = res.data
 		}
 	}

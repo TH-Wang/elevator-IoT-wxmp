@@ -1,6 +1,44 @@
 {
 	"pages": [
 		{
+			"path": "pages/workdel/workdel",
+			"style": {
+				"navigationBarTitleText": "工单详情",
+				"usingComponents":{
+					"van-steps": "/wxcomponents/vant/dist/steps/index",
+					"van-icon": "/wxcomponents/vant/dist/icon/index",
+					"van-popup": "/wxcomponents/vant/dist/popup/index"
+				}
+			}
+		},
+		{
+			"path": "pages/workOrder/workOrder",
+			"style": {
+				"navigationBarTitleText": "维保工单",
+				"usingComponents":{
+					"van-dropdown-menu": "/wxcomponents/vant/dist/dropdown-menu/index",
+					"van-dropdown-item": "/wxcomponents/vant/dist/dropdown-item/index",
+					"van-icon": "/wxcomponents/vant/dist/icon/index",
+					"van-uploader": "/wxcomponents/vant/dist/uploader/index"
+				}
+			}
+		},
+		{
+			"path": "pages/maintain/maintain",
+			"style": {
+				"navigationBarTitleText": "保养",
+				"enablePullDownRefresh":true,//开启下拉刷新
+				"onReachBottomDistance": 100,	
+				"usingComponents":{
+					"van-button": "/wxcomponents/vant/dist/button/index",
+					"van-tab": "/wxcomponents/vant/dist/tab/index",
+					"van-tabs": "/wxcomponents/vant/dist/tabs/index"
+				}
+			}
+			
+		},
+		
+		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "首页"
@@ -27,12 +65,7 @@
 		{
 			"path": "pages/repairDetail/repairDetail"		//急修详情
 		},
-		{
-			"path": "pages/maintain/maintain",
-			"style": {
-				"navigationBarTitleText": "保养"
-			}
-		},
+		
 		{
 			"path": "pages/mine/mine",
 			"style": {
@@ -56,6 +89,7 @@
 		},
 		{
 			"path": "pages/contractDetail/contractDetail"		//合同详情
+			
 		},
 		{
 			"path": "pages/maintainList/maintainList",
