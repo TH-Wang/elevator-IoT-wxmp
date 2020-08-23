@@ -77,6 +77,7 @@
 		},
 		onLoad: async function() {
 			var res = await request.post('/users/lists')
+			console.log(res)
 			this.dataSource = res.data
 		}
 	}

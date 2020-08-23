@@ -7,6 +7,54 @@
 			}
 		},
 		{
+			"path": "pages/citylist/citylist",
+			"style": {
+				"navigationBarTitleText": "选择城市",
+				"usingComponents":{
+					"van-index-bar": "/wxcomponents/vant/dist/index-bar/index",
+					"van-index-anchor": "/wxcomponents/vant/dist/index-anchor/index",
+					"van-cell": "/wxcomponents/vant/dist/cell/index"
+				}
+			}
+		},
+		{
+			"path": "pages/maintain/maintain",
+			"style": {
+				"navigationBarTitleText": "保养",
+				"enablePullDownRefresh":true,//开启下拉刷新
+				"onReachBottomDistance": 100,	
+				"usingComponents":{
+					"van-button": "/wxcomponents/vant/dist/button/index",
+					"van-tab": "/wxcomponents/vant/dist/tab/index",
+					"van-tabs": "/wxcomponents/vant/dist/tabs/index"
+				}
+			}
+			
+		},
+		{
+			"path": "pages/workdel/workdel",
+			"style": {
+				"navigationBarTitleText": "工单详情",
+				"usingComponents":{
+					"van-steps": "/wxcomponents/vant/dist/steps/index",
+					"van-icon": "/wxcomponents/vant/dist/icon/index",
+					"van-popup": "/wxcomponents/vant/dist/popup/index"
+				}
+			}
+		},
+		{
+			"path": "pages/workOrder/workOrder",
+			"style": {
+				"navigationBarTitleText": "维保工单",
+				"usingComponents":{
+					"van-dropdown-menu": "/wxcomponents/vant/dist/dropdown-menu/index",
+					"van-dropdown-item": "/wxcomponents/vant/dist/dropdown-item/index",
+					"van-icon": "/wxcomponents/vant/dist/icon/index",
+					"van-uploader": "/wxcomponents/vant/dist/uploader/index"
+				}
+			}
+		},
+		{
 			"path": "pages/login/login", 				//账号绑定
 			"style": {
 				"navigationBarTextStyle": "white",
@@ -38,12 +86,7 @@
 				"navigationBarTitleText": "工单处理"
 			}
 		},
-		{
-			"path": "pages/maintain/maintain",
-			"style": {
-				"navigationBarTitleText": "保养"
-			}
-		},
+		
 		{
 			"path": "pages/deviceDebug/deviceDebug",
 			"style": {
