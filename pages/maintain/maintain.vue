@@ -196,22 +196,21 @@
 				this.info.selected = [
 					{
 						date: getDate(new Date(), -3).fullDate,
-						info: '打卡'
+						class:'timenone',
+						info: '超期',
 					},
 					{
 						date: getDate(new Date(), -2).fullDate,
-						info: '签到',
-						data: {
-							custom: '自定义信息',
-							name: '自定义消息头'
-						}
+						class:'timetow',
+						info: '待处理',
 					},
 					{
-						date: getDate(new Date(), -1).fullDate,
-						info: '已打卡'
+						date: getDate(new Date(), -10).fullDate,
+						class:'timebox',
+						info: '完成',
 					}
 				]
-			}, 500)
+			}, 100)
 		},
 		methods: {
 			// 跳转维保工单
@@ -278,6 +277,39 @@
 </script>
 
 <style>
+	.timebox{
+		
+		width: 66rpx !important;
+		height: 66rpx !important;
+		border-radius: 50% !important;
+		border: 1rpx solid #10C367;
+		left: 0 !important;
+		top: 0 !important;
+		background: none !important;
+	}
+	.uni-calendar-item--checked{
+		background-color: none !important;
+		color: #333 !important;
+
+	}
+	.timetow{
+		width: 66rpx !important;
+		height: 66rpx !important;
+		border-radius: 50% !important;
+		border: 1rpx solid rgba(253,144,38,1) !important;
+		left: 0 !important;
+		top: 0 !important;
+		background: none !important;
+	}
+	.timenone{
+		width: 66rpx !important;
+		height: 66rpx !important;
+		border-radius: 50% !important;
+		border: 1rpx solid #FF8D87;
+		left: 0 !important;
+		top: 0 !important;
+		background: none !important;
+	}
 	.main-list-li-num,.main-list-li-fot-addres{
 		display: flex;
 		align-items: center;
@@ -473,7 +505,7 @@
 		width: 30rpx !important;
 	}
 	.uni-calendar__backtoday{
-		/* display: none; */
+		display: none;
 	}
 	.contboxs{
 		position: relative;

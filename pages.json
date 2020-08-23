@@ -1,6 +1,37 @@
 {
 	"pages": [
 		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/citylist/citylist",
+			"style": {
+				"navigationBarTitleText": "选择城市",
+				"usingComponents":{
+					"van-index-bar": "/wxcomponents/vant/dist/index-bar/index",
+					"van-index-anchor": "/wxcomponents/vant/dist/index-anchor/index",
+					"van-cell": "/wxcomponents/vant/dist/cell/index"
+				}
+			}
+		},
+		{
+			"path": "pages/maintain/maintain",
+			"style": {
+				"navigationBarTitleText": "保养",
+				"enablePullDownRefresh":true,//开启下拉刷新
+				"onReachBottomDistance": 100,	
+				"usingComponents":{
+					"van-button": "/wxcomponents/vant/dist/button/index",
+					"van-tab": "/wxcomponents/vant/dist/tab/index",
+					"van-tabs": "/wxcomponents/vant/dist/tabs/index"
+				}
+			}
+			
+		},
+		{
 			"path": "pages/workdel/workdel",
 			"style": {
 				"navigationBarTitleText": "工单详情",
@@ -21,27 +52,6 @@
 					"van-icon": "/wxcomponents/vant/dist/icon/index",
 					"van-uploader": "/wxcomponents/vant/dist/uploader/index"
 				}
-			}
-		},
-		{
-			"path": "pages/maintain/maintain",
-			"style": {
-				"navigationBarTitleText": "保养",
-				"enablePullDownRefresh":true,//开启下拉刷新
-				"onReachBottomDistance": 100,	
-				"usingComponents":{
-					"van-button": "/wxcomponents/vant/dist/button/index",
-					"van-tab": "/wxcomponents/vant/dist/tab/index",
-					"van-tabs": "/wxcomponents/vant/dist/tabs/index"
-				}
-			}
-			
-		},
-		
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "首页"
 			}
 		},
 		{

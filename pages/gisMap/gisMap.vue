@@ -7,7 +7,7 @@
 		      <image src="../../static/image/yfm/search.png"></image>
 		      <input type="text" placeholder="输入电梯名字"></input>
 		    </view>
-		    <view class="dwboxs">
+		    <view class="dwboxs" @click="listcitybtn()">
 		      <view class="addstxt">重庆</view>
 		      <image src="../../static/image/yfm/dwbox.png"></image>
 		    </view>
@@ -75,7 +75,11 @@
 			}
 		},
 		methods: {
-			
+			listcitybtn(){
+				uni.navigateTo({
+					url:'../citylist/citylist'
+				})
+			},
 		}
 	}
 </script>

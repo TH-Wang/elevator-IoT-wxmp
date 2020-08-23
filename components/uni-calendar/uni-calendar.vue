@@ -52,7 +52,8 @@
 				</view>
 				<view class="uni-calendar__weeks" v-for="(item,weekIndex) in weeks" :key="weekIndex">
 					<view class="uni-calendar__weeks-item" v-for="(weeks,weeksIndex) in item" :key="weeksIndex">
-						<calendar-item class="uni-calendar-item--hook" :weeks="weeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></calendar-item>
+						<!-- @change="choiceDate" -->
+						<calendar-item class="uni-calendar-item--hook" :weeks="weeks" :calendar="calendar" :selected="selected" :lunar="lunar" ></calendar-item>
 					</view>
 				</view>
 			</view>
@@ -148,7 +149,9 @@
 				this.cale.resetEndDate(val)
 			},
 			selected(newVal) {
+				console.log(newVal)
 				this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
+				// console.log(this.cale.weeks)
 				this.weeks = this.cale.weeks
 			}
 		},
@@ -171,8 +174,12 @@
 			clean() {},
 			bindDateChange(e) {
 				const value = e.detail.value + '-1'
-				console.log(this.cale.getDate(value));
-				this.init(value)
+				// console.log(this.cale.getDate(value));
+				// this.init(this.cale.getDate(value).year)
+				const preDate = this.cale.getDate(value).fullDate
+				this.setDate(preDate)
+				this.monthSwitch()
+				
 			},
 			/**
 			 * 初始化日期显示
@@ -230,6 +237,7 @@
 			 * 选择月份触发
 			 */
 			monthSwitch() {
+				console.log(222)
 				let {
 					year,
 					month
@@ -288,6 +296,7 @@
 			 * 上个月
 			 */
 			pre() {
+				// console.log(this.cale.getDate(this.nowDate.fullDate, -1, 'month'))
 				const preDate = this.cale.getDate(this.nowDate.fullDate, -1, 'month').fullDate
 				this.setDate(preDate)
 				this.monthSwitch()
