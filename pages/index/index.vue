@@ -89,9 +89,6 @@
 			value: '',
 			publicPop: false
 		}),
-		onLoad(){
-			// uni.removeStorageSync('token')
-		},
 		methods: {
 			handleNavigateLink(path, isTabbarPage) {
 				const option = {url: path}
