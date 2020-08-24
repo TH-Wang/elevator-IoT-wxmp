@@ -7,6 +7,54 @@
 			}
 		},
 		{
+			"path": "pages/citylist/citylist",
+			"style": {
+				"navigationBarTitleText": "选择城市",
+				"usingComponents":{
+					"van-index-bar": "/wxcomponents/vant/dist/index-bar/index",
+					"van-index-anchor": "/wxcomponents/vant/dist/index-anchor/index",
+					"van-cell": "/wxcomponents/vant/dist/cell/index"
+				}
+			}
+		},
+		{
+			"path": "pages/maintain/maintain",
+			"style": {
+				"navigationBarTitleText": "保养",
+				"enablePullDownRefresh":true,//开启下拉刷新
+				"onReachBottomDistance": 100,	
+				"usingComponents":{
+					"van-button": "/wxcomponents/vant/dist/button/index",
+					"van-tab": "/wxcomponents/vant/dist/tab/index",
+					"van-tabs": "/wxcomponents/vant/dist/tabs/index"
+				}
+			}
+			
+		},
+		{
+			"path": "pages/workdel/workdel",
+			"style": {
+				"navigationBarTitleText": "工单详情",
+				"usingComponents":{
+					"van-steps": "/wxcomponents/vant/dist/steps/index",
+					"van-icon": "/wxcomponents/vant/dist/icon/index",
+					"van-popup": "/wxcomponents/vant/dist/popup/index"
+				}
+			}
+		},
+		{
+			"path": "pages/workOrder/workOrder",
+			"style": {
+				"navigationBarTitleText": "维保工单",
+				"usingComponents":{
+					"van-dropdown-menu": "/wxcomponents/vant/dist/dropdown-menu/index",
+					"van-dropdown-item": "/wxcomponents/vant/dist/dropdown-item/index",
+					"van-icon": "/wxcomponents/vant/dist/icon/index",
+					"van-uploader": "/wxcomponents/vant/dist/uploader/index"
+				}
+			}
+		},
+		{
 			"path": "pages/login/login", 				//账号绑定
 			"style": {
 				"navigationBarTextStyle": "white",
@@ -38,12 +86,7 @@
 				"navigationBarTitleText": "工单处理"
 			}
 		},
-		{
-			"path": "pages/maintain/maintain",
-			"style": {
-				"navigationBarTitleText": "保养"
-			}
-		},
+		
 		{
 			"path": "pages/deviceDebug/deviceDebug",
 			"style": {
@@ -86,8 +129,35 @@
 			"style": { "navigationBarTitleText": "合同详情" }
 		},
 		{
-			"path": "pages/allMaintain/allMaintain",	//电梯保养
-			"style": { "navigationBarTitleText": "电梯保养" }
+			"path": "pages/maintainList/maintainList",
+			"style": {
+				"navigationBarTitleText": "电梯保养",
+				"enablePullDownRefresh":true,//开启下拉刷新
+				"onReachBottomDistance": 100,	
+				"usingComponents":{
+					"van-button": "/wxcomponents/vant/dist/button/index",
+					"van-tab": "/wxcomponents/vant/dist/tab/index",
+					"van-tabs": "/wxcomponents/vant/dist/tabs/index"
+				}
+			}
+		},
+		{
+			"path": "pages/gisMap/gisMap",
+			"style": {
+				"navigationBarTitleText": "GIS地图"
+			}
+		},
+		{
+			"path": "pages/elevatorMonitor/elevatorMonitor",
+			"style": {
+				"navigationBarTitleText": "电梯监控"
+			}
+		},
+		{
+			"path": "pages/eleInfo/eleInfo",
+			"style": {
+				"navigationBarTitleText": "电梯监控详情"
+			}
 		},
 		{
 			"path": "pages/faultReport/faultReport",				//故障上报
@@ -137,13 +207,12 @@
 			"path": "pages/null/null",		//空页面
 			"style": { "navigationBarTitleText": "开发中" }
 		}
-   ],
+    ],
 	 "tabBar": {
 	 	"color": "#7A7E83",
 	 	"selectedColor": "#4190F5",
 	 	"borderStyle": "white",
 	 	"backgroundColor": "#f8f8f8",
-	 	"iconWidth":"36px",
 	 		"list": [{
 	 				"pagePath": "pages/index/index",
 	 				"iconPath": "static/icon/tabbar/home.png",
@@ -170,10 +239,9 @@
 	 },
 	"globalStyle": {
 		// "navigationStyle": "custom",
-		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#FFFFFF",
 		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "梯联宝",
+		"navigationBarBackgroundColor": "#FFFFFF",
 		"backgroundColor": "#FFFFFF"
 	}
 }

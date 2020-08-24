@@ -694,5 +694,5 @@
 </script>
 
 <style scoped>
-	@import "../../static/css/wxj.css";
+	@import "/static/css/wxj.css";
 </style>
