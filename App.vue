@@ -12,10 +12,6 @@ export default {
 				this.$store.commit("setStatusBarHeight", statusBarHeight)
 			}
 		})
-		var res = await request.login()
-		store.commit('setBaseUrl', res.request_url)
-		store.commit('setUserInfo', res)
-		console.log(res)
 	},
 	onShow: function() {
 		console.log('App Show');

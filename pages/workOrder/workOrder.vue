@@ -130,11 +130,6 @@
 			}
 		},
 		methods: {
-			workdel(){
-				uni.navigateTo({
-					url: '/pages/workdel/workdel'
-				})
-			},
 			// 上传视频
 			opvideobtn(res) {
 				console.log(res)
