@@ -137,8 +137,8 @@
 									var token = res.data.token
 									// 存储token
 									uni.setStorageSync('token', token)
-									_this_.$store.commit('setBaseUrl', res.request_url)
-									_this_.$store.commit('setUserInfo', res)
+									_this_.$store.commit('setBaseUrl', res.data.request_url)
+									_this_.$store.commit('setUserInfo', res.data)
 									console.log(res)
 								}
 							}, 5000)
