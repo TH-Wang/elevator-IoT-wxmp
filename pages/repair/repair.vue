@@ -117,11 +117,12 @@
 					request.post(url, {...option, type: 0})
 				])
 				this.dataSource = {
-					pending: item[0],
-					doing: item[2],
-					finish: item[3],
-					all: item[4]
+					pending: res[0],
+					doing: res[1],
+					finish: res[2],
+					all: res[3]
 				}
+				console.log(this.dataSource)
 			}catch(e){
 				console.log(e)
 			}
