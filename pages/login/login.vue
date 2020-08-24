@@ -29,7 +29,6 @@
 			<input
 				type="text"
 				v-model="form.name"
-				@blur="validateName"
 				placeholder="请输入账号"
 			/>
 		</IconInput>

@@ -15,16 +15,7 @@ const request = {
 						method: 'POST',
 						data: {code},
 						success: res => {
-							console.log(res)
-							if(res.data.code == 1){
-								var token = res.data.data.token
-								// 存储token
-								uni.setStorageSync('token', token)
-								resolve(res.data.data)
-							}
-							else {
-								reject(res.data.content || res.data.msg)
-							}
+							resolve(res.data)
 						},
 						fail: (err) => {
 							reject(err)

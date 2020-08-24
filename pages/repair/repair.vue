@@ -76,13 +76,13 @@
 					key: 'all'
 				}
 			],
-			// dataSource: {
-			// 	pending: [],
-			// 	doing: [],
-			// 	finish: [],
-			// 	all: []
-			// },
-			dataSource: repairData
+			dataSource: {
+				pending: [],
+				doing: [],
+				finish: [],
+				all: []
+			},
+			// dataSource: repairData
 		}),
 		computed: {
 			tabs() {
@@ -107,20 +107,24 @@
 			}
 		},
 		onLoad: async function() {
-			var option = {page: 1, limit: 100}
-			var url = '/maint/fault_order'
-			// var res = await Promise.all([
-			// 	request.post(url, {...option, type: 2}),
-			// 	request.post(url, {...option, type: 3}),
-			// 	request.post(url, {...option, type: 4}),
-			// 	request.post(url, {...option, type: 0})
-			// ])
-			// this.dataSource = {
-			// 	pending: item[0],
-			// 	doing: item[2],
-			// 	finish: item[3],
-			// 	all: item[4]
-			// }
+			try{
+				var option = {page: 1, limit: 100}
+				var url = '/maint/fault_order'
+				var res = await Promise.all([
+					request.post(url, {...option, type: 2}),
+					request.post(url, {...option, type: 3}),
+					request.post(url, {...option, type: 4}),
+					request.post(url, {...option, type: 0})
+				])
+				this.dataSource = {
+					pending: item[0],
+					doing: item[2],
+					finish: item[3],
+					all: item[4]
+				}
+			}catch(e){
+				console.log(e)
+			}
 		}
 	}
 </script>
@@ -130,12 +134,12 @@
 		height: calc(100vh - 200rpx);
 		padding-top: 1px;
 		box-sizing: border-box;
-		background-color: #F9F9F9;
 	}
 	.swiper-item{
 		overflow-y: scroll;
 		height: 100%;
-		padding-top: 1px;
+		padding-bottom: 30rpx;
+		box-sizing: border-box;
 		background-color: #FFFFFF;
 	}
 	.list-container{

@@ -1,5 +1,11 @@
 <template>
 		<view class="container">
+			<!-- 关注微信公众号弹窗 -->
+			<official-account
+				v-if="publicPop"
+				@load="handleOfficeLoad"
+				@error="handleOfficeError"
+			></official-account>
 			<!-- banner -->
 			<swiper
 				class="swiper"
@@ -65,6 +71,7 @@
 	import Search from '../../components/Search/Search.vue'
 	import gridConfig from './gridConfig.js'
 	import debounce from '../../utils/debounce.js'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -79,7 +86,8 @@
 				'市规划局三个世界观和三个价值观'
 			],
 			gridConfig,
-			value: ''
+			value: '',
+			publicPop: false
 		}),
 		methods: {
 			handleNavigateLink(path, isTabbarPage) {
@@ -98,13 +106,82 @@
 			handleLinkNotice(){
 				uni.navigateTo({url: '/pages/notice/notice'})
 			},
-			getUserInfo() {
-				
+			handleLinkBind(){
+				uni.navigateTo({url: '/pages/login/login'})
+			},
+			handleOfficeLoad(e) {
+				console.log(e.detail)
+			},
+			handleOfficeError(e) {
+				console.log(e.detail)
+			},
+			handleConfirmPublicAccount() {
+				var _this_ = this
+				uni.showModal({
+					showCancel: false,
+					title: '关注公众号',
+					content: '请先关注上方“梯联宝”公众号，然后进行绑定账号',
+					success(res) {
+						if(res.confirm){
+							setTimeout(async ()=>{
+								var res = await request.login()
+								if(res.code == -2){
+									_this_.handleLinkBind()
+									_this_.publicPop = false
+								}
+								else if(res.code == -1){
+									_this_.handleConfirmPublicAccount()
+								}
+								else{
+									_this_.publicPop = false
+									var token = res.data.token
+									// 存储token
+									uni.setStorageSync('token', token)
+									_this_.$store.commit('setBaseUrl', res.request_url)
+									_this_.$store.commit('setUserInfo', res)
+									console.log(res)
+								}
+							}, 5000)
+						}
+					}
+				})
 			}
 		},
-		mounted() {
-			// console.log(this.$store.state.request.url)
-			// console.log(this.$store.state.user.info)
+		onLoad: async function() {
+			try{
+				var _this_ = this
+				var res = await request.login()
+				console.log(res)
+				if(res.code == -1){
+					this.publicPop = true
+					setTimeout(()=>{
+						_this_.handleConfirmPublicAccount()
+					}, 2000)
+				}
+				else if(res.code == -2){
+					uni.showModal({
+						title: '绑定账号',
+						content: res.msg,
+						showCancel: false,
+						success(res) {
+							if(res.confirm){
+								_this_.handleLinkBind()
+							}
+						}
+					})
+				}
+				else{
+					var token = res.data.token
+					// 存储token
+					uni.setStorageSync('token', token)
+					this.$store.commit('setBaseUrl', res.request_url)
+					this.$store.commit('setUserInfo', res)
+					console.log(res)
+				}
+			}catch(e){
+				console.log(e)
+			}
+			
 		}
 	}
 </script>
