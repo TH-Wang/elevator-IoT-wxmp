@@ -96,11 +96,20 @@
 				}
 			}
 		},
+		onLoad(){
+			this.getList();
+		},
 		methods: {
 			onChange(event) {
 				console.log(event.detail)
 				let id = event.detail.name;
 			},
+			getList(){
+				let data = {};
+				request.post('/backlog/banner',data).then((res) =>{
+					console.log(res)
+				})
+			}
 		},
 		onPullDownRefresh(){
 			console.log('下拉开始')
