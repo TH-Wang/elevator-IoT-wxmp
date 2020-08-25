@@ -41,6 +41,7 @@
 <script>
 	import Null from '@/components/uni-null/uni-null.vue'
 	import uniLoadMore from "@/components/uni-load-more/uni-load-more.vue"
+	import request from '@/service/request.js'
 	export default {
 		components:{
 			Null,uniLoadMore
