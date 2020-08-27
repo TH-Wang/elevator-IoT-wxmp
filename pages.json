@@ -81,7 +81,8 @@
 		{
 			"path": "pages/repair/repair",
 			"style": {
-				"navigationBarTitleText": "急修"
+				"navigationBarTitleText": "急修",
+				"enablePullDownRefresh": true							//开启下拉刷新
 			}
 		},
 		{

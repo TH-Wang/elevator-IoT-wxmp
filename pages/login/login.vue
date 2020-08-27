@@ -167,7 +167,7 @@
 					}
 					else {
 						this.feedback = {
-							visible: false,
+							visible: true,
 							title: '登录失败',
 							mode: 'error',
 							tip: res.msg

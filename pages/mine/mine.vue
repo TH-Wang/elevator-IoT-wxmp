@@ -38,6 +38,7 @@
 	import PersonCard from '../../components/PersonCard/PersonCard.vue'
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
 	import listConfig from './listConfig.js'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -57,8 +58,19 @@
 			}
 		},
 		methods: {
-			handleClickSingOutBtn() {
-				console.log('退出登录')
+			async handleClickSingOutBtn() {
+				var res = await request.post('/logins/ontlogin')
+				console.log(res)
+				if(res.code == 1) {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+				} else {
+					uni.showModal({
+						title: '退出失败，请稍后再试',
+						showCancel: false
+					})
+				}
 			},
 			handleLink(path) {
 				uni.navigateTo({

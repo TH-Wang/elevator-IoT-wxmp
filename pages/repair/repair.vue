@@ -112,26 +112,33 @@
 				uni.navigateTo({
 					url: '/pages/repairDetail/repairDetail?id=' + id
 				})
+			},
+			async handleRequestData() {
+				var option = {page: 1, limit: 10}
+				var url = '/maint/fault_order'
+				var res = await Promise.all([
+					request.post(url, {...option, type: 1}),
+					request.post(url, {...option, type: 2}),
+					request.post(url, {...option, type: 3}),
+					request.post(url, {...option, type: 4}),
+					request.post(url, {...option, type: 0})
+				])
+				console.log(res)
+				this.dataSource = {
+					wait: res[0].data,
+					pending: res[1].data,
+					doing: res[2].data,
+					finish: res[3].data,
+					all: res[4].data
+				}
 			}
 		},
 		onLoad: async function() {
-			var option = {page: 1, limit: 10}
-			var url = '/maint/fault_order'
-			var res = await Promise.all([
-				request.post(url, {...option, type: 1}),
-				request.post(url, {...option, type: 2}),
-				request.post(url, {...option, type: 3}),
-				request.post(url, {...option, type: 4}),
-				request.post(url, {...option, type: 0})
-			])
-			console.log(res)
-			this.dataSource = {
-				wait: res[0].data,
-				pending: res[1].data,
-				doing: res[2].data,
-				finish: res[3].data,
-				all: res[4].data
-			}
+			await this.handleRequestData()
+		},
+		onPullDownRefresh: async function() {
+			await this.handleRequestData()
+			uni.stopPullDownRefresh()
 		}
 	}
 </script>

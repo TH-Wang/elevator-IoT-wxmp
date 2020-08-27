@@ -54,17 +54,35 @@
 			<!-- 待办事项 -->
 			<view class="todos-title">
 				<text>待办事项</text>
-				<text><text style="color: #4190F5;">todoCount</text>项</text>
+				<text><text style="color: #4190F5;">{{todoCount}}</text>项</text>
 			</view>
 			
 			<view class="todos-list">
+				<!-- 急修 -->
 				<RepairCard
-					v-for="record in todoList"
+					v-for="record in todoList.repair"
+					:key="record.repair_id"
+					:record="record"
+					type="repair"
+					hasTag
+					hasButton
+					@click="handleLinkRepair($event, record.repair_id)"
+				/>
+				<!-- 保养 -->
+				<RepairCard
+					v-for="record in todoList.maint"
 					:key="record.id"
 					:record="record"
-					:type="record.__TYPE"
+					type="maint"
 					hasTag
-					@click="handleLinkDetail($event, record.id)"
+					hasButton
+					@click="handleLinkMaint($event, record.id)"
+				/>
+				<!-- 证件到期 -->
+				<PromptCard
+					v-for="record in todoList.prompt"
+					:key="record.id"
+					:record="record"
 				/>
 			</view>
 			
@@ -75,15 +93,18 @@
 	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
 	import Search from '../../components/Search/Search.vue'
 	import RepairCard from '../../components/RepairCard/RepairCard.vue'
+	import PromptCard from '../../components/PromptCard/PromptCard.vue'
 	import gridConfig from './gridConfig.js'
 	import debounce from '../../utils/debounce.js'
 	import request from '../../service/request.js'
+	import todos from '../../data/todos.js'
 	
 	export default {
 		components: {
 			TabbarPage,
 			Search,
-			RepairCard
+			RepairCard,
+			PromptCard
 		},
 		data: () => ({
 			swiperList: ['1', '2', '3'],
@@ -94,7 +115,7 @@
 			],
 			gridConfig,
 			value: '',
-			todoList: [],
+			todoList: {},
 			todoCount: 0
 		}),
 		methods: {
@@ -117,10 +138,13 @@
 			handleLinkBind(){
 				uni.navigateTo({url: '/pages/login/login'})
 			},
-			handleLinkDetail(e, id) {
+			handleLinkRepair(e, id) {
 				uni.navigateTo({
 					url: '/pages/repairDetail/repairDetail?id=' + id
 				})
+			},
+			handleLinkMaint(e, id) {
+				console.log('跳转维保工单详情页面: ' + id)
 			},
 			handleOfficeLoad(e) {
 				console.log(e.detail)
@@ -131,15 +155,8 @@
 			// 待办事项处理
 			async requestTodoWork() {
 				var res = await request.post('/backlog')
-				var list = Object.entries(res.data)
-					.map(([type, items]) => {
-						items.forEach(item => {item.__TYPE = type})
-						return items
-					})
-					.reduce((prev, item) => [...prev, ...item], [])
-				console.log(list)
-				this.todoList = list
-				this.todoCount = list.length
+				this.todoList = res.data
+				this.todoCount = Object.values(res.data).reduce((p,i)=>[...p, ...i], []).length
 			}
 		},
 		onLoad: async function() {
@@ -178,7 +195,6 @@
 					uni.setStorageSync('token', token)
 					this.$store.commit('setBaseUrl', res.data.request_url)
 					this.$store.commit('setUserInfo', res.data)
-					console.log(res)
 					await this.requestTodoWork()
 				}
 			}catch(e){
@@ -289,5 +305,14 @@
 		color: #000000;
 		background-color: #FFFFFF;
 		border-bottom: solid 1px #EEEEEE;
+		position: sticky;
+		top: 0;
+		left: 0;
+	}
+	
+	.todos-list{
+		padding-top: 0.5px;
+		padding-bottom: 30rpx;
+		background-color: #FFFFFF;
 	}
 </style>
