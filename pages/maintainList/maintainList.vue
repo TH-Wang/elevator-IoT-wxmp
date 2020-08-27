@@ -48,39 +48,14 @@
 		},
 		data() {
 			return {
+				type: 1,
+				page: 1,
+				size: 10,
 				status: 'more',
 				active: "1",
 				float: false,
 				title: '暂无数据',
 				list: [
-					{
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
-					{
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
-					{
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
-					{
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
 					{
 						title: '这是电梯名称',
 						time: '2020-11-11',
@@ -97,26 +72,41 @@
 			}
 		},
 		onLoad(){
-			this.getList();
+			let that = this;
+			that.getList(that.type,1);
 		},
 		methods: {
 			onChange(event) {
 				console.log(event.detail)
 				let id = event.detail.name;
 			},
-			getList(){
-				let data = {};
-				request.post('/backlog/banner',data).then((res) =>{
-					console.log(res)
+			getList(type,page){
+				let that = this;
+				let data = {
+					type: type,
+					page: page,
+					limit: that.size
+				};
+				request.post('/maint/main_order',data).then((res) =>{
+					if(res.code == 1){
+						
+					}else{
+						uni.showToast({
+							title:res.message,
+							icon:"none"
+						})
+					}
 				})
 			}
 		},
 		onPullDownRefresh(){
 			console.log('下拉开始')
-			setTimeout(function () {
-				console.log('下拉结束')
-			   uni.stopPullDownRefresh();
-			}, 1000);
+			let that = this;
+			that.getList(that.type,1);
+			// setTimeout(function () {
+			// 	console.log('下拉结束')
+			//    uni.stopPullDownRefresh();
+			// }, 1000);
 		},
 		onReachBottom(){
 			console.log('上拉开始')
