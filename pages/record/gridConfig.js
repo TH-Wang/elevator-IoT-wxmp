@@ -13,7 +13,7 @@ export default [
 		image: '../../static/icon/record/code.png',
 		text: '故障代码',
 		color: '#FF8D87',
-		path: '/pages/null/null'
+		path: '/pages/faultCode/faultCode'
 	}, {
 		image: '../../static/icon/record/job.png',
 		text: '工作规范',

@@ -29,7 +29,9 @@
 							v-for="record in dataSource[item.key]"
 							:key="record.id"
 							:record="record"
-							@click="handleLinkDetail(record.id)"
+							hasButton
+							type="repair"
+							@click="handleLinkDetail($event, record.id)"
 						/>
 					<!-- </scroll-view> -->
 				</swiper-item>
@@ -59,6 +61,11 @@
 		data: () => ({
 			repairType: [
 				{
+					code: 1,
+					label: '待接警',
+					key: 'wait'
+				}, 
+				{
 					code: 2,
 					label: '待处理',
 					key: 'pending'
@@ -77,6 +84,7 @@
 				}
 			],
 			dataSource: {
+				wait: [],
 				pending: [],
 				doing: [],
 				finish: [],
@@ -100,31 +108,29 @@
 				if(code === 3) return this.dataSource
 				else return this.dataSource.filter(i => i.code === code)
 			},
-			handleLinkDetail(id) {
+			handleLinkDetail(e, id) {
 				uni.navigateTo({
 					url: '/pages/repairDetail/repairDetail?id=' + id
 				})
 			}
 		},
 		onLoad: async function() {
-			try{
-				var option = {page: 1, limit: 100}
-				var url = '/maint/fault_order'
-				var res = await Promise.all([
-					request.post(url, {...option, type: 2}),
-					request.post(url, {...option, type: 3}),
-					request.post(url, {...option, type: 4}),
-					request.post(url, {...option, type: 0})
-				])
-				this.dataSource = {
-					pending: res[0],
-					doing: res[1],
-					finish: res[2],
-					all: res[3]
-				}
-				console.log(this.dataSource)
-			}catch(e){
-				console.log(e)
+			var option = {page: 1, limit: 10}
+			var url = '/maint/fault_order'
+			var res = await Promise.all([
+				request.post(url, {...option, type: 1}),
+				request.post(url, {...option, type: 2}),
+				request.post(url, {...option, type: 3}),
+				request.post(url, {...option, type: 4}),
+				request.post(url, {...option, type: 0})
+			])
+			console.log(res)
+			this.dataSource = {
+				wait: res[0].data,
+				pending: res[1].data,
+				doing: res[2].data,
+				finish: res[3].data,
+				all: res[4].data
 			}
 		}
 	}

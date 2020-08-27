@@ -2,12 +2,12 @@
 	<view class="container">
 		
 		<!-- 页面主体 -->
-		<scroll-view :scroll-y="true" class="main">
+		<view class="main">
 			
 			<view class="main-info">
 				<!-- 公司图片 -->
 				<view class="header">
-					<image class="header-image" src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3547277651,1427004120&fm=26&gp=0.jpg" mode="aspectFill" />
+					<image class="header-image" :src="'http://' + detail.img" mode="aspectFill" />
 				</view>
 				
 				<!-- 公司名称 -->
@@ -20,20 +20,7 @@
 				<view class="space-line"></view>
 				
 				<!-- 公司简介 -->
-				<view class="detail">
-							在公司发展壮大的5年里，我们始终为客户提供好的产品和技术支持、健全的售后
-					服务，我公司主要经营互联网信息技术开发、咨询、服务；网络推广；计算机软
-					硬件开发、咨询、销售；计算机系统集成；文体活动策划。在公司发展壮大的5年
-					里，我们始终为客户提供好的产品和技术支持、健全的售后服务，我公司主要经营
-					互联网信息技术开发、咨询、服务；网络推广；计算机软硬件开发、咨询、销售；
-					计算机系统集成；文体活动策划。在公司发展壮大的5年里，我们始终为客户提供好
-					的产品和技术支持、健全的售后服务，我公司主要经营互联网信息技术开发、咨询、
-					服务；网络推广；计算机软硬件开发、咨询、销售；计算机系统集成；文体活动策划。
-					计算机系统集成；文体活动策划。在公司发展壮大的5年里，我们始终为客户提供好的
-					产品和技术支持、健全的售后服务，我公司主要经营互联网信息技术开发、咨询、服
-					务；网络推广；计算机软硬件开发、咨询、销售；计算机系统集成；文体活动策划。
-					计算机系统集成；文体活动策划。在公司发展壮大的5年里。
-				</view>
+				<view class="detail">{{detail.title}}</view>
 			</view>
 			
 			<!-- 页脚联系方式 -->
@@ -44,32 +31,36 @@
 				<view class="footer-info">
 					<view class="footer-info-item">
 						<text>电话：</text>
-						<text class="tel">023-66863595</text>
+						<text class="tel">{{detail.telephone}}</text>
 					</view>
 					<view class="footer-info-item">
 						<text>邮箱：</text>
-						<text>15875412544@163.com</text>
+						<text>{{detail.email}}</text>
 					</view>
 					<view class="footer-info-item">
 						<text>地址：</text>
-						<text>重庆市渝中区朝天门409号</text>
+						<text>{{detail.address}}</text>
 					</view>
 					<view class="footer-info-item">
 						<text>工作时间：</text>
-						<text>9:00 - 18:00</text>
+						<text>{{detail.working_day}}</text>
 					</view>
 				</view>
 			</view>
-		</scroll-view>
+		</view>
 	</view>
 </template>
 
 <script>
-	import NavHeader from '../../components/NavHeader/NavHeader.vue'
+	import request from '../../service/request.js'
 	
 	export default {
-		components: {
-			NavHeader
+		data: () => ({
+			detail: {}
+		}),
+		onLoad: async function() {
+			var res = await request.post('/about_us/index')
+			this.detail = res.data
 		}
 	}
 </script>

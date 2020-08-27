@@ -45,27 +45,7 @@
 			steps: Array
 		},
 		data: () => ({
-			steps: [
-				{
-					type: 1,
-					title: '待接警',
-					time: '4-11 15:11:23'
-				},
-				{
-					type: 2,
-					title: '待处理',
-					time: '4-11 15:11:23'
-				},
-				{
-					type: 3,
-					title: '已到达',
-					time: '4-11 15:11:23'
-				},
-				{
-					type: 4,
-					title: '已完成'
-				}
-			]
+			
 		}),
 		computed: {
 			active() {

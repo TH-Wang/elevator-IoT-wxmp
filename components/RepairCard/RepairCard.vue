@@ -1,15 +1,27 @@
 <template>
 	<view class="container" :style="'background-color:' + background" @click="$emit('click')">
+		<!-- 头部 -->
 		<view class="header">
+			<view v-if="hasTag" :class="'header-tag ' + 'tag-' + type">{{getHeaderTagText()}}</view>
 			<text class="title ellipsis">{{record.ele_name}}</text>
 			<text class="time">{{record.fault_start_time}}</text>
 		</view>
-		<view class="detail ellipsis">
-			{{record.fault_syn}}
+		
+		<!-- 维保 -->
+		<view v-if="type == 'maint'" class="detail ellipsis">
+			电梯编码: {{record.elevator_number}}
 		</view>
+		<!-- 急修 -->
+		<view v-elseif="type == 'repair'" class="detail ellipsis">
+			<text>{{record.fault_code}}</text>
+			<text class="space-point">·</text>
+			<text>{{record.fault_syn}}</text>
+		</view>
+		
+		<!-- 底部 -->
 		<view class="footer">
 			<text class="address ellipsis">{{record.address}}</text>
-			<view :class="'type-button ' + 'button-' + record.repair_type">{{getButtonText()}}</view>
+			<view v-if="hasButton" :class="buttonClass">{{getButtonText()}}</view>
 		</view>
 	</view>
 </template>
@@ -24,15 +36,33 @@
 			background: {
 				type: String,
 				default: 'rgba(65, 144, 245, .05)'
+			},
+			hasTag: Boolean,
+			type: String,
+			hasButton: Boolean
+		},
+		computed: {
+			buttonClass() {
+				return 'type-button ' + 'button-' + (this.record.repair_type >= 4 ? 4 : this.record.repair_type)
 			}
 		},
 		methods: {
 			getButtonText() {
 				switch(this.record.repair_type) {
+					case 1: return '待接警';
 					case 2: return '待处理';
 					case 3: return '进行中';
 					case 4: return '已完成';
 					default: return '已完成';
+				}
+			},
+			getHeaderTagText() {
+				switch(this.type) {
+					case 'repair': return '急修';
+					case 'maint': return '维保';
+					case 'prompt': return '到期';
+					case 'answer': return '反应';
+					default: return '提示';
 				}
 			}
 		}
@@ -63,19 +93,41 @@
 		justify-content: space-between;
 	}
 	
+	.header-tag{
+		margin-right: 10rpx;
+		width: 60rpx;
+		height: 40rpx;
+		line-height: 40rpx;
+		text-align: center;
+		font-size: 22rpx;
+		color: #FFFFFF;
+		border-radius: 6rpx;
+		flex-shrink: 0;
+	}
+	.time{
+		flex-shrink: 0;
+	}
+	
 	.detail{
 		margin: 20rpx 0;
+		display: flex;
+		align-items: center;
 	}
 	
 	.title{
 		width: 78%;
 		color: #000000;
 		font-size: 28rpx;
+		flex: 1;
 	}
 	
 	.time, .type-button{
 		width: 22%;
 		font-size: 22rpx;
+	}
+	
+	.space-point{
+		margin: 0 10rpx;
 	}
 	
 	.detail, .address{
@@ -95,7 +147,14 @@
 		text-align: center;
 	}
 	/* 按钮 */
+	.button-1{background-color: #E19877; color: #FFFFFF}
 	.button-2{background-color: #4190F5; color: #FFFFFF}
 	.button-3{background-color: #FD9026; color: #FFFFFF}
 	.button-4{background-color: #EEEEEE; color: #999999}
+	
+	/* 标签 */
+	.tag-repair{background-color: #4190F5;}
+	.tag-maint{background-color: #FD9026;}
+	.tag-prompt{background-color: #FD9026;}
+	.tag-answer{background-color: #4190F5;}
 </style>

@@ -7,7 +7,7 @@
 			<view class="handle-card">
 				<!-- 左侧信息 -->
 				<view class="handle-info">
-					<text class="title">{{record.fault_attr}}</text>
+					<text class="title">{{record.fault_syn}}</text>
 					<view class="info">
 						<image src="../../static/icon/repair/time.png" />
 						<text>故障时间：{{record.fault_start_time}}</text>
@@ -19,7 +19,7 @@
 				</view>
 				<!-- 右侧按钮 -->
 				<view class="handle-button">
-					<view class="button primary">接警</view>
+					<view class="button primary" @click="handleAlarm">接警</view>
 					<view class="button secondary">导航</view>
 				</view>
 			</view>
@@ -29,7 +29,7 @@
 				
 				<view class="baseinfo-item">
 					<text>电梯名称</text>
-					<text>{{record.ele_name}}</text>
+					<text>{{ele.name}}</text>
 				</view>
 				<view class="baseinfo-item">
 					<text>工单编号</text>
@@ -37,11 +37,23 @@
 				</view>
 				<view class="baseinfo-item">
 					<text>故障来源</text>
-					<text>{{record.fault_source}}</text>
+					<text>{{fault_source}}</text>
 				</view>
 				<view class="baseinfo-item">
 					<text>故障描述</text>
 					<text>{{record.fault_syn}}</text>
+				</view>
+				<view class="baseinfo-item">
+					<text>发生时间</text>
+					<text>{{record.fault_start_time}}</text>
+				</view>
+				<view class="baseinfo-item">
+					<text>维保人员</text>
+					<text>{{ele.user_name}}</text>
+				</view>
+				<view class="baseinfo-item">
+					<text>联系方式</text>
+					<text>{{record.fault_start_time}}</text>
 				</view>
 			</view>
 			
@@ -55,6 +67,7 @@
 	import Steps from '../../components/Steps/Steps.vue'
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
 	import repairData from '../../data/repair.js'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -63,32 +76,38 @@
 			CommonButton
 		},
 		data: () => ({
-			repairId: null,
+			// repairId: null,
 			steps: [
 				{
 					type: 1,
 					title: '待接警',
-					time: '4-11 15:11:23'
+					time: ''
 				},
 				{
 					type: 2,
 					title: '待处理',
-					time: '4-11 15:11:23'
+					time: ''
 				},
 				{
 					type: 3,
 					title: '已到达',
-					time: '4-11 15:11:23'
+					time: ''
 				},
 				{
 					type: 4,
-					title: '已完成'
+					title: '已完成',
+					time: ''
 				}
-			]
+			],
+			record: {},
+			ele: {}
 		}),
 		computed: {
-			record() {
-				return repairData.all.find(i=>i.id === this.repairId)
+			fault_source() {
+				return this.record.fault_source == 0 ? '电梯自动报警' : '用户报警'
+			},
+			jobs() {
+				return this.$store.state.user.info.jobs
 			}
 		},
 		methods: {
@@ -96,10 +115,30 @@
 				uni.navigateTo({
 					url: '/pages/repairHandle/repairHandle'
 				})
+			},
+			// 点击接警
+			async handleAlarm() {
+				var _this_ = this
+				var res = await request.post('/maint/fault_submit', {
+					id: _this_.record.id,
+					type: 3
+				})
+				console.log(res)
 			}
 		},
-		onLoad(option) {
-			this.repairId = option.id
+		onLoad: async function(option) {
+			var _this_ = this
+			var { id } = option
+			var res = await request.post('/maint/fault_one', {id})
+			console.log(res)
+			this.record = res.data.repair
+			this.ele = res.data.ele
+			var newSteps = this.steps
+			newSteps.forEach(item => {
+				var hasTime = res.data.repair.log_time.find(i=>i.type==item.type)
+				if(hasTime) item.time = hasTime.time
+			})
+			this.steps = newSteps
 		}
 	}
 </script>
@@ -135,8 +174,8 @@
 		align-items: center;
 	}
 	.info image{
-		width: 30rpx;
-		height: 30rpx;
+		width: 28rpx;
+		height: 28rpx;
 		margin-right: 10rpx;
 	}
 	
