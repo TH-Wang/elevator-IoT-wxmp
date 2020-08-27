@@ -1,5 +1,6 @@
 <template>
 	<view class="container">
+		
 		<view class="background">
 			<image class="background-image" src="../../static/image/login-background.png" mode=""></image>
 		</view>
@@ -10,17 +11,22 @@
 		
 		<view class="title">账号绑定</view>
 		
-		<IconInput
-			iconImage="../../static/icon/login/code.png"
-			:tip="errTip.channel_number"
-		>
-			<input
-				type="text"
-				v-model="form.channel_number"
-				@blur="validateCNumber"
-				placeholder="通道号"
-			/>
-		</IconInput>
+		<!-- 关注微信公众号弹窗 -->
+		<official-account></official-account>
+		
+		<view style="margin-top: 20rpx;">
+			<IconInput
+				iconImage="../../static/icon/login/code.png"
+				:tip="errTip.channel_number"
+			>
+				<input
+					type="text"
+					v-model="form.channel_number"
+					@blur="validateCNumber"
+					placeholder="通道号"
+				/>
+			</IconInput>
+		</view>
 		
 		<IconInput
 			iconImage="../../static/icon/login/tel.png"
@@ -145,24 +151,29 @@
 					var res = await request.bind(this.form)
 					console.log(res)
 					
-					// 反馈框: 成功
-					this.feedback = {
-						visible: true,
-						title: '登录成功',
-						mode: 'success',
-						tip: '正在跳转首页'
+					if(res.code)
+					if(res.code == -1) {
+						this.feedback = {
+							visible: false
+						}
+						uni.showModal({
+							title: '请先关注“梯联宝”公众号',
+							showCancel: false
+						})
+					}
+					else if(res.code == 1){
+						// 绑定成功
+						this.handleBindSuccess(res)
+					}
+					else {
+						this.feedback = {
+							visible: false,
+							title: '登录失败',
+							mode: 'error',
+							tip: res.msg
+						}
 					}
 					
-					// 保存用户信息
-					this.$store.commit('setUserInfo', res)
-					// 保存请求地址
-					this.$store.commit('setBaseUrl', res.request_url)
-					// 跳转到首页
-					setTimeout(() => {
-						uni.reLaunch({
-							url: '/pages/index/index'
-						})
-					}, 300)
 				}
 				catch(err){
 					if(err){
@@ -176,6 +187,27 @@
 					}
 					console.log(err)
 				}
+			},
+			// 绑定成功操作
+			handleBindSuccess(res) {
+				// 反馈框: 成功
+				this.feedback = {
+					visible: true,
+					title: '登录成功',
+					mode: 'success',
+					tip: '正在跳转首页'
+				}
+				
+				// 保存用户信息
+				this.$store.commit('setUserInfo', res.data)
+				// 保存请求地址
+				this.$store.commit('setBaseUrl', res.data.request_url)
+				// 跳转到首页
+				setTimeout(() => {
+					uni.reLaunch({
+						url: '/pages/index/index'
+					})
+				}, 300)
 			},
 			// 表单所有字段的验证
 			validateForm() {
@@ -284,7 +316,7 @@
 	.title{
 		width: 100%;
 		text-align: center;
-		margin-top: -20rpx;
+		margin: -20rpx 0 30rpx 0;
 		font-size: 36rpx;
 		color: #000000;
 	}

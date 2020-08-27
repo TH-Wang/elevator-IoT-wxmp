@@ -3,7 +3,7 @@
 			<!-- 头部文本 -->
 			<view class="header">
 				<text>请为你的账号</text>
-				<text class="acount-text">admin</text>
+				<text class="acount-text">{{info.user_name}}</text>
 				<text>修改密码</text>
 			</view>
 			
@@ -52,8 +52,8 @@
 			visible: false
 		}),
 		computed: {
-			height() {
-				return this.$store.getters.commonHeight
+			info() {
+				return this.$store.state.user.info
 			}
 		},
 		methods: {
@@ -67,6 +67,8 @@
 <style scoped>
 	.container{
 		background-color: #F9F9F9;
+		height: 100vh;
+		overflow-y: scroll;
 	}
 	.header{
 		width: 100%;
@@ -77,6 +79,7 @@
 		font-size: 28rpx;
 		color: #666666;
 		background-color: #FFFFFF;
+		border-top: solid 1px #F9F9F9;
 	}
 	.acount-text{
 		margin: 0 20rpx;

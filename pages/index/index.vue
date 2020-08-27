@@ -1,11 +1,5 @@
 <template>
 		<view class="container">
-			<!-- 关注微信公众号弹窗 -->
-			<official-account
-				v-if="publicPop"
-				@load="handleOfficeLoad"
-				@error="handleOfficeError"
-			></official-account>
 			<!-- banner -->
 			<swiper
 				class="swiper"
@@ -60,7 +54,18 @@
 			<!-- 待办事项 -->
 			<view class="todos-title">
 				<text>待办事项</text>
-				<text><text style="color: #4190F5;">2</text>项</text>
+				<text><text style="color: #4190F5;">todoCount</text>项</text>
+			</view>
+			
+			<view class="todos-list">
+				<RepairCard
+					v-for="record in todoList"
+					:key="record.id"
+					:record="record"
+					:type="record.__TYPE"
+					hasTag
+					@click="handleLinkDetail($event, record.id)"
+				/>
 			</view>
 			
 		</view>
@@ -69,6 +74,7 @@
 <script>
 	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
 	import Search from '../../components/Search/Search.vue'
+	import RepairCard from '../../components/RepairCard/RepairCard.vue'
 	import gridConfig from './gridConfig.js'
 	import debounce from '../../utils/debounce.js'
 	import request from '../../service/request.js'
@@ -76,7 +82,8 @@
 	export default {
 		components: {
 			TabbarPage,
-			Search
+			Search,
+			RepairCard
 		},
 		data: () => ({
 			swiperList: ['1', '2', '3'],
@@ -87,7 +94,8 @@
 			],
 			gridConfig,
 			value: '',
-			publicPop: false
+			todoList: [],
+			todoCount: 0
 		}),
 		methods: {
 			handleNavigateLink(path, isTabbarPage) {
@@ -109,42 +117,29 @@
 			handleLinkBind(){
 				uni.navigateTo({url: '/pages/login/login'})
 			},
+			handleLinkDetail(e, id) {
+				uni.navigateTo({
+					url: '/pages/repairDetail/repairDetail?id=' + id
+				})
+			},
 			handleOfficeLoad(e) {
 				console.log(e.detail)
 			},
 			handleOfficeError(e) {
 				console.log(e.detail)
 			},
-			handleConfirmPublicAccount() {
-				var _this_ = this
-				uni.showModal({
-					showCancel: false,
-					title: '关注公众号',
-					content: '请先关注上方“梯联宝”公众号，然后进行绑定账号',
-					success(res) {
-						if(res.confirm){
-							setTimeout(async ()=>{
-								var res = await request.login()
-								if(res.code == -2){
-									_this_.handleLinkBind()
-									_this_.publicPop = false
-								}
-								else if(res.code == -1){
-									_this_.handleConfirmPublicAccount()
-								}
-								else{
-									_this_.publicPop = false
-									var token = res.data.token
-									// 存储token
-									uni.setStorageSync('token', token)
-									_this_.$store.commit('setBaseUrl', res.request_url)
-									_this_.$store.commit('setUserInfo', res)
-									console.log(res)
-								}
-							}, 5000)
-						}
-					}
-				})
+			// 待办事项处理
+			async requestTodoWork() {
+				var res = await request.post('/backlog')
+				var list = Object.entries(res.data)
+					.map(([type, items]) => {
+						items.forEach(item => {item.__TYPE = type})
+						return items
+					})
+					.reduce((prev, item) => [...prev, ...item], [])
+				console.log(list)
+				this.todoList = list
+				this.todoCount = list.length
 			}
 		},
 		onLoad: async function() {
@@ -153,9 +148,16 @@
 				var res = await request.login()
 				console.log(res)
 				if(res.code == -1){
-					this.publicPop = true
+					// this.publicPop = true
 					setTimeout(()=>{
-						_this_.handleConfirmPublicAccount()
+						uni.showModal({
+							title: '关注公众号',
+							content: '请先关注“梯联宝”公众号，然后进行账号绑定',
+							showCancel: false,
+							success() {
+								_this_.handleLinkBind()
+							}
+						})
 					}, 2000)
 				}
 				else if(res.code == -2){
@@ -177,11 +179,16 @@
 					this.$store.commit('setBaseUrl', res.data.request_url)
 					this.$store.commit('setUserInfo', res.data)
 					console.log(res)
+					await this.requestTodoWork()
 				}
 			}catch(e){
 				console.log(e)
 			}
-			
+		},
+		// 刷新首页
+		onPullDownRefresh: async function() {
+			await this.requestTodoWork()
+			uni.stopPullDownRefresh()
 		}
 	}
 </script>

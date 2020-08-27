@@ -3,7 +3,17 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页"
+				"navigationBarTitleText": "首页",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/test/test",				//测试
+			"style": {
+				"navigationBarTitleText": "测试",
+				"usingComponents": {
+				  "van-icon": "/wxcomponents/vant/dist/icon/index"
+				}
 			}
 		},
 		{
@@ -83,7 +93,10 @@
 		{
 			"path": "pages/repairHandle/repairHandle",		//急修工单处理
 			"style": {
-				"navigationBarTitleText": "工单处理"
+				"navigationBarTitleText": "工单处理",
+				"usingComponents": {
+					"van-icon": "/wxcomponents/vant/dist/icon/index"
+				}
 			}
 		},
 		
@@ -168,10 +181,6 @@
 			"style": { "navigationBarTitleText": "档案资料" }
 		},
 		{
-			"path": "pages/test/test",				//测试
-			"style": { "navigationBarTitleText": "测试" }
-		},
-		{
 			"path": "pages/searchPage/searchPage",		//搜索页
 			"style": { "navigationBarTitleText": "搜索" }
 		},
@@ -198,6 +207,16 @@
 		{
 			"path" : "pages/peopleDetail/peopleDetail",	//人员详细信息
 			"style": { "navigationBarTitleText": "人员详情" }
+		},
+		{
+			"path": "pages/faultCode/faultCode",		//故障代码
+			"style": {
+				"navigationBarTitleText": "故障代码",
+				"usingComponents": {
+					"van-dropdown-menu": "/wxcomponents/vant/dist/dropdown-menu/index",
+					"van-dropdown-item": "/wxcomponents/vant/dist/dropdown-item/index"
+				}
+			}
 		},
 		{
 			"path": "pages/worknorm/worknorm",		//工作规范

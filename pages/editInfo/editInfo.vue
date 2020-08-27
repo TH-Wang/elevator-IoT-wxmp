@@ -2,7 +2,7 @@
 	<view class="container">
 			<!-- 头像 -->
 			<view class="avatar">
-				<image class="avatar-image" src="../../static/image/avatar.png" />
+				<image class="avatar-image" :src="'http://' + info.head_img" />
 				<view class="avatar-button">
 					<view class="avatar-text">选择头像</view>
 					<image class="avatar-right-icon" src="../../static/icon/right.png" />
@@ -12,25 +12,38 @@
 			<!-- 表单主体 -->
 			<view class="form-container">
 				<FormItem label="登录账号" >
-					<text class="disable-text">zhoulixia@zhiyicx.com</text>
+					<text class="disable-text">{{info.user_name}}</text>
 				</FormItem>
 				<FormItem label="通道号" >
-					<input class="input" type="text" value="" placeholder="请输入..."/>
+					<text class="disable-text">{{info.channel_number}}</text>
 				</FormItem>
 				<FormItem label="职位" >
-					<text class="disable-text">维保员</text>
+					<text class="disable-text">{{getJob()}}</text>
 				</FormItem>
 				<FormItem label="姓名" >
-					<input class="input" type="text" value="" placeholder="请输入..."/>
+					<input class="input" type="text" v-model="realname" placeholder="请输入..."/>
 				</FormItem>
 				<FormItem label="性别" >
-					<input class="input" type="text" value="" placeholder="请输入..."/>
+					<radio-group class="radio-group" @change="handleSexChange">
+							<radio
+								class="radio"
+								color="#0088FF" 
+								:value="1" 
+								:checked="sex == 1" 
+							/><text style="margin-right: 6rpx;">男</text>
+							<radio
+								class="radio"
+								color="#0088FF" 
+								:value="2" 
+								:checked="sex == 2" 
+							/><text>女</text>
+					</radio-group>
 				</FormItem>
 				<FormItem label="电话" >
-					<input class="input" type="text" value="" placeholder="请输入..."/>
+					<input class="input" type="text" v-model="phone" placeholder="请输入"/>
 				</FormItem>
 				<FormItem label="邮箱" >
-					<input class="input" type="text" value="" placeholder="请输入..."/>
+					<input class="input" type="text" v-model="email" placeholder="请输入"/>
 				</FormItem>
 			</view>
 			
@@ -50,15 +63,45 @@
 			FormItem,
 			CommonButton
 		},
+		data: () => ({
+			realname: '',
+			sex: '',
+			phone: '',
+			email: ''
+		}),
 		computed: {
-			height() {
-				return this.$store.getters.commonHeight
+			info() {
+				return this.$store.state.user.info
 			}
 		},
 		methods: {
+			handleSexChange(e) {
+				this.sex = e.detail.value
+			},
+			getJob() {
+				switch(this.info.jobs) {
+					case 1: return '作用人员';
+					case 2: return '管理人员';
+					case 3: return '普通人员';
+					default: return '普通人员'
+				}
+			},
 			handleSubmit() {
-				console.log('保存资料')
+				var _this_ = this
+				console.log('----保存资料----')
+				console.log({
+					realname: _this_.realname,
+					sex: _this_.sex,
+					phone: _this_.phone,
+					email: _this_.email
+				})
 			}
+		},
+		onLoad() {
+			this.realname = this.info.realname
+			this.sex = this.info.sex
+			this.phone = this.info.phone
+			this.email = this.info.email
 		}
 	}
 </script>
@@ -107,5 +150,13 @@
 	.input{
 		flex: 1;
 		text-align: right;
+	}
+	
+	.radio-group{
+		display: flex;
+		align-items: center;
+	}
+	.radio{
+		transform: scale(0.7);
 	}
 </style>
