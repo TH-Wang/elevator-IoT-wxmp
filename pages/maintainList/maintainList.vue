@@ -41,6 +41,7 @@
 <script>
 	import Null from '@/components/uni-null/uni-null.vue'
 	import uniLoadMore from "@/components/uni-load-more/uni-load-more.vue"
+	import request from '@/service/request.js'
 	export default {
 		components:{
 			Null,uniLoadMore
@@ -95,11 +96,20 @@
 				}
 			}
 		},
+		onLoad(){
+			this.getList();
+		},
 		methods: {
 			onChange(event) {
 				console.log(event.detail)
 				let id = event.detail.name;
 			},
+			getList(){
+				let data = {};
+				request.post('/backlog/banner',data).then((res) =>{
+					console.log(res)
+				})
+			}
 		},
 		onPullDownRefresh(){
 			console.log('下拉开始')
