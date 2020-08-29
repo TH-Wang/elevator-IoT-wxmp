@@ -3,7 +3,7 @@
 		<!-- 电梯 -->
 		<view class="ele-box">
 			<image src="../../static/image/wxj/dt.png" mode=""></image>
-			<view class="ele-box-num">15</view>
+			<view class="ele-box-num">{{ lcNum || 0 }}</view>
 			<view class="room">
 				<view class="room_1" :class="isShow?'':'room-an1'">
 					<image src="../../static/image/wxj/2.png" mode=""></image>
@@ -153,13 +153,13 @@
 				<view class="menu-bar-jy-cont">
 					<view class="menu-bar-jy-videl">
 						<view class="menu-bar-jy-videl-more" v-if="ds==0">
-							<view class="menu-bar-jy-videl-more-li"></view>
-							<view class="menu-bar-jy-videl-more-li"></view>
-							<view class="menu-bar-jy-videl-more-li"></view>
-							<view class="menu-bar-jy-videl-more-li"></view>
+							<view class="menu-bar-jy-videl-more-li"><video src="https://yanuojixie.oss-cn-beijing.aliyuncs.com/video/15986882862966.mp4" controls></video></view>
+							<view class="menu-bar-jy-videl-more-li"><video src="https://yanuojixie.oss-cn-beijing.aliyuncs.com/video/15986882862966.mp4" controls></video></view>
+							<view class="menu-bar-jy-videl-more-li"><video src="https://yanuojixie.oss-cn-beijing.aliyuncs.com/video/15986882862966.mp4" controls></video></view>
+							<view class="menu-bar-jy-videl-more-li"><video src="https://yanuojixie.oss-cn-beijing.aliyuncs.com/video/15986882862966.mp4" controls></video></view>
 						</view>
 						<view class="menu-bar-jy-videl-big" v-else>
-							<view class="menu-bar-jy-videl-big-box"></view>
+							<view class="menu-bar-jy-videl-big-box"><video src="https://yanuojixie.oss-cn-beijing.aliyuncs.com/video/15986882862966.mp4" controls></video></view>
 						</view>
 					</view>
 					<view class="menu-bar-jy-list">
@@ -247,7 +247,7 @@
 									</view>
 									<!-- 第二类 列表 -->
 									<view class="menu-cs-list4" v-if="item.stu == 1 && twoId == i.id">
-										<view class="menu-cs-list4-li" v-for="(j,index) in i.dtListCsInfo">
+										<view class="menu-cs-list4-li" v-for="(j,index) in i.dtListCsInfo" :key="j.index">
 											<view class="menu-cs-list4-li-title">
 												{{ j.name }}
 											</view>
@@ -338,6 +338,7 @@
 </template>
 
 <script>
+	import request from '@/service/request.js'
 	import Null from '@/components/uni-null/uni-null.vue'
 	import uniLoadMore from "@/components/uni-load-more/uni-load-more.vue"
 	export default {
@@ -346,6 +347,7 @@
 		},
 		data() {
 			return {
+				lcNum: 0,
 				OiId:0,
 				status1: 'more',
 				status2: 'more',
@@ -598,7 +600,25 @@
 				that.isShow = !that.isShow;
 			}, 6000)
 		},
+		onLoad() {
+			let that = this;
+			that.getDtLc();
+		},
 		methods: {
+			// 获取电梯楼层
+			getDtLc(){
+				let that = this;
+				let data = {
+					id: 1507,
+					ele_unmber:230000002
+				};
+				request.post('/lift/get_floor',data).then((res)=>{
+					console.log(res)
+					if(res.code == 1){
+						that.lcNum = actual_floor
+					}
+				})
+			},
 			// 事件方法
 			OiListTap(id){
 				let that = this;
@@ -695,4 +715,12 @@
 
 <style scoped>
 	@import "../../static/css/wxj.css";
+	.menu-bar-jy-videl-more-li video{
+		width: 100%;
+		height: 100%;
+	}
+	.menu-bar-jy-videl-big-box video{
+		width: 100%;
+		height: 100%;
+	}
 </style>

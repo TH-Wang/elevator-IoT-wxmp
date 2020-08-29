@@ -2,32 +2,34 @@
 	<view class="main">
 		<view class="main-list-tab" :class="float?'topPost':''">
 			<van-tabs :active="active" color="#4190F5" @click="onChange">
-				<van-tab title="待处理" name="1"></van-tab>
-				<van-tab title="进行中" name="2"></van-tab>
-				<van-tab title="已完成" name="3"></van-tab>
-				<van-tab title="全部" name="4"></van-tab>
+				<van-tab title="待处理" :name="1"></van-tab>
+				<van-tab title="进行中" :name="3"></van-tab>
+				<van-tab title="已完成" :name="2"></van-tab>
+				<van-tab title="全部" :name="0"></van-tab>
 			</van-tabs>
 		</view>
 		<view class="main-list" v-if="list.length > 0">
-			<view class="main-list-li" v-for="(item,index) in list" :key="index">
-				<view class="main-list-li-ttle">
-					<view class="main-list-li-ttle-name">{{ item.title }}</view>
-					<view class="main-list-li-ttle-time">{{ item.time }}</view>
-				</view>
-				<view class="main-list-li-num">
-					电梯编号: {{ item.num }}
-				</view>
-				<view class="main-list-li-fot">
-					<view class="main-list-li-fot-addres">
-						{{ item.addres }}
+			<navigator v-for="(item,index) in list" :key="index" :url="'/pages/workdel/workdel?id='+item.id">
+				<view class="main-list-li">
+					<view class="main-list-li-ttle">
+						<view class="main-list-li-ttle-name">{{ item.ele_name }}</view>
+						<view class="main-list-li-ttle-time">{{ item.maint_time }}</view>
 					</view>
-					<view class="main-list-li-fot-btn">
-						<text class="main-list-li-fot-btn-d" v-if="item.studes==1">待处理</text>
-						<text class="main-list-li-fot-btn-z" v-if="item.studes==2">进行中</text>
-						<text class="main-list-li-fot-btn-w" v-if="item.studes==3">已完成</text>
+					<view class="main-list-li-num">
+						电梯编号: {{ item.elevator_number }} 【{{ item.register_code }}】
+					</view>
+					<view class="main-list-li-fot">
+						<view class="main-list-li-fot-addres">
+							{{ item.address }}
+						</view>
+						<view class="main-list-li-fot-btn">
+							<text class="main-list-li-fot-btn-d" v-if="item.is_maintain==1">待处理</text>
+							<text class="main-list-li-fot-btn-z" v-if="item.is_maintain==3">进行中</text>
+							<text class="main-list-li-fot-btn-w" v-if="item.is_maintain==2">已完成</text>
+						</view>
 					</view>
 				</view>
-			</view>
+			</navigator>
 			<!-- 加载中/没有更多数据 -->
 			<uni-load-more iconType="snow" :iconSize="14" :status="status" />
 		</view>
@@ -51,18 +53,19 @@
 				type: 1,
 				page: 1,
 				size: 10,
+				isMore: true, //是否可以可以上拉
 				status: 'more',
-				active: "1",
+				active: 1,
 				float: false,
 				title: '暂无数据',
 				list: [
-					{
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					}
+					// {
+					// 	title: '这是电梯名称',
+					// 	time: '2020-11-11',
+					// 	num: '23000300',
+					// 	addres: '重庆市九龙坡区歇台子渝州路126号',
+					// 	studes: '1'
+					// }
 				],
 				contentText: {
 				    contentdown: '上拉加载更多',
@@ -77,10 +80,22 @@
 		},
 		methods: {
 			onChange(event) {
-				console.log(event.detail)
-				let id = event.detail.name;
+				let that = this,
+				 id = event.detail.name;
+				that.type = id;
+				that.page = 1;
+				that.isMore = true;
+				that.status = 'more';
+				// 切换tab设置页面返回顶部
+				uni.pageScrollTo({ 
+				　　scrollTop: 0, duration: 300 
+				}); 
+				that.getList(id,that.page,0);
 			},
-			getList(type,page){
+			getList(type,page,isla){
+				//type 数据类型
+				//page 页数
+				//isla 0正常加载 1下拉刷新 2上拉加载
 				let that = this;
 				let data = {
 					type: type,
@@ -89,7 +104,23 @@
 				};
 				request.post('/maint/main_order',data).then((res) =>{
 					if(res.code == 1){
-						
+						if(res.data.length < 10){
+							that.isMore = false;
+							that.status = 'noMore'
+						}
+						console.log(that.isMore)
+						if(isla == 0){
+							that.list = [];
+							that.list = res.data;
+						}else if(isla == 1){
+							that.list = [];
+							that.list = res.data;
+							uni.stopPullDownRefresh();
+						}else{
+							that.list = that.list.concat(res.data)
+							console.log(that.list)
+						}
+						console.log(res.data)
 					}else{
 						uni.showToast({
 							title:res.message,
@@ -102,21 +133,22 @@
 		onPullDownRefresh(){
 			console.log('下拉开始')
 			let that = this;
-			that.getList(that.type,1);
-			// setTimeout(function () {
-			// 	console.log('下拉结束')
-			//    uni.stopPullDownRefresh();
-			// }, 1000);
+			that.page = 1;
+			that.isMore = true;
+			that.status = 'loading';
+			that.getList(that.type,that.page,1);
 		},
 		onReachBottom(){
 			console.log('上拉开始')
 			let that = this;
-			that.status = 'loading'
-			setTimeout(function () {
-				console.log('上拉结束')
-				that.status = 'noMore'
-				console.log(that.status)
-			}, 2000);
+			console.log(that.isMore)
+			if(that.isMore == true){
+				let pageNumber = that.page + 1;
+				that.status = 'loading';
+				that.page = pageNumber;
+				console.log(pageNumber)
+				that.getList(that.type,pageNumber,2)
+			}
 		},
 		/**
 		 * 屏幕滚动监听
@@ -158,7 +190,7 @@
 	}
 
 	.main-list {
-		padding: 30rpx;
+		padding: 0rpx 30rpx 30rpx;
 		box-sizing: border-box;
 		background-color: #fff;
 	}
@@ -171,9 +203,9 @@
 		margin-top: 30rpx;
 	}
 
-	.main-list-li:first-of-type {
+/* 	.main-list-li:first-of-type {
 		margin-top: 0rpx;
-	}
+	} */
 
 	.main-list-li-ttle {
 		display: flex;
