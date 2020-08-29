@@ -22,7 +22,7 @@
 						</view>
 					</view>
 					<!-- 插入模式 -->
-					<uni-calendar class="uni-calendar--hook" :selected="info.selected" :showMonth="false" @change="change" @monthSwitch="monthSwitch"  />
+					<uni-calendar class="uni-calendar--hook" :selected="info.selected" :showMonth="false" @change="change" @monthSwitch="monthSwitch" />
 				</view>
 				<!-- <uni-section title="弹出模式" type="line"></uni-section> -->
 				<!-- <view class="example-body">
@@ -37,7 +37,6 @@
 				<van-tabs :active="active" color="#4190F5" @click="onChange">
 					<van-tab title="待处理" name="1"></van-tab>
 					<van-tab title="进行中" name="2"></van-tab>
-					<van-tab title="带审核" name="3"></van-tab>
 					<van-tab title="已完成" name="4"></van-tab>
 					<van-tab title="全部" name="4"></van-tab>
 				</van-tabs>
@@ -88,6 +87,10 @@
 	import uniCalendar from "@/components/uni-calendar/uni-calendar.vue"
 	import Null from '@/components/uni-null/uni-null.vue'
 	import uniLoadMore from "@/components/uni-load-more/uni-load-more.vue"
+	import request from '@/service/request.js'
+	// request.post('/backlog/banner',data).then((res) =>{
+	// 	console.log(res)
+	// })
 	function getDate(date, AddDayCount = 0) {
 		if (!date) {
 			date = new Date()
@@ -289,7 +292,7 @@
 	}
 	.uni-calendar-item--checked{
 		background-color: none !important;
-		color: #333 !important;
+		/* color: #333 !important; */
 
 	}
 	.timetow{
