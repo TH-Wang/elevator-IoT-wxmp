@@ -5,10 +5,10 @@
 		  <view class="headtopbox">
 		    <view class="headlet">
 		      <image src="../../static/image/yfm/search.png"></image>
-		      <input type="text" placeholder="输入电梯名字"></input>
+		      <input type="text" placeholder="输入电梯名字"  :value="addxiaoqu"   @input="recordName"></input>
 		    </view>
-		    <view class="dwboxs" @click="listcitybtn()">
-		      <view class="addstxt">重庆</view>
+		    <view class="dwboxs" @click="changeAddres()">
+		      <view class="addstxt">{{ addText }}</view>
 		      <image src="../../static/image/yfm/dwbox.png"></image>
 		    </view>
 		  </view>
@@ -44,42 +44,136 @@
 		id="map" :longitude="longitude" :latitude=" latitude" :markers="covers" scale="15" 
 		>
 		</map>
-
+        <van-popup
+		  :show="addresShow"
+		  position="bottom"
+		  @close="onClose"
+		>
+		<van-area @confirm="isokAdd" @cancel="onClose" :area-list="areaList" />
+		</van-popup>
 	</view>
 </template>
 
 <script>
+	import AREA from "@/utils/area.js"
+	import request from '@/service/request.js'
 	export default {
 		data() {
 			return {
+				xqShow: false,
+				xqText: '全部地区',
+				cityda:'重庆市',
+				xqCode: 0,
+				addText: '江北区',
+				dqCode: 500107,
+				addresShow: false,
+				areaList: {},
 				latitude: 39.909,
 				longitude: 116.39742,
 				markers:'' ,
-				covers: [{
-              id: 0,
-              iconPath: "../../static/image/yfm/dwbox.png",
-              latitude: 39.909,
-              longitude:116.39742 ,
-              width: 20,  //图片显示宽度
-              height: 20,  //图片显示高度
-              callout: { 
-                content: " 这里是小区名字圣诞节规划是  \n 维修:10  维修:10  维修:10",
-                color: "#000000",
-                fontSize: "12", 
-                borderRadius: "5",
-                bgColor: "#ffffff",
-                padding: "5",
-                display:"ALWAYS"
-                }
-            }]
+				covers: '',
+				addressList:'',
+				addxiaoqu:'',
 			}
 		},
+		onLoad() {
+			let that = this;
+			that.areaList = AREA;
+			this.getadd()
+		},
 		methods: {
-			listcitybtn(){
-				uni.navigateTo({
-					url:'../citylist/citylist'
+			recordName(e){
+				this.addxiaoqu = e.detail.value; 
+				this.searchbox(this.cityda,e.detail.value,this.addText)
+			},
+			searchbox(city,vaill_name,province){
+				request.post('/gis_map',{
+					city:city,
+					vaill_name:vaill_name,
+					province:province,
+				}).then((res)=>{
+					console(res)
 				})
 			},
+			getadd(){
+				uni.getLocation({
+					type: 'wgs84',
+					geocode:true,
+					success:data=>{
+						console.log(data)
+						this.latitude=data.latitude
+						this.longitude=data.longitude
+						this.covers= [{
+						  id: 0,
+						  latitude: data.latitude,
+						  longitude: data.longitude,
+						  iconPath: "../../static/image/yfm/dwbox.png",
+						  width: 20,  //图片显示宽度
+						  height: 20,  //图片显示高度
+						  callout: { 
+						    content: " 这里是小区名字圣诞节规划是  \n 维修:10  维修:10  维修:10",
+						    color: "#000000",
+						    fontSize: "12", 
+						    borderRadius: "5",
+						    bgColor: "#ffffff",
+						    padding: "5",
+						    display:"ALWAYS"
+						    }
+						}]
+					
+					//     var point = new plus.maps.Point(res.longitude, res.latitude);
+					// 	plus.maps.Map.reverseGeocode(
+					// 		point,
+					// 		{},
+					// 		function(event) {
+					// 			console.log(event)
+					// 			var address = event.address; // 转换后的地理位置
+					// 			var point = event.coord; // 转换后的坐标信息
+					// 			var coordType = event.coordType; // 转换后的坐标系类型
+					// 			console.log(address, 'address');
+					// 			var reg = /.+?(省|市|自治区|自治州|县|区)/g;
+								
+					// 			console.log(address.match(reg));
+					// 			_this.addressList=address.match(reg).toString().split(",");
+					// 			 _this.address= _this.addressList[1];
+					// 			console.log(_this.addressList[0]);
+					// 			console.log(_this.addressList[1]);
+					// 			console.log(_this.addressList[2]);
+								
+					// 		},
+					// 		function(e) {}
+					// 	);
+					
+					}
+				})
+			},
+			changeAddres(){
+				let that = this;
+				that.addresShow = true;
+			},
+			isokAdd(e){
+				console.log(e)
+				let that = this;
+				let value = e.target.values;
+				let addText = value[2].name; //value[0].name+'/'+value[1].name+'/'+
+				let dqCode = value[2].code;
+				that.cityda=value[1].name;
+				that.addText = addText;
+				that.dqCode = dqCode;
+				that.xqText= '全部地区',
+				that.xqCode= 0,
+				that.onClose();
+			},
+			
+			onClose(){
+				let that = this;
+				that.addresShow = false;
+			},
+			// listcitybtn(){
+			// 	uni.navigateTo({
+			// 		url:'../citylist/citylist'
+			// 	})
+			// },
 		}
 	}
 </script>
@@ -110,7 +204,7 @@
   height: 70rpx;
 }
 .headlet{
-  width: 570rpx;
+  width: 500rpx;
   height: 70rpx;
   position: relative;
   display: flex;

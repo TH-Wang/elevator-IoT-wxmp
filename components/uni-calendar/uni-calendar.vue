@@ -156,6 +156,7 @@
 		},
 		created() {
 			// 获取日历方法实例
+			
 			this.cale = new Calendar({
 				// date: new Date(),
 				selected: this.selected,
@@ -165,7 +166,11 @@
 			})
 			// 选中某一天
 			// this.cale.setDate(this.date)
-			this.init(this.date)
+			const value  = this.cale.getDate(this.nowDate.fullDate, +0, 'month').year.toString()+'-'+this.cale.getDate(this.nowDate.fullDate, +0, 'month').month.toString()+'-'+'01'
+			console.log(value);
+			// console.log(this.date)
+			this.init(value)
+			
 			// this.setDay
 		},
 		methods: {
@@ -180,7 +185,7 @@
 				// this.monthSwitch()
 				
 				const value = e.detail.value + '-1'
-				console.log(value)
+				console.log(e)
 				this.init(value)
 				
 			},
