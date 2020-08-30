@@ -34,15 +34,15 @@
 	    <view class="wbcont">
 			<view class="headcont">
 				<view class="wbnum">维保项目</view>
-				<view class="rigtwbnum">（2150）</view>
+				<view class="rigtwbnum">（{{wblist.length}}）</view>
 			</view>
 			<view class="wblist">
-				<view class="wbnavcont" v-for="(item,index) of wblist">
-					<view class="wbname">{{item.name}}</view>
+				<view class="wbnavcont" v-for="(item,index) of wblist" :key="item.name">
+					<view class="wbname"  >{{item.name}}</view>
 					<view class="wbrightnum">
-						<view class="znum">总数<text class="texcol1">{{item.znum}}</text></view>/
-						<view class="znum">合格<text class="texcol2">{{item.hgnum}}</text></view>/
-						<view class="znum">不合格<text class="texcol3">{{item.nhgnum}}</text></view>
+						<view class="znum" >总数<text class="texcol1">{{quanbus[index]}}</text></view>/
+						<view class="znum" >合格<text class="texcol2">{{hegenum[index]}}</text></view>/
+						<view class="znum" >不合格<text class="texcol3">{{wxbnum[index]}}</text></view>
 						<van-icon name="arrow" />
 					</view>
 				</view>
@@ -80,6 +80,9 @@
 	export default {
 	  data() {
 	    return {
+			quanbus:[],//全部
+			wxbnum:[],//不合格
+			hegenum:[],//合格
 			coniden:'',//签字人员：1安全人员；2维保员；3物业；（有参数signature_image，就必须有本参数）
 			dataid:'',//详情ID
 			marcont:'',//签字备注
@@ -88,16 +91,9 @@
 			show:false,
 		  // 维保项目
 		  datadel:'',
-		  wblist:[
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' }
+		  wblist:[   //项目列表
+		  			  // {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
+		  			 
 		  ],
 	      active: 0,
 		  steps: [
@@ -129,12 +125,65 @@
 		console.log(cont)
 		this.contdel(cont.id)
 		this.dataid=cont.id
+		
+		this.xmlist(cont.id)
 	  },
 	  mounted() {
 	  	
 	  },
 	  methods:{
-	    
+	    // 项目列表
+		xmlist(id){
+			var that=this
+			request.post('/maint/xm_classify',{
+				id:id,
+				type:0
+			}).then((data) =>{
+				console.log(data)
+				if(data.code == 1){
+					
+					for(var i=0;i<data.data.length;i++){
+						
+						request.post('/maint/main_xm',{
+							id:data.data[i].id,
+							maint_id:id,
+							type:0
+						}).then((res) =>{
+							if(res.code == 1){
+								that.quanbus.push(res.data.length)
+							}
+						})
+						request.post('/maint/main_xm',{
+							id:data.data[i].id,
+							maint_id:id,
+							type:1
+						}).then((res) =>{
+							if(res.code == 1){
+								that.wxbnum.push(res.data.length)
+							}
+						})
+						request.post('/maint/main_xm',{
+							id:data.data[i].id,
+							maint_id:id,
+							type:2
+						}).then((res) =>{
+							if(res.code == 1){
+								that.hegenum.push(res.data.length)
+							}
+						})
+						
+					}
+					that.wblist=data.data
+					console.log(that.quanbus)
+					
+				}else{
+					uni.showToast({
+						title:res.message,
+						icon:"none"
+					})
+				}
+			})
+		},
 		// 详情
 		contdel(id){
 			var that=this

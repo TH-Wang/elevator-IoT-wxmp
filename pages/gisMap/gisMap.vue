@@ -84,13 +84,12 @@
 		methods: {
 			recordName(e){
 				this.addxiaoqu = e.detail.value; 
-				this.searchbox(this.cityda,e.detail.value,this.addText)
+				this.searchbox(this.cityda,e.detail.value)
 			},
-			searchbox(city,vaill_name,province){
+			searchbox(city,vaill_name){
 				request.post('/gis_map',{
 					city:city,
 					vaill_name:vaill_name,
-					province:province,
 				}).then((res)=>{
 					console(res)
 				})
@@ -121,28 +120,7 @@
 						    }
 						}]
 					
-					//     var point = new plus.maps.Point(res.longitude, res.latitude);
-					// 	plus.maps.Map.reverseGeocode(
-					// 		point,
-					// 		{},
-					// 		function(event) {
-					// 			console.log(event)
-					// 			var address = event.address; // 转换后的地理位置
-					// 			var point = event.coord; // 转换后的坐标信息
-					// 			var coordType = event.coordType; // 转换后的坐标系类型
-					// 			console.log(address, 'address');
-					// 			var reg = /.+?(省|市|自治区|自治州|县|区)/g;
-								
-					// 			console.log(address.match(reg));
-					// 			_this.addressList=address.match(reg).toString().split(",");
-					// 			 _this.address= _this.addressList[1];
-					// 			console.log(_this.addressList[0]);
-					// 			console.log(_this.addressList[1]);
-					// 			console.log(_this.addressList[2]);
-								
-					// 		},
-					// 		function(e) {}
-					// 	);
+					
 					
 					}
 				})

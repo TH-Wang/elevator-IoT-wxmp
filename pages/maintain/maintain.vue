@@ -148,7 +148,7 @@
 			}
 		},
 		onReady() {
-			
+			let that = this;
 			this.$nextTick(() => {
 				this.showCalendar = true
 			})
@@ -162,11 +162,12 @@
 					
 				]
 			}, 100)
-		},
-		onLoad(){
-			let that = this;
 			that.getList(that.type,1,this.getCurrentMonthFirst());
 			this.caltime(this.getCurrentMonthFirst())
+		},
+		onLoad(){
+			
+			
 		},
 		methods: {
 			// 跳转维保工单
