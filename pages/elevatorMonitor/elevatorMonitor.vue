@@ -38,7 +38,7 @@
 			<!-- 列表 -->
 			<view class="ele-bot-sj">
 				<view class="ele-list" v-if="list.length>0">
-					<navigator v-for="(item, index) in list" :key="item.index" :url="'/pages/eleInfo/eleInfo?id='+item.id+'&name='+item.name">
+					<navigator v-for="(item, index) in list" :key="item.index" :url="'/pages/eleInfo/eleInfo?item='+encodeURIComponent(JSON.stringify(item))">
 						<view class="ele-list-li">
 							<view class="ele-list-li-top">
 								<view class="ele-list-li-top-name">
@@ -121,7 +121,7 @@
 				xqCode: 0,
 				addText: '重庆',
 				dqCode: 0,
-				ssCode: 0,
+				ssCode: 500000,
 				addresShow: false,
 				classList: {},
 				status: 'more',
@@ -294,6 +294,7 @@
 							title: '您取消了授权，将使用默认地区',
 							icon: 'none'
 						})
+						that.getList(that.ssCode,'','','');
 					}
 
 				})
