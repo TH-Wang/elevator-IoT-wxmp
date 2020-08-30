@@ -31,7 +31,6 @@
 			"path": "pages/maintain/maintain",
 			"style": {
 				"navigationBarTitleText": "保养",
-				"enablePullDownRefresh":true,//开启下拉刷新
 				"onReachBottomDistance": 100,	
 				"usingComponents":{
 					"van-button": "/wxcomponents/vant/dist/button/index",

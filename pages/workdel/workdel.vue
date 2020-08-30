@@ -13,20 +13,20 @@
 			<view class="qdlist">
 				<view class="qdlettxt">
 					<image src="../../static/icon/tabbar/mine-active.png"></image>
-					<text>维保人员：副书记</text>
+					<text>维保人员：{{datadel.basis.user_name}}</text>
 				</view>
 				<view class="qdbtns" @click="onClickShow">签到</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
 					<image src="../../static/icon/repair/time.png"></image>
-					<text>维保时间：2020-04-14 14:20:11</text>
+					<text>维保时间：{{datadel.basis.maint_end_time}}</text>
 				</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
 					<image src="../../static/icon/repair/address.png"></image>
-					<text>所在小区：是读后各说各话建设公司公司觉得开个会</text>
+					<text>所在小区：{{datadel.ele.village_name}}</text>
 				</view>
 			</view>
 		</view>
@@ -55,7 +55,7 @@
 			<view class="wrapper">
 			  <view class="qrbtnqz">签字确认</view>
 			  <van-icon name="close" class="closebtns" @click="onClickHide" />
-			  <input type="text" placeholder="请输入备信息" class="bzcont" />
+			  <input type="text" placeholder="请输入备信息" v-model="marcont" class="bzcont" />
 			  <view class="qzban">
 				  	<canvas class="mycanvas" canvas-id="mycanvas" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend"></canvas>
 				  	
@@ -76,14 +76,18 @@
 <script>
 	var x = 20;
 	var y =20;
+	import request from '@/service/request.js'
 	export default {
 	  data() {
 	    return {
+			coniden:'',//签字人员：1安全人员；2维保员；3物业；（有参数signature_image，就必须有本参数）
+			dataid:'',//详情ID
+			marcont:'',//签字备注
 			ctx:'',         //绘图图像
 			points:[],       //路径点集合 
 			show:false,
 		  // 维保项目
-		  
+		  datadel:'',
 		  wblist:[
 		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
 		  			  {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
@@ -116,18 +120,45 @@
 	      
 		  
 	  },
-	  onLoad() {
+	  onLoad(cont) {
 	  	this.ctx = uni.createCanvasContext("mycanvas",this);   //创建绘图对象
-	  	
 	  	//设置画笔样式
 	  	this.ctx.lineWidth = 4;
 	  	this.ctx.lineCap = "round"
 	  	this.ctx.lineJoin = "round"
+		console.log(cont)
+		this.contdel(cont.id)
+		this.dataid=cont.id
 	  },
 	  mounted() {
 	  	
 	  },
 	  methods:{
+	    
+		// 详情
+		contdel(id){
+			var that=this
+			this.steps=[]
+			request.post('/maint/maint_one',{
+				id:id
+			}).then((res) =>{
+				console.log(res)
+				if(res.code == 1){
+					that.datadel=res.data
+					that.coniden=res.data.basis.iden
+					for(var i=0;i<res.data.log_time.length;i++){
+						that.steps.push({text:res.data.log_time[i].time,desc:res.data.log_time[i].type})
+					}
+					console.log(that.steps)
+				}else{
+					uni.showToast({
+						title:res.message,
+						icon:"none"
+					})
+				}
+			})
+		},
+		  
 		//触摸开始，获取到起点
 		touchstart:function(e){
 			let startX = e.changedTouches[0].x;
@@ -187,14 +218,25 @@
 		
 		//完成绘画并保存到本地
 		finish:function(){
+			var that=this
 			uni.canvasToTempFilePath({
 			  canvasId: 'mycanvas',
 			  success: function(res) {
 				  console.log(res)
 			    let path = res.tempFilePath;
-				uni.saveImageToPhotosAlbum({
-					filePath:path,
+				request.post('/maint/signature',{
+					id:that.dataid,
+					image:path,
+					type:that.coniden,
+					remark:that.marcont
+				}).then((res) =>{
+					console.log(res)
+					
 				})
+				
+				// uni.saveImageToPhotosAlbum({
+				// 	filePath:path,
+				// })
 			  } 
 			})
 		},

@@ -22,7 +22,7 @@
 						</view>
 					</view>
 					<!-- 插入模式 -->
-					<uni-calendar class="uni-calendar--hook" :selected="info.selected" :showMonth="false" @change="change" @monthSwitch="monthSwitch" />
+					<uni-calendar ref="calendar" class="uni-calendar--hook" :selected="info.selected" :showMonth="false" @change="change" @click="bindDateChange" :confirm="confirm" />
 				</view>
 				<!-- <uni-section title="弹出模式" type="line"></uni-section> -->
 				<!-- <view class="example-body">
@@ -121,6 +121,7 @@
 		},
 		data() {
 			return {
+				chantime:'',//时间
 				showCalendar: false,
 				info: {
 					lunar: true,
@@ -128,12 +129,12 @@
 					insert: false,
 					selected: []
 				},
-				type: 1,
+				type: '1',
 				page: 1,
 				size: 10,
 				isMore: true, //是否可以可以上拉
 				status: 'more',
-				active: 1,
+				active: '1',
 				float: false,
 				title: '暂无数据',
 				list: [
@@ -147,6 +148,7 @@
 			}
 		},
 		onReady() {
+			
 			this.$nextTick(() => {
 				this.showCalendar = true
 			})
@@ -156,27 +158,15 @@
 				this.info.startDate = getDate(new Date(), -60).fullDate
 				this.info.endDate = getDate(new Date(), 30).fullDate
 				this.info.selected = [
-					{
-						date: '2020-08-27',
-						class:'timenone',
-						info: '超期',
-					},
-					{
-						date: '2020-08-28',
-						class:'timetow',
-						info: '待处理',
-					},
-					{
-						date: '2020-08-30`',
-						class:'timebox',
-						info: '完成',
-					}
+					
+					
 				]
 			}, 100)
 		},
 		onLoad(){
 			let that = this;
-			that.getList(that.type,1);
+			that.getList(that.type,1,this.getCurrentMonthFirst());
+			this.caltime(this.getCurrentMonthFirst())
 		},
 		methods: {
 			// 跳转维保工单
@@ -185,14 +175,63 @@
 			// 		url:'../workOrder/workOrder'
 			// 	})
 			// },
+			//时间戳转换方法    date:时间戳数字
 			
+			formatDate(date) {
+			  var date = new Date(date*1000);
+			  var YY = date.getFullYear() + '-';
+			  var MM = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+			  var DD = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate());
+			  var hh = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+			  var mm = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+			  var ss = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
+			  return YY + MM + DD ;
+			},
+			// 日历
+			caltime(time){
+				request.post('/maint/calendar',{
+					month:time
+				}).then((res) =>{
+					console.log(res)
+					var das=res.data
+					this.info.selected=[]
+					if(res.code==1){
+						for(var i=0;i<das.length;i++){
+							if(das[i].is_maintain==-1){
+								this.info.selected.push({date:this.formatDate(das[i].maint_time),class:'timenone'})
+							}else if(das[i].is_maintain==1){
+								this.info.selected.push({date:this.formatDate(das[i].maint_time),class:'timetow'})
+							}else if(das[i].is_maintain==2){
+								this.info.selected.push({date:this.formatDate(das[i].maint_time),class:'timebox'})
+							}
+						}
+					}
+				})
+			},
+			
+			// 获取当前月第一天
+			getCurrentMonthFirst(){
+			        var date = new Date();
+			        date.setDate(1);
+			        var month = parseInt(date.getMonth()+1);
+			        var day = date.getDate();
+			        if (month < 10) {
+			            month = '0' + month
+			        }
+			        if (day < 10) {
+			            day = '0' + day
+			        }
+					this.chantime=date.getFullYear() + '-' + month + '-' + day
+			        return date.getFullYear() + '-' + month + '-' + day;
+			    },
 			open() {
 				this.$refs.calendar.open()
 			},
 			
 			change(e) {
 				console.log('change 返回:', e)
-				
+				this.caltime(e.fulldate)
+				this.getList(this.type,1,e.fulldate,1)
 			},
 			confirm(e) {
 				console.log('confirm 返回:', e)
@@ -201,6 +240,7 @@
 				console.log('monthSwitchs 返回:', e)
 			},
 			onChange(event) {
+				
 				let that = this,
 				 id = event.detail.name;
 				that.type = id;
@@ -211,9 +251,9 @@
 				uni.pageScrollTo({ 
 				　　scrollTop: 0, duration: 300 
 				}); 
-				that.getList(id,that.page,0);
+				that.getList(id,that.page,this.chantime,0);
 			},
-			getList(type,page,isla){
+			getList(type,page,time,isla){
 				//type 数据类型
 				//page 页数
 				//isla 0正常加载 1下拉刷新 2上拉加载
@@ -221,7 +261,8 @@
 				let data = {
 					type: type,
 					page: page,
-					limit: that.size
+					limit: that.size,
+					time:time,
 				};
 				request.post('/maint',data).then((res) =>{
 					if(res.code == 1){
@@ -229,7 +270,6 @@
 							that.isMore = false;
 							that.status = 'noMore'
 						}
-						console.log(that.isMore)
 						if(isla == 0){
 							that.list = [];
 							that.list = res.data;
@@ -237,11 +277,12 @@
 							that.list = [];
 							that.list = res.data;
 							uni.stopPullDownRefresh();
+							console.log(that.list)
 						}else{
 							that.list = that.list.concat(res.data)
-							console.log(that.list)
+							
 						}
-						console.log(res.data)
+						
 					}else{
 						uni.showToast({
 							title:res.message,
@@ -257,7 +298,7 @@
 			that.page = 1;
 			that.isMore = true;
 			that.status = 'loading';
-			that.getList(that.type,that.page,1);
+			that.getList(that.type,that.page,this.chantime,1);
 		},
 		onReachBottom(){
 			console.log('上拉开始')
@@ -268,7 +309,7 @@
 				that.status = 'loading';
 				that.page = pageNumber;
 				console.log(pageNumber)
-				that.getList(that.type,pageNumber,2)
+				that.getList(that.type,pageNumber,this.chantime,2)
 			}
 		},
 		/**
@@ -289,7 +330,8 @@
 	.null{
 		position: relative;
 		top: 50%;
-		margin-top: 50%;
+		padding-top: 50%;
+		box-sizing: border-box;
 	}
 	.timebox{
 		
@@ -356,7 +398,7 @@
 		margin-right: 20rpx;
 	}
 	.main{
-		min-height: 100vh;
+		min-height: auto;
 	}
 	/** 动画 */
 	@keyframes show {
