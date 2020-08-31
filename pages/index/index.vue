@@ -11,9 +11,9 @@
 				:interval="5000"
 				:duration="500"
 			>
-				<swiper-item v-for="item in swiperList" :key="item">
+				<swiper-item v-for="(item, index) in swiperList" :key="index">
 					<view class="swiper-item">
-						<image class="swper-image" src="../../static/image/index-swiper.jpg" mode />
+						<image class="swper-image" :src="'http://' + item" />
 					</view>
 				</swiper-item>
 			</swiper>
@@ -22,15 +22,20 @@
 			<Search @click-button="handleClickButton" @change="handleSearchChange" button />
 			
 			<!-- 公告 -->
-			<view class="notice" @click="handleLinkNotice">
+			<view class="notice">
 				<image class="notice-image" src="../../static/icon/notice.png" mode />
+				<!-- 暂无公告 -->
+				<view v-if="noticeList.length==0" class="notice-swiper notice-empty">暂无公告</view>
+				<!-- 公告列表 -->
 				<swiper
+					v-else
 					class="notice-swiper"
 					:vertical="true"
 					:autoplay="true"
 					:circular="true"
 					:interval="3000"
 					:duration="300"
+					@click="handleLinkNotice"
 				>
 					<swiper-item class="notice-swiper-item" v-for="(item, index) in noticeList" :key="index">
 						<text class="notice-title">{{item}}</text>
@@ -107,12 +112,8 @@
 			PromptCard
 		},
 		data: () => ({
-			swiperList: ['1', '2', '3'],
-			noticeList: [
-				'这里是后台的系统公告市规划局三个世界观和三个',
-				'这里是后台的系统公告',
-				'市规划局三个世界观和三个价值观'
-			],
+			swiperList: [],
+			noticeList: [],
 			gridConfig,
 			value: '',
 			todoList: {},
@@ -146,11 +147,24 @@
 			handleLinkMaint(e, id) {
 				console.log('跳转维保工单详情页面: ' + id)
 			},
-			handleOfficeLoad(e) {
-				console.log(e.detail)
+			// 请求banner
+			async requestBanner() {
+				var res = await request.post('/backlog/banner')
+				var imageList = res.data.map(item => {
+					item.image_url.replace(/\\/g, '/').replace(/\s/g, '/')
+					return item.image_url
+				})
+				console.log(imageList)
+				this.swiperList = imageList
 			},
-			handleOfficeError(e) {
-				console.log(e.detail)
+			// 请求公告
+			async requestNotice() {
+				var res = await request.post('/jobs/lists', {
+					limit: 100,
+					page: 1,
+					type: 0
+				})
+				this.noticeList = res.data.map(i=>i.title)
 			},
 			// 待办事项处理
 			async requestTodoWork() {
@@ -189,13 +203,30 @@
 						}
 					})
 				}
-				else{
+				else if(res.code == 1){
 					var token = res.data.token
 					// 存储token
 					uni.setStorageSync('token', token)
 					this.$store.commit('setBaseUrl', res.data.request_url)
 					this.$store.commit('setUserInfo', res.data)
+					// 请求banner
+					await this.requestBanner()
+					// 请求公告列表
+					await this.requestNotice()
+					// 请求代办事项
 					await this.requestTodoWork()
+				}
+				else {
+					setTimeout(() => {
+						uni.showModal({
+							showCancel: false,
+							title: '登录失败',
+							content: '账号登录失败，即将前往绑定页面重新登录',
+							success() {
+								_this_.handleLinkBind()
+							}
+						})
+					}, 1200)
 				}
 			}catch(e){
 				console.log(e)
@@ -245,6 +276,12 @@
 		margin: 0 30rpx 0 45rpx;
 		width: 36rpx;
 		height: 32rpx;
+	}
+	.notice-empty{
+		color: #999999;
+		font-size: 26rpx;
+		display: flex;
+		align-items: center;
 	}
 	.notice-swiper{
 		width: calc(100% - 120rpx);

@@ -1,5 +1,11 @@
 {
 	"pages": [
+		// {
+		// 	"path": "pages/board/board",
+		// 	"style": {
+		// 		"navigationBarTitleText": "手写板"
+		// 	}
+		// },
 		{
 			"path": "pages/index/index",
 			"style": {

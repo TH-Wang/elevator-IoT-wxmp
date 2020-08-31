@@ -32,7 +32,7 @@
 						@click="handleSignIn"
 					>签到</view>
 					<view
-						v-if="authority && record.repair_type < 2"
+						v-if="authority && record.repair_type <= 2"
 						class="button secondary"
 					>导航</view>
 				</view>
@@ -74,7 +74,13 @@
 			<CommonButton
 				v-if="authority && record.repair_type == 3"
 				text="去处理"
-				@click="handleLinkHandlePage"
+				@click="handleLinkHandlePage($event, 'submit')"
+			/>
+			
+			<CommonButton
+				v-if="record.repair_type == 4"
+				text="故障详情"
+				@click="handleLinkHandlePage($event, 'preview')"
 			/>
 			
 			<!-- 签到成功弹窗 -->
@@ -137,9 +143,10 @@
 			}
 		},
 		methods: {
-			handleLinkHandlePage() {
+			handleLinkHandlePage(e, mode) {
+				var id = this.record.id
 				uni.navigateTo({
-					url: '/pages/repairHandle/repairHandle'
+					url: `/pages/repairHandle/repairHandle?mode=${mode}&id=${id}`
 				})
 			},
 			// 点击接警

@@ -151,7 +151,6 @@
 					var res = await request.bind(this.form)
 					console.log(res)
 					
-					if(res.code)
 					if(res.code == -1) {
 						this.feedback = {
 							visible: false

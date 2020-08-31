@@ -16,7 +16,7 @@
 					:key="idx"
 				/>
 				<view
-					:class="active == steps.length-1 ? 'line-active' : 'line'"
+					:class="active >= steps.length-1 ? 'line-active' : 'line'"
 					:style="'width: ' + (100 / steps.length / 2) + '%'"
 				/>
 			</view>
@@ -49,7 +49,9 @@
 		}),
 		computed: {
 			active() {
-				return this.steps.findIndex(item => item.type === this.type)
+				return this.steps.findIndex(i=>i.type==this.type) == -1
+					?	this.steps.length
+					: this.steps.findIndex(i=>i.type==this.type)
 			},
 			lines() {
 				return [...this.steps.map((e,i)=>i)]

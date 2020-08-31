@@ -87,7 +87,7 @@
 		},
 		onLoad: async function() {
 			var res = await request.post('/lift/list_info', {
-				limit: 100,
+				limit: 10,
 				page: 1
 			})
 			this.dataSource = res.data

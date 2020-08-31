@@ -5,36 +5,33 @@
 			<!-- 故障属性选择器 -->
 				<view class="form-item">
 					<view class="label">故障属性</view>
-					<picker class="picker" :value="propPickerIndex" :range="propRange" @change="handlePropPickerChange">
-						<text class="pickered-text">{{propRange[propPickerIndex]}}</text>
-						<image class="picker-icon" src="../../static/icon/right.png" />
-					</picker>
+					<view class="">
+						
+					</view>
 				</view>
 				
 				<!-- 配件更换选择器 -->
 				<view class="form-item">
 					<view class="label">配件更换</view>
-					<picker class="picker" :value="replacePickerIndex" :range="replaceRange" @change="handleSafePickerChange">
-						<text class="pickered-text">{{replaceRange[replacePickerIndex]}}</text>
-						<image class="picker-icon" src="../../static/icon/right.png" />
-					</picker>
+					<view class="">
+						
+					</view>
 				</view>
 				
 				<!-- 急修建议选择器 -->
 				<view class="form-item">
 					<view class="label">急修建议</view>
-					<picker class="picker" :value="proposePickerIndex" :range="proposeRange" @change="handleTrappedPickerChange">
-						<text class="pickered-text">{{proposeRange[proposePickerIndex]}}</text>
-						<image class="picker-icon" src="../../static/icon/right.png" />
-					</picker>
+					<view class="">
+						
+					</view>
 				</view>
 				
 				<!-- 描述 -->
-				<view class="text-container">
-					<view class="form-item border-top">
-						<view class="label">备注信息</view>
+				<view class="form-item border-top">
+					<view class="label">备注信息</view>
+					<view class="">
+						
 					</view>
-					<textarea class="textarea" v-model="describe" placeholder="请在这里输入故障描述..."></textarea>
 				</view>
 		</view>
 	
@@ -342,6 +339,7 @@
 					},
 					formData: data,
 					success: function(res) {
+						console.log(res)
 						var result = JSON.parse(res.data)
 						console.log(result)
 						if(result.code == 1) {
