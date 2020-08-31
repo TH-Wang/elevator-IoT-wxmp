@@ -777,7 +777,8 @@
 					that.gzIsMore = true;
 					that.getGzArr(that.dtId,'');
 				} else if (id == 7) {
-					console.log(id)
+					//oi
+					that.getOIArr();
 				} else {
 					that.isBar = false;
 				}
@@ -890,6 +891,14 @@
 					if(res.code == 1){
 						that.dtCsArrListTwo = res.data
 					}
+				})
+			},
+			//获取OI
+			getOIArr(){
+				let that = this;
+				let data = {};
+				request.post('/Com/io_list',data).then((res) => {
+					console.log(res)
 				})
 			}
 		}
