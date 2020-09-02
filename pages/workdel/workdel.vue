@@ -15,13 +15,15 @@
 					<image src="../../static/icon/tabbar/mine-active.png"></image>
 					<text>维保人员：{{datadel.basis.user_name}}</text>
 				</view>
-				<view class="qdbtns" @click="onClickShow">签到</view>
+				<view class="qdbtns" @click="onClickShow">签名</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
 					<image src="../../static/icon/repair/time.png"></image>
 					<text>维保时间：{{datadel.basis.maint_end_time}}</text>
 				</view>
+				<view class="qdbtns qdindes"  v-if="is_qanfal">已签到</view>
+				<view class="qdbtns " @click="qiandaobtn" v-if="!is_qanfal">签到</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
@@ -37,7 +39,7 @@
 				<view class="rigtwbnum">（{{wblist.length}}）</view>
 			</view>
 			<view class="wblist">
-				<view class="wbnavcont" v-for="(item,index) of wblist" :key="item.name">
+				<view class="wbnavcont" v-for="(item,index) of wblist" :key="item.name" @click="workOrderbtn(item.id)">
 					<view class="wbname"  >{{item.name}}</view>
 					<view class="wbrightnum">
 						<view class="znum" >总数<text class="texcol1">{{quanbus[index]}}</text></view>/
@@ -49,7 +51,7 @@
 			</view>
 		</view>
 	
-	    <view class="tjbtns">提交</view>
+	    <!-- <view class="tjbtns" @click="qdbtns">提交</view> -->
 		
 		<van-popup  :show="show" @close="onClickHide" >
 			<view class="wrapper">
@@ -77,6 +79,7 @@
 	var x = 20;
 	var y =20;
 	import request from '@/service/request.js'
+	import app from '../../App.vue'
 	export default {
 	  data() {
 	    return {
@@ -95,6 +98,7 @@
 		  			  // {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
 		  			 
 		  ],
+		  is_qanfal:false,
 	      active: 0,
 		  steps: [
 		        {
@@ -126,12 +130,57 @@
 		this.contdel(cont.id)
 		this.dataid=cont.id
 		
+		
 		this.xmlist(cont.id)
+		this.falqiand(cont.id)
 	  },
 	  mounted() {
 	  	
 	  },
 	  methods:{
+		  // 维保项目
+		workOrderbtn(id){
+			uni.navigateTo({
+				url:'../workOrder/workOrder?id='+id+'&maint_id='+this.dataid
+			})
+		}, 
+		//提交
+		  qdbtns(){
+			  
+		  },
+		  // 签到
+		  qiandaobtn(){
+			  var that=this
+			  request.post('/maint/sign_in',{
+			  	id:that.dataid,
+			  	is_qan:1
+			  }).then((res) =>{
+			  	if(res.code == 1){
+					this.falqiand()
+					this.contdel(dataid)
+			  		uni.showToast({
+			  			title:'签到成功',
+						duration:1500
+			  		})
+			  	}
+			  })
+		  },
+		  // 判断是否签到
+		  falqiand(){
+			var that=this
+			request.post('/maint/verify_location',{
+				id:that.dataid,
+			}).then((res) =>{
+				if(res.code == 1){
+					console.log(res)
+					if( res.data.is_qan==1){
+						that.is_qanfal=true
+					}else{
+						that.is_qanfal=false
+					}
+				}
+			})  
+		  },
 	    // 项目列表
 		xmlist(id){
 			var that=this
@@ -198,7 +247,17 @@
 					for(var i=0;i<res.data.log_time.length;i++){
 						that.steps.push({text:res.data.log_time[i].time,desc:res.data.log_time[i].type})
 					}
-					console.log(that.steps)
+					
+					
+					for(var i=0;i<res.data.log_time.length;i++){
+						console.log(res.data.log_time[i].time)
+						if(res.data.log_time[i].time==''){
+							return that.active=i-1 
+						}
+					}
+					
+					
+					
 				}else{
 					uni.showToast({
 						title:res.message,
@@ -268,20 +327,65 @@
 		//完成绘画并保存到本地
 		finish:function(){
 			var that=this
+			
 			uni.canvasToTempFilePath({
 			  canvasId: 'mycanvas',
 			  success: function(res) {
 				  console.log(res)
 			    let path = res.tempFilePath;
-				request.post('/maint/signature',{
-					id:that.dataid,
-					image:path,
-					type:that.coniden,
-					remark:that.marcont
-				}).then((res) =>{
-					console.log(res)
-					
-				})
+				app.globalData.isHeader = true;
+				var token = uni.getStorageSync('token')
+				uni.uploadFile({
+				          url: 'https://wcs.xdiot.net/api/upload_file' , //仅为示例，非真实的接口地址
+				          filePath: path,
+				          name: "file",
+				          header: {
+				          "Content-Type": "multipart/form-data",
+						  "token": token,
+				          },
+				          formData: {
+							order_id:that.dataid,
+							file_type:'3',
+							file_belong:'2',
+							file:'file',
+				          },
+				          success: function (res) {
+				            var data = res.data
+							console.log(data)
+							var dataw=JSON.parse(data)
+				            console.log(dataw.data.length )
+							//发送请求
+							uni.request({
+								url: 'https://wcs.xdiot.net/api/maint/signature',
+								method: 'POST',
+								header: {
+									"token": token,
+									'Content-Type':'multipart/form-data',
+								},
+								data:{
+									id:that.dataid,
+									image:dataw.data[dataw.data.length-1].file_url,
+									type:that.coniden,
+									remark:that.marcont
+								},
+								success: res => {
+									console.log(res.data)
+									if(res.data.code==1){
+										that.clear()
+										that.show=false
+									}
+									
+								},
+								fail: (err) => {
+								}
+							});
+							
+				          }
+				        })
+				
+				
+				
+				
 				
 				// uni.saveImageToPhotosAlbum({
 				// 	filePath:path,
@@ -294,7 +398,6 @@
 		   onClickShow() {
 			  
 		      this.show=true;
-			  console.log(this.show)
 		    },
 			onClickHide() {
 			    this.show=false;
@@ -305,6 +408,9 @@
 </script>
 
 <style>
+	.qdindes{
+		background: #999999 !important;
+	}
 	.closebtns{
 		font-size: 50rpx;
 		right: -14rpx;

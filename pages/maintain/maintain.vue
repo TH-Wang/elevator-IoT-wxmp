@@ -45,7 +45,7 @@
 				<navigator class="main-list-li" v-for="(item,index) in list" :key="index" :url="'/pages/workdel/workdel?id='+item.id">
 					<view class="main-list-li-ttle">
 						<view class="main-list-li-ttle-name">
-						  <view class="stutstxt head1" >{{item.main_type}}</view>
+						  <view class="stutstxt head1" v-if="item.main_type!=''">{{item.main_type}}</view>
 						  <!-- <view class="stutstxt head1" v-if="item.main_type==1">半月保</view> -->
 						  <!-- <view class="stutstxt head2" v-if="item.status==2">月保</view>
 						  <view class="stutstxt head3" v-if="item.status==3">半年保</view>
