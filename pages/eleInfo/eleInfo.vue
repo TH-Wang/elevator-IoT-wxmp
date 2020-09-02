@@ -251,7 +251,7 @@
 						<view class="menu-cs-title-time">
 							当前参数获取时间：{{ newTime }}
 						</view>
-						<view class="menu-cs-title-btn">
+						<view class="menu-cs-title-btn" @click="dtCsNewTap">
 							获取数据
 						</view>
 					</view>
@@ -259,31 +259,56 @@
 					<view class="menu-cs-list">
 						<view class="menu-cs-list-li">
 							<view class="menu-cs-list-tile" @click="omeMuTap(1)">
-								<view class="menu-cs-list-tile-left">故障代码</view>
+								<view class="menu-cs-list-tile-left">故障记录</view>
 								<view class="menu-cs-list-tile-right">
 									<image :class="oneId==1?'xz':''" src="../../static/image/wxj/up.png" mode=""></image>
 								</view>
 							</view>
 							<view class="menu-cs-list2" v-if="1 == oneId">
-								<view class="menu-cs-list2-li" v-for="(i,index) in gzArrList" :key="i.name">
-									<view class="menu-cs-list2-tile" @click="twoMuTap(i.id)">
-										<view class="menu-cs-list-tile-left menu-cs-list2-tile-left">{{ i.name }}</view>
+								<view class="menu-cs-list2-li" v-for="(item,index) in gzArrList" :key="index">
+									<view class="menu-cs-list2-tile" @click="twoMuTap(index)">
+										<view class="menu-cs-list-tile-left menu-cs-list2-tile-left">故障记录{{ index+1 }}  {{ item.time }}</view>
 										<view class="menu-cs-list-tile-right">
-											<image :class="twoId == i.id?'xz':''" src="../../static/image/wxj/up.png" mode=""></image>
+											<image :class="twoId == index?'xz':''" src="../../static/image/wxj/up.png" mode=""></image>
 										</view>
 									</view>
 									<!-- 第一类 列表 表格 -->
-									<view class="menu-cs-list3" v-if="twoId == i.id">
-										<view class="menu-cs-list3-li"  v-for="(l,index) in i.gzArrListTl" :key='l.index'>
-											<view class="menu-cs-list3-li-tile">{{ l.name }}</view>
+									<view class="menu-cs-list3" v-if="twoId == index">
+										<view class="menu-cs-list3-li">
+											<view class="menu-cs-list3-li-tile">表格: {{ item.ecdo }}</view>
 											<view class="menu-cs-list3-li-cont">
 												<!-- 表格 -->
-												<view class="menu-cs-list3-li-cont-bg" v-if="l.isbg==0">
-													<view class="menu-cs-list3-li-cont-bg-li" v-for="(d,index) in l.bgList" :key="d.name">{{ d.title }}:{{ d.name }}</view>
+												<view class="menu-cs-list3-li-cont-bg">
+													<view class="menu-cs-list3-li-cont-bg-li">楼层位置：{{ item[0] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">故障代码：{{ item[1] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">启动楼层：{{ item[20] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">目标楼层：{{ item[21] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">RUN_S：{{ item[19] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">速度百分比：{{ item[22] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">输出电流：{{ item[28] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">母线电压：{{ item[29] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">给定速度：{{ item[26] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">返回速度：{{ item[27] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">启动脉冲数：{{ item[25] }}</view>
+													<view class="menu-cs-list3-li-cont-bg-li">当前脉冲数：{{ item[24] }}</view>
 												</view>
+											</view>
+										</view>
+										<view class="menu-cs-list3-li">
+											<view class="menu-cs-list3-li-tile">OI输入口</view>
+											<view class="menu-cs-list3-li-cont">
 												<!-- 列表 -->
-												<view class="menu-cs-list3-li-cont-lb" v-else>
-													<view class="menu-cs-list3-li-cont-lb-dd" v-for="(e,index) in l.bgList" :key="e.name"><text :class="e.studs == 0?'textA':'textB'">{{ e.title }}</text>{{ e.name }}</view>
+												<view class="menu-cs-list3-li-cont-lb">
+													<view class="menu-cs-list3-li-cont-lb-dd" v-for="(e,index) in item.X" :key="e.name"><text :class="0 == 0?'textA':'textB'">{{ e.val }}</text>{{ e.name }}</view>
+												</view>
+											</view>
+										</view>
+										<view class="menu-cs-list3-li">
+											<view class="menu-cs-list3-li-tile">OI输出口</view>
+											<view class="menu-cs-list3-li-cont">
+												<!-- 列表 -->
+												<view class="menu-cs-list3-li-cont-lb">
+													<view class="menu-cs-list3-li-cont-lb-dd" v-for="(e,index) in item.Y" :key="e.name"><text :class="0 == 0?'textA':'textB'">{{ e.val }}</text>{{ e.name }}</view>
 												</view>
 											</view>
 										</view>
@@ -388,12 +413,12 @@
 			<view class="menu-yx" v-if="active==7">
 				<view class="menu-yx-oi">
 					<view class="menu-yx-oi-li" v-for="(item,index) in OIList" :key="item.name">
-						<view class="menu-yx-oi-li-top" @click="OiListTap(item.id)">
+						<view class="menu-yx-oi-li-top" @click="OiListTap(item.type)">
 							<view class="menu-yx-oi-li-top-title">{{ item.name }}</view>
-							<view class="menu-yx-oi-li-top-img"><image :class="OiId == item.id?'xz':''" src="../../static/image/wxj/up.png" mode=""></image></view>
+							<view class="menu-yx-oi-li-top-img"><image :class="OiId == item.type?'xz':''" src="../../static/image/wxj/up.png" mode=""></image></view>
 						</view>
-						<view class="menu-yx-oi-li-cont" v-if="OiId == item.id">
-							<view class="menu-yx-oi-li-cont-li" v-for="(i,index) in item.OiListArr" :key="i.id"><text :class="i.stu == 1?'textA':'textB'">{{ i.bh }}</text>{{ i.name }}</view>
+						<view class="menu-yx-oi-li-cont" v-if="OiId == item.type">
+							<view class="menu-yx-oi-li-cont-li" v-for="(i,index) in item.child" :key="i.b_name"><text :class="1 == 1?'textA':'textB'">{{ i.b_name }}</text>{{ i.name }}</view>
 						</view>
 					</view>
 				</view>
@@ -538,83 +563,13 @@
 				//二级电梯参数列表
 				dtCsArrListTwo:[],
 				//电梯参数故障记录
-				gzArrList: [{
-					id: 1,
-					name: '故障记录1',
-					gzArrListTl: [{
-						id:1,
-						name:'表格',
-						isbg: 0,
-						bgList:[{
-							id:1,
-							title:'楼层',
-							name:'13'
-						},
-						{
-							id:2,
-							title:'楼层',
-							name:'13'
-						},
-						{
-							id:3,
-							title:'楼层',
-							name:'13'
-						},
-						{
-							id:4,
-							title:'楼层',
-							name:'13'
-						}]
-					},
-					{
-						id:2,
-						name:'OI输入口',
-						isbg:1,
-						bgList:[{
-							id:1,
-							title:'02',
-							name:'1层后门锁',
-							studs: 1,
-						},
-						{
-							id:2,
-							title:'02',
-							name:'1层后门锁',
-							studs: 0,
-						},
-						{
-							id:3,
-							title:'02',
-							name:'1层后门锁',
-							studs: 0,
-						},
-						{
-							id:4,
-							title:'02',
-							name:'1层后门锁',
-							studs: 0,
-						}]
-					}]
-				}],
-				
+				gzArrList: [],
 				// 维保记录
 				wbList:[],
 				// 故障记录
 				gzList:[],
 				// OI
-				OIList:[
-					{id:1,name:'门锁节点1',OiListArr:[
-						{id:1,name:'1成后门',bh:'O2',stu:0},
-						{id:2,name:'1成后门',bh:'O2',stu:1},
-						{id:2,name:'1成后门',bh:'O2',stu:1},
-						{id:2,name:'1成后门',bh:'O2',stu:1},
-						{id:3,name:'1成后门',bh:'O2',stu:1},
-						{id:3,name:'1成后门',bh:'O2',stu:1}
-					]},
-					{id:2,name:'门锁节点2',OiListArr:[
-						{id:1,name:'1成后门',bh:'O2',stu:1}
-					]}
-				]
+				OIList:[]
 			}
 		},
 		onLoad: function(option) {
@@ -698,6 +653,7 @@
 			},
 			twoMuTap: function(id){
 				let that = this;
+				console.log(11,id)
 				if(that.twoId == id){
 					that.twoId = 0;
 				}else{
@@ -761,8 +717,9 @@
 					// 获取电梯详情
 					that.getDtInfo();
 				} else if (id == 3) {
-					//获取电梯
+					//获取电梯参数 电梯参数故障记录
 					that.getDtCs();
+					that.getDtcsGzList();
 				} else if (id == 4) {
 					// 运行统计
 					that.getLjTj();
@@ -783,12 +740,15 @@
 					that.isBar = false;
 				}
 			},
+			//刷新电梯参数
+			dtCsNewTap(){
+				let that = this;
+				that.getDtCs();
+				that.getDtcsGzList();
+			},
 			//获取电梯故障记录
 			getGzArr(dtId,isSla){
 				let that = this;
-				uni.showLoading({
-					title:'加载中...'
-				})
 				let data = {
 					elevator_id: dtId,
 					limit: that.size,
@@ -807,16 +767,12 @@
 							that.gzList = [];
 							that.gzList = res.data;
 						}
-						uni.hideLoading();
 					}
 				})
 			},
 			// 获取维保记录
 			getWbArr(dtId,isSla){
 				let that = this;
-				uni.showLoading({
-					title:'加载中...'
-				})
 				let data = {
 					elevator_id: dtId,
 					limit: that.size,
@@ -835,7 +791,6 @@
 							that.wbList = [];
 							that.wbList = res.data;
 						}
-						uni.hideLoading();
 					}
 				})
 			},
@@ -897,8 +852,29 @@
 			getOIArr(){
 				let that = this;
 				let data = {};
-				request.post('/Com/io_list',data).then((res) => {
+				request.post('/Com/wx_io_list',data).then((res) => {
 					console.log(res)
+					if(res.code == 1){
+						that.OIList = res.data
+					}else{
+						uni.showToast({
+							title:'参数错误',
+							icon:'none'
+						})
+					}
+				})
+			},
+			// 电梯参数-故障记录 /lift/para_repair
+			getDtcsGzList(){
+				let that = this;
+				let data = {
+					id:that.dtId
+				};
+				request.post('/lift/para_repair',data).then((res) => {
+					console.log(res)
+					if(res.code == 1){
+						that.gzArrList = res.data
+					}
 				})
 			}
 		}
