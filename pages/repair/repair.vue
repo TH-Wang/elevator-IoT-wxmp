@@ -114,7 +114,7 @@
 				})
 			},
 			async handleRequestData() {
-				var option = {page: 1, limit: 10}
+				var option = {page: 1, limit: 100}
 				var url = '/maint/fault_order'
 				var res = await Promise.all([
 					request.post(url, {...option, type: 1}),

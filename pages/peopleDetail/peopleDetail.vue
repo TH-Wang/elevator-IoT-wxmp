@@ -77,6 +77,7 @@
 		data: () => ({
 			tabs: ['维保工单', '急修工单', '上报故障'],
 			maintList: {},
+			dataSource: {}
 			// record
 		}),
 		methods: {

@@ -1,13 +1,15 @@
 <template>
 	<view>
-		<canvas
-			class="mycanvas"
-			canvas-id="mycanvas"
-			:disable-scroll="true"
-			@touchstart="touchstart"
-			@touchmove="touchmove"
-			@touchend="touchend"
-		/>
+		<view class="canvas-box">
+			<canvas
+				class="mycanvas"
+				canvas-id="mycanvas"
+				:disable-scroll="true"
+				@touchstart="touchstart"
+				@touchmove="touchmove"
+				@touchend="touchend"
+			/>
+		</view>
 		<view class="footer">
 			<view class="right" @click="clear">清除</view>
 		</view>
@@ -15,8 +17,6 @@
 </template>
 
 <script>
-	var x = 20;
-	var y =20;
 	export default{
 		props: {
 			save: {
@@ -102,35 +102,38 @@
 			},
 			
 			//完成绘画并保存到本地
-			finish: function(){
+			finish: function() {
 				var _this_ = this
-				uni.canvasToTempFilePath({
-				  canvasId: 'mycanvas',
-				  success: function(res) {
-						_this_.$emit('finish', res.tempFilePath)
-				  },
-					fail(err) {
-						console.log(err)
-					}
-				}, this)
-			}
-		},
-		watch: {
-			save: function(newValue, oldValue) {
-				if(newValue > oldValue){
-					this.finish()
-				}
+				return new Promise((resolve, reject) => {
+					uni.canvasToTempFilePath({
+					  canvasId: 'mycanvas',
+					  success: function(res) {
+							resolve(res.tempFilePath)
+					  },
+						fail(err) {
+							reject(err)
+						}
+					}, _this_)
+				})
 			}
 		}
 	}
 </script>
 
 <style>
-	.mycanvas{
+	.canvas-box{
 		width: 100%;
 		height: 294rpx;
 		border-radius: 6rpx;
 		background-color: #F9F9F9;
+		position: relative;
+	}
+	.mycanvas{
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
 	}
 	.footer{
 		width: 100%;

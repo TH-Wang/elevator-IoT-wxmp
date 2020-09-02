@@ -97,19 +97,7 @@
 		<!-- 签字确认 -->
 		<view class="sign-container">
 			<view class="sign-label">签字</view>
-			<view class="canvas-box">
-				<canvas
-					class="mycanvas"
-					canvas-id="mycanvas"
-					:disable-scroll="true"
-					@touchstart="touchstart"
-					@touchmove="touchmove"
-					@touchend="touchend"
-				/>
-			</view>
-			<view class="footer">
-				<view class="right" @click="clear">清除</view>
-			</view>
+			<SignBoard ref="sign" />
 		</view>
 		
 		<!-- 提交按钮 -->
@@ -120,15 +108,17 @@
 
 <script>
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import SignBoard from '../../components/SignBoard/SignBoard.vue'
 	import request from '../../service/request.js'
 	
 	export default {
 		components: {
-			CommonButton
+			CommonButton,
+			SignBoard
 		},
 		data: () => ({
 			orderId: null,
-			props: [],
+			attrs: [],
 			propPickerIndex: 0,
 			replaceRange: ['未更换', '更换'],
 			replacePickerIndex: 0,
@@ -142,18 +132,14 @@
 			// 视频实例
 			videoContext: [],
 			// 视频空间是否显示
-			videoControl: [],
-			// canvas对象
-			ctx: null,
-			// 路径点集合
-			points: []
+			videoControl: []
 		}),
 		computed: {
 			propRange() {
-				return this.props.map(i=>i.name)
+				return this.attrs.map(i=>i.name)
 			},
 			propId() {
-				return this.props.map(i=>i.id)
+				return this.attrs.map(i=>i.id)
 			}
 		},
 		methods: {
@@ -314,15 +300,9 @@
 				this.videoContext.splice(idx, 1)
 				this.videoControl.splice(idx, 1)
 			},
-			// 拿到签字图片
-			handleGetSignImage(filePath) {
-				console.log(filePath)
-				this.signFilePath = filePath
-			},
 			// 提交
 			handleSubmit: async function() {
 				var _this_ = this
-				var filePath = await this.finish()
 				var data = {
 					id: _this_.orderId,
 					content: _this_.describe,
@@ -331,6 +311,7 @@
 					is_replace: _this_.replacePickerIndex + 1,
 					suggest: _this_.proposePickerIndex
 				}
+				var filePath = await this.$refs.sign.finish()
 				uni.showLoading({title: '提交中...'})
 				uni.uploadFile({
 					url: `${_this_.$store.state.request.url}/api/maint/fault_submit`,
@@ -372,84 +353,15 @@
 					}
 				})
 			},
-			/**
-			 * canvas绘制 
-			 * */
-			//触摸开始，获取到起点
-			touchstart: function(e){
-				let startX = e.changedTouches[0].x;
-				let startY = e.changedTouches[0].y;
-				let startPoint = {X:startX,Y:startY};
-				this.points.push(startPoint);
-				this.ctx.beginPath();
-			},
-			//触摸移动，获取到路径点
-			touchmove: function(e){
-				let moveX = e.changedTouches[0].x;
-				let moveY = e.changedTouches[0].y;
-				let movePoint = {X:moveX,Y:moveY};
-				this.points.push(movePoint);       //存点
-				let len = this.points.length;
-				if(len>=2){
-					this.draw();                   //绘制路径
-				}
-			},
-			// 触摸结束，将未绘制的点清空防止对后续路径产生干扰
-			touchend: function(){                   
-				this.points=[];
-			},
-			// 绘制笔迹
-			draw: function() {
-				let point1 = this.points[0]
-				let point2 = this.points[1]
-				this.points.shift()
-				this.ctx.moveTo(point1.X, point1.Y)
-				this.ctx.lineTo(point2.X, point2.Y)
-				this.ctx.stroke()
-				this.ctx.draw(true)
-			},
-			//清空画布
-			clear: function(){
-				var _this_ = this;
-				uni.getSystemInfo({
-					success: function(res) {
-						let canvasw = res.windowWidth;
-						let canvash = res.windowHeight;
-						_this_.ctx.clearRect(0, 0, canvasw, canvash);
-						_this_.ctx.draw(true);
-					},
-				})
-			},
-			//完成绘画并保存到本地
-			finish: function(){
-				var _this_ = this
-				return new Promise((resolve, reject) => {
-					uni.canvasToTempFilePath({
-					  canvasId: 'mycanvas',
-					  success: function(res) {
-							resolve(res.tempFilePath)
-					  },
-						fail(err) {
-							reject(err)
-						}
-					}, this)
-				})
-			}
 		},
 		onLoad: async function(option) {
 			// 拿到工单id
-			var { mode, id } = option
+			var { id } = option
 			this.orderId = id
-			
-			// 创建绘图对象
-			this.ctx = uni.createCanvasContext("mycanvas", this);
-			this.ctx.lineWidth = 2;
-			this.ctx.lineCap = "round"
-			this.ctx.lineJoin = "round"
 			
 			// 请求故障属性
 			var res = await request.post('/maint/fault_attr')
-			this.props = res.data
+			this.attrs = res.data
 		}
 	}
 </script>
@@ -610,42 +522,6 @@
 	.sign-label{
 		height: 80rpx;
 		line-height: 80rpx;
-	}
-</style>
-
-<!-- 签字画布组件 -->
-<style scoped>
-	.canvas-box{
-		width: 100%;
-		height: 294rpx;
-		border-radius: 6rpx;
-		background-color: #F9F9F9;
-		position: relative;
-	}
-	.mycanvas{
-		width: 100%;
-		height: 100%;
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
-	.footer{
-		width: 100%;
-		height: 80rpx;
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-	}
-	.left, .right{
-		width: 120rpx;
-		height: 50rpx;
-		border-radius: 10rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 22rpx;
-		color: #4190F5;
-		background-color: rgba(65, 144, 245, 0.2);
 	}
 </style>
 

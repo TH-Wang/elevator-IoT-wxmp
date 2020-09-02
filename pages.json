@@ -1,11 +1,5 @@
 {
 	"pages": [
-		// {
-		// 	"path": "pages/board/board",
-		// 	"style": {
-		// 		"navigationBarTitleText": "手写板"
-		// 	}
-		// },
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -99,6 +93,15 @@
 		},
 		{
 			"path": "pages/repairHandle/repairHandle",		//急修工单处理
+			"style": {
+				"navigationBarTitleText": "工单处理",
+				"usingComponents": {
+					"van-icon": "/wxcomponents/vant/dist/icon/index"
+				}
+			}
+		},
+		{
+			"path": "pages/repairSubmitInfo/repairSubmitInfo",		//急修工单处理详情
 			"style": {
 				"navigationBarTitleText": "工单处理",
 				"usingComponents": {

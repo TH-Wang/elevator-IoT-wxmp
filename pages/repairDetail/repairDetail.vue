@@ -80,7 +80,7 @@
 			<CommonButton
 				v-if="record.repair_type == 4"
 				text="故障详情"
-				@click="handleLinkHandlePage($event, 'preview')"
+				@click="handleLinkDetailInfo($event, 'preview')"
 			/>
 			
 			<!-- 签到成功弹窗 -->
@@ -143,10 +143,16 @@
 			}
 		},
 		methods: {
-			handleLinkHandlePage(e, mode) {
+			handleLinkHandlePage(e) {
 				var id = this.record.id
 				uni.navigateTo({
-					url: `/pages/repairHandle/repairHandle?mode=${mode}&id=${id}`
+					url: `/pages/repairHandle/repairHandle?id=${id}`
+				})
+			},
+			handleLinkDetailInfo(e) {
+				var id = this.record.id
+				uni.navigateTo({
+					url: `/pages/repairSubmitInfo/repairSubmitInfo?id=${id}`
 				})
 			},
 			// 点击接警

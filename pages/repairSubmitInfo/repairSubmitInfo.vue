@@ -5,33 +5,25 @@
 			<!-- 故障属性选择器 -->
 				<view class="form-item">
 					<view class="label">故障属性</view>
-					<view class="">
-						
-					</view>
+					<view class=""></view>
 				</view>
 				
 				<!-- 配件更换选择器 -->
 				<view class="form-item">
 					<view class="label">配件更换</view>
-					<view class="">
-						
-					</view>
+					<view class="">{{replaceRange[dataSource.is_replace]}}</view>
 				</view>
 				
 				<!-- 急修建议选择器 -->
 				<view class="form-item">
 					<view class="label">急修建议</view>
-					<view class="">
-						
-					</view>
+					<view class="">{{proposeRange[dataSource.suggest - 1]}}</view>
 				</view>
 				
 				<!-- 描述 -->
 				<view class="form-item border-top">
 					<view class="label">备注信息</view>
-					<view class="">
-						
-					</view>
+					<view class=""></view>
 				</view>
 		</view>
 	
@@ -55,15 +47,6 @@
 					<view class="mask">
 						<image src="../../static/icon/play-video.png" />
 					</view>
-					<image
-						class="remove-button"
-						src="../../static/icon/remove.png"
-						@click="handleVideoRemove($event, idx)"
-					/>
-				</view>
-					
-				<view class="media-container" @click="handleChooseVideo">
-					<van-icon name="plus" size="60rpx" color="#DEDEDE" />
 				</view>
 			</view>
 		</view>
@@ -79,59 +62,64 @@
 					@click="handlePreview(idx)"
 				>
 					<image class="preview-image" :src="img.file_url" mode="aspectFill"></image>
-					<image
-						class="remove-button"
-						src="../../static/icon/remove.png"
-						@click="handleImageRemove($event, idx)"
-					/>
-				</view>
-				<view class="media-container" @click="handleChooseImage">
-					<van-icon name="plus" size="60rpx" color="#DEDEDE" />
 				</view>
 			</view>
 		</view>
 		
-		<!-- 签字确认 -->
+		<!-- 维保人员签字 -->
 		<view class="sign-container">
-			<view class="sign-label">签字</view>
-			<view class="canvas-box">
-				<canvas
-					class="mycanvas"
-					canvas-id="mycanvas"
-					:disable-scroll="true"
-					@touchstart="touchstart"
-					@touchmove="touchmove"
-					@touchend="touchend"
+			<view class="sign-label">维保人员签字</view>
+			<image :src="'http://'+dataSource.signature_img_two" />
+		</view>
+		
+		<!-- 安全人员签字 -->
+		<view class="sign-container">
+			<view class="sign-label">安全人员签字</view>
+			<image v-if="hasSafeSign" :src="'http://'+dataSource.signature_img_one" />
+			<view v-else class="sign-content">
+				<CommonButton
+					v-if="dataSource.iden == 2"
+					text="签字确认"
+					size="small"
+					:margin="false"
 				/>
-			</view>
-			<view class="footer">
-				<view class="right" @click="clear">清除</view>
+				<view v-else class="wait-text">等待签字</view>
 			</view>
 		</view>
 		
-		<!-- 提交按钮 -->
-		<CommonButton text="确认提交" @click="handleSubmit" />
+		<!-- 物业人员签字 -->
+		<view class="sign-container">
+			<view class="sign-label">物业人员签字</view>
+			<image v-if="hasPropertySign" :src="'http://'+dataSource.signature_img_three" />
+			<view v-else class="sign-content">
+				<CommonButton
+					v-if="dataSource.iden == 3"
+					text="签字确认"
+					size="small"
+					:margin="false"
+				/>
+				<view v-else class="wait-text">等待签字</view>
+			</view>
+		</view>
 		
 	</view>
 </template>
 
 <script>
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import SignBoard from '../../components/SignBoard/SignBoard.vue'
 	import request from '../../service/request.js'
 	
 	export default {
 		components: {
-			CommonButton
+			CommonButton,
+			SignBoard
 		},
 		data: () => ({
 			orderId: null,
-			props: [],
-			propPickerIndex: 0,
+			dataSource: {},
 			replaceRange: ['未更换', '更换'],
-			replacePickerIndex: 0,
 			proposeRange: ['停梯', '运行'],
-			proposePickerIndex: 0,
-			describe: '',
 			// 选择图片列表
 			imageList: [],
 			// 选择视频列表
@@ -139,146 +127,23 @@
 			// 视频实例
 			videoContext: [],
 			// 视频空间是否显示
-			videoControl: [],
-			// canvas对象
-			ctx: null,
-			// 路径点集合
-			points: []
+			videoControl: []
 		}),
 		computed: {
-			propRange() {
-				return this.props.map(i=>i.name)
+			hasSafeSign() {
+				return Boolean(this.dataSource.signature_img_one)
 			},
-			propId() {
-				return this.props.map(i=>i.id)
+			hasPropertySign() {
+				return Boolean(this.dataSource.signature_img_three)
 			}
 		},
 		methods: {
-			// 选择故障属性
-			handlePropPickerChange(e) {
-				this.propPickerIndex = e.target.value
-			},
-			// 选择是否更换配件
-			handleSafePickerChange(e) {
-				this.replacePickerIndex = e.target.value
-			},
-			// 选择急修建议
-			handleTrappedPickerChange(e) {
-				this.proposePickerIndex = e.target.value
-			},
-			// 选择图片
-			handleChooseImage() {
-				var _this_ = this
-				uni.chooseImage({
-					count: 1,
-					success(res) {
-						var filePath = res.tempFilePaths[0]
-						uni.showLoading({title: '正在上传...'})
-						// 上传
-						uni.uploadFile({
-							url: `${_this_.$store.state.request.url}/api/upload_file`,
-							filePath: res.tempFilePaths[0],
-							name: 'file',
-							header: {
-								"token": uni.getStorageSync('token')
-							},
-							formData: {
-								order_id: _this_.orderId,
-								file_type: 3,
-								file_belong: 1
-							},
-							success(res) {
-								var result = JSON.parse(res.data)
-								console.log(result)
-								if(result.code == 1) {
-									_this_.imageList = result.data
-								}
-								else {
-									uni.showModal({
-										title: '上传失败，请稍后重试',
-										showCancel: false
-									})
-								}
-							},
-							fail(err) {
-								uni.showModal({
-									title: '上传失败，请稍后重试',
-									showCancel: false
-								})
-							},
-							complete() {
-								uni.hideLoading()
-							}
-						})
-					}
-				})
-			},
 			// 预览图片
 			handlePreview(idx) {
 				var _this_ = this
 				uni.previewImage({
 					current: idx,
 					urls: _this_.imageList
-				})
-			},
-			// 删除图片
-			handleImageRemove: async function(e, idx) {
-				var id = this.imageList[idx].id
-				await request.post('/upload_file/del', { id })
-				this.imageList.splice(idx, 1)
-			},
-			// 选择视频
-			handleChooseVideo() {
-				var _this_ = this
-				uni.chooseVideo({
-					success(res) {
-						var path = res.tempFilePath
-						uni.showLoading({title: '上传中...'})
-						// 上传
-						uni.uploadFile({
-							url: `${_this_.$store.state.request.url}/api/upload_file`,
-							filePath: path,
-							name: 'file',
-							header: {
-								"token": uni.getStorageSync('token')
-							},
-							formData: {
-								order_id: _this_.orderId,
-								file_type: 1,
-								file_belong: 1
-							},
-							success: function(res) {
-								// _this_.videoList.push(res.data[0])
-								// _this_.videoContext.push(uni.createVideoContext(path))
-								// _this_.videoControl.push(false)
-								var result = JSON.parse(res.data)
-								console.log(result)
-								if(result.code == 1){
-									var dataList = result.data
-									_this_.videoList = dataList
-									_this_.videoContext = dataList.map(item => {
-										return uni.createVideoContext(item.file_url)
-									})
-									_this_.videoControl = new Array(dataList.length).fill(false)
-								}
-								else {
-									uni.showModal({
-										title: '上传失败，请稍后重试',
-										showCancel: false
-									})
-								}
-							},
-							fail: function(err) {
-								uni.showModal({
-									title: '上传失败，请稍后重试',
-									showCancel: false
-								})
-							},
-							complete: function() {
-								uni.hideLoading()
-							}
-						})
-					}
 				})
 			},
 			// 预览视频
@@ -302,152 +167,17 @@
 						return item
 					})
 				}
-			},
-			// 删除视频
-			handleVideoRemove: async function(e, idx) {
-				var id = this.videoList[idx].id
-				await request.post('/upload_file/del', { id })
-				this.videoList.splice(idx, 1)
-				this.videoContext.splice(idx, 1)
-				this.videoControl.splice(idx, 1)
-			},
-			// 拿到签字图片
-			handleGetSignImage(filePath) {
-				console.log(filePath)
-				this.signFilePath = filePath
-			},
-			// 提交
-			handleSubmit: async function() {
-				var _this_ = this
-				var filePath = await this.finish()
-				var data = {
-					id: _this_.orderId,
-					content: _this_.describe,
-					type: 4,
-					fault_attr: _this_.propId[_this_.propPickerIndex],
-					is_replace: _this_.replacePickerIndex + 1,
-					suggest: _this_.proposePickerIndex
-				}
-				uni.showLoading({title: '提交中...'})
-				uni.uploadFile({
-					url: `${_this_.$store.state.request.url}/api/maint/fault_submit`,
-					filePath: filePath,
-					name: 'image',
-					header: {
-						"token": uni.getStorageSync('token'),
-						"Content-Type": "multipart/form-data"
-					},
-					formData: data,
-					success: function(res) {
-						console.log(res)
-						var result = JSON.parse(res.data)
-						console.log(result)
-						if(result.code == 1) {
-							uni.showModal({
-								title: '提交成功',
-								showCancel: false,
-								success(res) {
-									uni.redirectTo({ url: '/pages/repairDetail/repairDetail?id=' + _this_.orderId })
-								}
-							})
-						} else {
-							console.log('----收到response----')
-							uni.showModal({
-								showCancel: false,
-								title: '提交失败，请稍后重试'
-							})
-						}
-					},
-					fail: function(err) {
-						console.log('----请求失败----')
-						uni.showModal({
-							showCancel: false,
-							title: '提交失败，请稍后重试'
-						})
-					},
-					complete: function() {
-						uni.hideLoading()
-					}
-				})
-			},
-			/**
-			 * canvas绘制 
-			 * */
-			//触摸开始，获取到起点
-			touchstart: function(e){
-				let startX = e.changedTouches[0].x;
-				let startY = e.changedTouches[0].y;
-				let startPoint = {X:startX,Y:startY};
-				this.points.push(startPoint);
-				this.ctx.beginPath();
-			},
-			//触摸移动，获取到路径点
-			touchmove: function(e){
-				let moveX = e.changedTouches[0].x;
-				let moveY = e.changedTouches[0].y;
-				let movePoint = {X:moveX,Y:moveY};
-				this.points.push(movePoint);       //存点
-				let len = this.points.length;
-				if(len>=2){
-					this.draw();                   //绘制路径
-				}
-			},
-			// 触摸结束，将未绘制的点清空防止对后续路径产生干扰
-			touchend: function(){                   
-				this.points=[];
-			},
-			// 绘制笔迹
-			draw: function() {
-				let point1 = this.points[0]
-				let point2 = this.points[1]
-				this.points.shift()
-				this.ctx.moveTo(point1.X, point1.Y)
-				this.ctx.lineTo(point2.X, point2.Y)
-				this.ctx.stroke()
-				this.ctx.draw(true)
-			},
-			//清空画布
-			clear: function(){
-				var _this_ = this;
-				uni.getSystemInfo({
-					success: function(res) {
-						let canvasw = res.windowWidth;
-						let canvash = res.windowHeight;
-						_this_.ctx.clearRect(0, 0, canvasw, canvash);
-						_this_.ctx.draw(true);
-					},
-				})
-			},
-			//完成绘画并保存到本地
-			finish: function(){
-				var _this_ = this
-				return new Promise((resolve, reject) => {
-					uni.canvasToTempFilePath({
-					  canvasId: 'mycanvas',
-					  success: function(res) {
-							resolve(res.tempFilePath)
-					  },
-						fail(err) {
-							reject(err)
-						}
-					}, this)
-				})
 			}
 		},
 		onLoad: async function(option) {
 			// 拿到工单id
-			var { mode, id } = option
+			var { id } = option
 			this.orderId = id
 			
-			// 创建绘图对象
-			this.ctx = uni.createCanvasContext("mycanvas", this);
-			this.ctx.lineWidth = 2;
-			this.ctx.lineCap = "round"
-			this.ctx.lineJoin = "round"
-			
-			// 请求故障属性
-			var res = await request.post('/maint/fault_attr')
-			this.props = res.data
+			// 请求详细数据
+			var res = await request.post('/maint/fault_one', {id})
+			console.log(res.data.repair)
+			this.dataSource = res.data.repair
 		}
 	}
 </script>
@@ -468,7 +198,6 @@
 	.text-container{
 		width: 100%;
 		margin-top: 24rpx;
-		
 	}
 	
 	.form-item{
@@ -605,45 +334,29 @@
 		box-sizing: border-box;
 		background-color: #FFFFFF;
 	}
+	.sign-container image{
+		width: 100%;
+		height: 294rpx;
+		border-radius: 5px;
+	}
+	.sign-content{
+		width: 100%;
+		height: 294rpx;
+		border-radius: 5px;
+		border: solid 1px #F9F9F9;
+		box-sizing: border-box;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	
 	.sign-label{
 		height: 80rpx;
 		line-height: 80rpx;
 	}
-</style>
-
-<!-- 签字画布组件 -->
-<style scoped>
-	.canvas-box{
-		width: 100%;
-		height: 294rpx;
-		border-radius: 6rpx;
-		background-color: #F9F9F9;
-		position: relative;
-	}
-	.mycanvas{
-		width: 100%;
-		height: 100%;
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
-	.footer{
-		width: 100%;
-		height: 80rpx;
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-	}
-	.left, .right{
-		width: 120rpx;
-		height: 50rpx;
-		border-radius: 10rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 22rpx;
-		color: #4190F5;
-		background-color: rgba(65, 144, 245, 0.2);
+	.wait-text{
+		font-size: 24rpx;
+		color: #999999;
 	}
 </style>
 
