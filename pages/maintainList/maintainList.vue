@@ -16,7 +16,7 @@
 						<view class="main-list-li-ttle-time">{{ item.maint_time }}</view>
 					</view>
 					<view class="main-list-li-num">
-						电梯编号: {{ item.elevator_number }} 【{{ item.register_code }}】
+						电梯编号: {{ item.elevator_number }} <text v-if="item.register_code">【{{ item.register_code }}】</text>
 					</view>
 					<view class="main-list-li-fot">
 						<view class="main-list-li-fot-addres">
@@ -118,9 +118,7 @@
 							uni.stopPullDownRefresh();
 						}else{
 							that.list = that.list.concat(res.data)
-							console.log(that.list)
 						}
-						console.log(res.data)
 					}else{
 						uni.showToast({
 							title:res.message,
@@ -131,7 +129,6 @@
 			}
 		},
 		onPullDownRefresh(){
-			console.log('下拉开始')
 			let that = this;
 			that.page = 1;
 			that.isMore = true;
@@ -139,9 +136,7 @@
 			that.getList(that.type,that.page,1);
 		},
 		onReachBottom(){
-			console.log('上拉开始')
 			let that = this;
-			console.log(that.isMore)
 			if(that.isMore == true){
 				let pageNumber = that.page + 1;
 				that.status = 'loading';

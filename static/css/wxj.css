@@ -725,6 +725,9 @@
 		-webkit-box-orient:vertical;
 		-webkit-line-clamp:2; 
 	}
+	.menu-yx-oi-li{
+		border-bottom: 2rpx solid #eee;
+	}
 	.menu-yx-oi-li-top{
 		display: flex;
 		justify-content: space-between;
@@ -735,7 +738,6 @@
 	.menu-yx-oi-li-top-title{
 		font-size: 26rpx;
 		color: #333;
-		border-bottom: 2rpx solid #eee;
 	}
 	.menu-yx-oi-li-cont{
 		padding: 0rpx 30rpx 40rpx;
