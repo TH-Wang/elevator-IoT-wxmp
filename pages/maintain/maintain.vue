@@ -22,7 +22,7 @@
 						</view>
 					</view>
 					<!-- 插入模式 -->
-					<uni-calendar class="uni-calendar--hook" :selected="info.selected" :showMonth="false" @change="change" @monthSwitch="monthSwitch"  />
+					<uni-calendar ref="calendar" class="uni-calendar--hook" :selected="info.selected" :showMonth="false" @change="change" @click="bindDateChange" :confirm="confirm" />
 				</view>
 				<!-- <uni-section title="弹出模式" type="line"></uni-section> -->
 				<!-- <view class="example-body">
@@ -36,45 +36,45 @@
 			<view class="main-list-tab" >
 				<van-tabs :active="active" color="#4190F5" @click="onChange">
 					<van-tab title="待处理" name="1"></van-tab>
-					<van-tab title="进行中" name="2"></van-tab>
-					<van-tab title="带审核" name="3"></van-tab>
-					<van-tab title="已完成" name="4"></van-tab>
-					<van-tab title="全部" name="4"></van-tab>
+					<van-tab title="进行中" name="3"></van-tab>
+					<van-tab title="已完成" name="2"></van-tab>
+					<van-tab title="全部" name="0"></van-tab>
 				</van-tabs>
 			</view>
 			<view class="main-list" v-if="list.length > 0">
-				<view class="main-list-li" v-for="(item,index) in list" :key="index" @click="workorderbtn">
+				<navigator class="main-list-li" v-for="(item,index) in list" :key="index" :url="'/pages/workdel/workdel?id='+item.id">
 					<view class="main-list-li-ttle">
 						<view class="main-list-li-ttle-name">
-						  <view class="stutstxt head1" v-if="item.status==1">半月保</view>
-						  <view class="stutstxt head2" v-if="item.status==2">月保</view>
+						  <view class="stutstxt head1" v-if="item.main_type!=''">{{item.main_type}}</view>
+						  <!-- <view class="stutstxt head1" v-if="item.main_type==1">半月保</view> -->
+						  <!-- <view class="stutstxt head2" v-if="item.status==2">月保</view>
 						  <view class="stutstxt head3" v-if="item.status==3">半年保</view>
-						  <view class="stutstxt head4" v-if="item.status==4">半年保</view>
-						  <view class="headconts">{{ item.title }}</view>
+						  <view class="stutstxt head4" v-if="item.status==4">半年保</view> -->
+						  <view class="headconts">{{ item.ele_name }}</view>
 						</view>
-						<view class="main-list-li-ttle-time">{{ item.time }}</view>
+						<view class="main-list-li-ttle-time">{{ item.maint_time }}</view>
 					</view>
 					<view class="main-list-li-num">
 						<image src="../../static/image/yfm/gs.png"></image>
-						<view class="txtms">{{ item.num }}</view>
+						<view class="txtms">{{ item.elevator_number }}</view>
 					</view>
 					<view class="main-list-li-fot">
 						<view class="main-list-li-fot-addres">
 							<image src="../../static/image/yfm/ads.png"></image>
-							<view class="txtms">{{ item.addres }}</view>
+							<view class="txtms">{{ item.address }}</view>
 						</view>
 						<view class="main-list-li-fot-btn">
-							<text class="main-list-li-fot-btn-d" v-if="item.studes==1">待处理</text>
-							<text class="main-list-li-fot-btn-z" v-if="item.studes==2">进行中</text>
-							<text class="main-list-li-fot-btn-w" v-if="item.studes==3">已完成</text>
+							<text class="main-list-li-fot-btn-d" v-if="item.is_maintain==1">待处理</text>
+							<text class="main-list-li-fot-btn-z" v-if="item.is_maintain==3">进行中</text>
+							<text class="main-list-li-fot-btn-w" v-if="item.is_maintain==2">已完成</text>
 						</view>
 					</view>
-				</view>
+				</navigator>
 				<!-- 加载中/没有更多数据 -->
 				<uni-load-more iconType="snow" :iconSize="14" :status="status" />
 			</view>
 			<!-- 没有数据 -->
-			<view class="null" v-else>
+			<view class="null" v-if="list<=0">
 				<Null :title="title"></Null>
 			</view>
 		</view>
@@ -88,6 +88,10 @@
 	import uniCalendar from "@/components/uni-calendar/uni-calendar.vue"
 	import Null from '@/components/uni-null/uni-null.vue'
 	import uniLoadMore from "@/components/uni-load-more/uni-load-more.vue"
+	import request from '@/service/request.js'
+	// request.post('/backlog/banner',data).then((res) =>{
+	// 	console.log(res)
+	// })
 	function getDate(date, AddDayCount = 0) {
 		if (!date) {
 			date = new Date()
@@ -117,6 +121,7 @@
 		},
 		data() {
 			return {
+				chantime:'',//时间
 				showCalendar: false,
 				info: {
 					lunar: true,
@@ -124,58 +129,16 @@
 					insert: false,
 					selected: []
 				},
+				type: '1',
+				page: 1,
+				size: 10,
+				isMore: true, //是否可以可以上拉
 				status: 'more',
-				active: "1",
+				active: '1',
 				float: false,
 				title: '暂无数据',
 				list: [
-					{   
-						status:'1',
-						title: '使用单位名称呼设计公司了收费贵金属',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
-					{   status:'2',
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
-					{   
-						status:'3',
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
-					{   
-						status:'4',
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
-					{  
-						status:'4',
-						title: '这是电梯名称',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					},
-					{
-						title: '这是电梯名称',
-						status:'4',
-						time: '2020-11-11',
-						num: '23000300',
-						addres: '重庆市九龙坡区歇台子渝州路126号',
-						studes: '1'
-					}
+					
 				],
 				contentText: {
 				    contentdown: '上拉加载更多',
@@ -185,6 +148,7 @@
 			}
 		},
 		onReady() {
+			let that = this;
 			this.$nextTick(() => {
 				this.showCalendar = true
 			})
@@ -194,73 +158,160 @@
 				this.info.startDate = getDate(new Date(), -60).fullDate
 				this.info.endDate = getDate(new Date(), 30).fullDate
 				this.info.selected = [
-					{
-						date: getDate(new Date(), -3).fullDate,
-						class:'timenone',
-						info: '超期',
-					},
-					{
-						date: getDate(new Date(), -2).fullDate,
-						class:'timetow',
-						info: '待处理',
-					},
-					{
-						date: getDate(new Date(), -10).fullDate,
-						class:'timebox',
-						info: '完成',
-					}
+					
+					
 				]
 			}, 100)
+			that.getList(that.type,1,this.getCurrentMonthFirst());
+			this.caltime(this.getCurrentMonthFirst())
+		},
+		onLoad(){
+			
+			
 		},
 		methods: {
 			// 跳转维保工单
-			workorderbtn(){
-				uni.navigateTo({
-					url:'../workOrder/workOrder'
+			// workorderbtn(){
+			// 	uni.navigateTo({
+			// 		url:'../workOrder/workOrder'
+			// 	})
+			// },
+			//时间戳转换方法    date:时间戳数字
+			
+			formatDate(date) {
+			  var date = new Date(date*1000);
+			  var YY = date.getFullYear() + '-';
+			  var MM = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+			  var DD = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate());
+			  var hh = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+			  var mm = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+			  var ss = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
+			  return YY + MM + DD ;
+			},
+			// 日历
+			caltime(time){
+				request.post('/maint/calendar',{
+					month:time
+				}).then((res) =>{
+					console.log(res)
+					var das=res.data
+					this.info.selected=[]
+					if(res.code==1){
+						for(var i=0;i<das.length;i++){
+							if(das[i].is_maintain==-1){
+								this.info.selected.push({date:this.formatDate(das[i].maint_time),class:'timenone'})
+							}else if(das[i].is_maintain==1){
+								this.info.selected.push({date:this.formatDate(das[i].maint_time),class:'timetow'})
+							}else if(das[i].is_maintain==2){
+								this.info.selected.push({date:this.formatDate(das[i].maint_time),class:'timebox'})
+							}
+						}
+					}
 				})
 			},
-			onChange(event) {
-				console.log(event.detail)
-				let id = event.detail.name;
-			},
+			
+			// 获取当前月第一天
+			getCurrentMonthFirst(){
+			        var date = new Date();
+			        date.setDate(1);
+			        var month = parseInt(date.getMonth()+1);
+			        var day = date.getDate();
+			        if (month < 10) {
+			            month = '0' + month
+			        }
+			        if (day < 10) {
+			            day = '0' + day
+			        }
+					this.chantime=date.getFullYear() + '-' + month + '-' + day
+			        return date.getFullYear() + '-' + month + '-' + day;
+			    },
 			open() {
 				this.$refs.calendar.open()
 			},
-			close() {
-				console.log('弹窗关闭');
-			},
+			
 			change(e) {
 				console.log('change 返回:', e)
-				// 模拟动态打卡
-				// if (this.info.selected.length > 5) return
-				// this.info.selected.push({
-				// 	date: e.fulldate,
-				// 	info: '打卡'
-				// })
+				this.caltime(e.fulldate)
+				this.getList(this.type,1,e.fulldate,1)
 			},
 			confirm(e) {
 				console.log('confirm 返回:', e)
 			},
 			monthSwitch(e) {
 				console.log('monthSwitchs 返回:', e)
+			},
+			onChange(event) {
+				
+				let that = this,
+				 id = event.detail.name;
+				that.type = id;
+				that.page = 1;
+				that.isMore = true;
+				that.status = 'more';
+				// 切换tab设置页面返回顶部
+				uni.pageScrollTo({ 
+				　　scrollTop: 0, duration: 300 
+				}); 
+				that.getList(id,that.page,this.chantime,0);
+			},
+			getList(type,page,time,isla){
+				//type 数据类型
+				//page 页数
+				//isla 0正常加载 1下拉刷新 2上拉加载
+				let that = this;
+				let data = {
+					type: type,
+					page: page,
+					limit: that.size,
+					time:time,
+				};
+				request.post('/maint',data).then((res) =>{
+					if(res.code == 1){
+						if(res.data.length < 10){
+							that.isMore = false;
+							that.status = 'noMore'
+						}
+						if(isla == 0){
+							that.list = [];
+							that.list = res.data;
+						}else if(isla == 1){
+							that.list = [];
+							that.list = res.data;
+							uni.stopPullDownRefresh();
+							console.log(that.list)
+						}else{
+							that.list = that.list.concat(res.data)
+							
+						}
+						
+					}else{
+						uni.showToast({
+							title:res.message,
+							icon:"none"
+						})
+					}
+				})
 			}
 		},
 		onPullDownRefresh(){
 			console.log('下拉开始')
-			setTimeout(function () {
-				console.log('下拉结束')
-			   uni.stopPullDownRefresh();
-			}, 1000);
+			let that = this;
+			that.page = 1;
+			that.isMore = true;
+			that.status = 'loading';
+			that.getList(that.type,that.page,this.chantime,1);
 		},
 		onReachBottom(){
 			console.log('上拉开始')
 			let that = this;
-			that.status = 'loading'
-			setTimeout(function () {
-				console.log('上拉结束')
-				that.status = 'noMore'
-				console.log(that.status)
-			}, 2000);
+			console.log(that.isMore)
+			if(that.isMore == true){
+				let pageNumber = that.page + 1;
+				that.status = 'loading';
+				that.page = pageNumber;
+				console.log(pageNumber)
+				that.getList(that.type,pageNumber,this.chantime,2)
+			}
 		},
 		/**
 		 * 屏幕滚动监听
@@ -277,6 +328,12 @@
 </script>
 
 <style>
+	.null{
+		position: relative;
+		top: 50%;
+		padding-top: 50%;
+		box-sizing: border-box;
+	}
 	.timebox{
 		
 		width: 66rpx !important;
@@ -289,7 +346,7 @@
 	}
 	.uni-calendar-item--checked{
 		background-color: none !important;
-		color: #333 !important;
+		/* color: #333 !important; */
 
 	}
 	.timetow{
@@ -342,7 +399,7 @@
 		margin-right: 20rpx;
 	}
 	.main{
-		min-height: 100vh;
+		min-height: auto;
 	}
 	/** 动画 */
 	@keyframes show {
