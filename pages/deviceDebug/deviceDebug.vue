@@ -4,7 +4,7 @@
 		<!-- 顶部搜索框、按钮 -->
 		<view class="header">
 			<view class="search-box">
-				<ModalSearch />
+				<ModalSearch placeholder="搜索SIM-IEMI或电梯编码" @search="handleSearch" />
 			</view>
 			<view class="scan-button">
 				<image class="header-icon" src="../../static/icon/device/monitor.png" />
@@ -24,6 +24,7 @@
 			:duration="300"
 		>
 			
+			<!-- 当前数据 -->
 			<swiper-item class="swiper-item">
 				<view class="data-item" v-for="curt in dataSource.current" :key="curt.id">
 					<view class="data-line">
@@ -37,42 +38,53 @@
 				</view>
 			</swiper-item>
 			
+			<!-- 设备连接 -->
 			<swiper-item class="swiper-item">
-				<view class="data-item device-data-item" v-for="device in dataSource.device" :key="device.id">
+				<Empty v-if="deviceData.length == 0" title="暂无数据" />
+				
+				<view class="data-item device-data-item" v-for="device in deviceData" :key="device.devid">
 					<view class="device-left">
 						<view class="data-line">
 							<text class="label">时间:</text>
-							<text>{{device.time}}</text>
+							<text>{{device.etime}}</text>
 						</view>
 						<view class="data-line second-line">
-							<text class="label">数据:</text>
-							<text>{{device.buffer}}</text>
+							<text class="label">编号:</text>
+							<text>{{device.elenumber}}</text>
 						</view>
 					</view>
 					<view class="device-icon">
 						<image
-							:src="'../../static/icon/feedback/'+(device.code === 0 ? 'error' : 'success')+'.png'"
+							:src="'../../static/icon/feedback/'+(device.elestatus=='连接成功' ? 'success' : 'error')+'.png'"
 						/>
-						<text class="device-connect" :style="'color:' + device.code === 0 ? '#4190F5' : '#52C28E'">
-							{{device.code === 0 ? '连接成功' : '连接失败'}}
+						<text 
+							class="device-connect" 
+							:style="'color:' + (device.elestatus=='连接成功' ? '#4190F5' : '#FF3B30')"
+						>
+							{{device.elestatus=='连接成功' ? '连接成功' : '连接失败'}}
 						</text>
 					</view>
 				</view>
 			</swiper-item>
 			
+			<!-- 服务器连接 -->
 			<swiper-item class="swiper-item">
-				<view class="data-item" v-for="server in dataSource.server" :key="server.id">
+				<Empty v-if="serverData.length == 0" title="暂无数据" />
+				
+				<view class="data-item" v-for="server in serverData" :key="server.connecttime">
 					<view class="data-line">
 						<text class="label">时间:</text>
-						<text>{{server.time}}</text>
+						<text>{{server.connecttime}}</text>
 					</view>
 					<view class="data-line second-line">
-						<text class="label">发送:</text>
-						<text>{{server.send}}</text>
+						<text class="label">接收:</text>
+						<text>{{server.fromstr}}</text>
 					</view>
 					<view class="data-line receive-line">
 						<text class="label">发送:</text>
-						<text>{{server.receive}}</text>
+						<text
+							:style="'color:' + (server.tostr ? '' : '#FF3B30')"
+						>{{server.tostr ? server.tostr : '未返回数据，链接失败'}}</text>
 					</view>
 				</view>
 			</swiper-item>
@@ -83,12 +95,15 @@
 <script>
 	import ModalSearch from '../../components/ModalSearch/ModalSearch.vue'
 	import Tabs from '../../components/Tabs/Tabs.vue'
+	import Empty from '../../components/Empty/Empty.vue'
 	import deviceData from '../../data/device.js'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
 			ModalSearch,
-			Tabs
+			Tabs,
+			Empty
 		},
 		props: {
 			
@@ -96,7 +111,9 @@
 		data: () => ({
 			active: 0,
 			tabs: ['当前数据', '设备连接', '服务器连接'],
-			dataSource: deviceData
+			dataSource: deviceData,
+			deviceData: null,
+			serverData: null
 		}),
 		computed: {
 			
@@ -112,6 +129,15 @@
 			},
 			handleSwiperChange(e) {
 				this.active = e.detail.current
+			},
+			async handleSearch(value) {
+				var option = { limit: 100, page: 1, id: value}
+				var res = await Promise.all([
+					request.post('/debuging/device', option),
+					request.post('/debuging/server', option)
+				])
+				this.deviceData = res[0].data
+				this.serverData = res[1].data
 			}
 		}
 	}
@@ -174,6 +200,9 @@
 	.device-icon{
 		margin-left: 20rpx;
 		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: start;
 	}
 	.device-icon image{
 		width: 24rpx;

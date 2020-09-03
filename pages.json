@@ -81,7 +81,8 @@
 		{
 			"path": "pages/repair/repair",
 			"style": {
-				"navigationBarTitleText": "急修"
+				"navigationBarTitleText": "急修",
+				"enablePullDownRefresh": true							//开启下拉刷新
 			}
 		},
 		{
@@ -92,6 +93,15 @@
 		},
 		{
 			"path": "pages/repairHandle/repairHandle",		//急修工单处理
+			"style": {
+				"navigationBarTitleText": "工单处理",
+				"usingComponents": {
+					"van-icon": "/wxcomponents/vant/dist/icon/index"
+				}
+			}
+		},
+		{
+			"path": "pages/repairSubmitInfo/repairSubmitInfo",		//急修工单处理详情
 			"style": {
 				"navigationBarTitleText": "工单处理",
 				"usingComponents": {

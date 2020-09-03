@@ -11,9 +11,9 @@
 				:interval="5000"
 				:duration="500"
 			>
-				<swiper-item v-for="item in swiperList" :key="item">
+				<swiper-item v-for="(item, index) in swiperList" :key="index">
 					<view class="swiper-item">
-						<image class="swper-image" src="../../static/image/index-swiper.jpg" mode />
+						<image class="swper-image" :src="'http://' + item" />
 					</view>
 				</swiper-item>
 			</swiper>
@@ -22,15 +22,20 @@
 			<Search @click-button="handleClickButton" @change="handleSearchChange" button />
 			
 			<!-- 公告 -->
-			<view class="notice" @click="handleLinkNotice">
+			<view class="notice">
 				<image class="notice-image" src="../../static/icon/notice.png" mode />
+				<!-- 暂无公告 -->
+				<view v-if="noticeList.length==0" class="notice-swiper notice-empty">暂无公告</view>
+				<!-- 公告列表 -->
 				<swiper
+					v-else
 					class="notice-swiper"
 					:vertical="true"
 					:autoplay="true"
 					:circular="true"
 					:interval="3000"
 					:duration="300"
+					@click="handleLinkNotice"
 				>
 					<swiper-item class="notice-swiper-item" v-for="(item, index) in noticeList" :key="index">
 						<text class="notice-title">{{item}}</text>
@@ -54,17 +59,35 @@
 			<!-- 待办事项 -->
 			<view class="todos-title">
 				<text>待办事项</text>
-				<text><text style="color: #4190F5;">todoCount</text>项</text>
+				<text><text style="color: #4190F5;">{{todoCount}}</text>项</text>
 			</view>
 			
 			<view class="todos-list">
+				<!-- 急修 -->
 				<RepairCard
-					v-for="record in todoList"
+					v-for="record in todoList.repair"
+					:key="record.repair_id"
+					:record="record"
+					type="repair"
+					hasTag
+					hasButton
+					@click="handleLinkRepair($event, record.repair_id)"
+				/>
+				<!-- 保养 -->
+				<RepairCard
+					v-for="record in todoList.maint"
 					:key="record.id"
 					:record="record"
-					:type="record.__TYPE"
+					type="maint"
 					hasTag
-					@click="handleLinkDetail($event, record.id)"
+					hasButton
+					@click="handleLinkMaint($event, record.id)"
+				/>
+				<!-- 证件到期 -->
+				<PromptCard
+					v-for="record in todoList.prompt"
+					:key="record.id"
+					:record="record"
 				/>
 			</view>
 			
@@ -75,26 +98,25 @@
 	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
 	import Search from '../../components/Search/Search.vue'
 	import RepairCard from '../../components/RepairCard/RepairCard.vue'
+	import PromptCard from '../../components/PromptCard/PromptCard.vue'
 	import gridConfig from './gridConfig.js'
 	import debounce from '../../utils/debounce.js'
 	import request from '../../service/request.js'
+	import todos from '../../data/todos.js'
 	
 	export default {
 		components: {
 			TabbarPage,
 			Search,
-			RepairCard
+			RepairCard,
+			PromptCard
 		},
 		data: () => ({
-			swiperList: ['1', '2', '3'],
-			noticeList: [
-				'这里是后台的系统公告市规划局三个世界观和三个',
-				'这里是后台的系统公告',
-				'市规划局三个世界观和三个价值观'
-			],
+			swiperList: [],
+			noticeList: [],
 			gridConfig,
 			value: '',
-			todoList: [],
+			todoList: {},
 			todoCount: 0
 		}),
 		methods: {
@@ -117,29 +139,38 @@
 			handleLinkBind(){
 				uni.navigateTo({url: '/pages/login/login'})
 			},
-			handleLinkDetail(e, id) {
+			handleLinkRepair(e, id) {
 				uni.navigateTo({
 					url: '/pages/repairDetail/repairDetail?id=' + id
 				})
 			},
-			handleOfficeLoad(e) {
-				console.log(e.detail)
+			handleLinkMaint(e, id) {
+				console.log('跳转维保工单详情页面: ' + id)
 			},
-			handleOfficeError(e) {
-				console.log(e.detail)
+			// 请求banner
+			async requestBanner() {
+				var res = await request.post('/backlog/banner')
+				var imageList = res.data.map(item => {
+					item.image_url.replace(/\\/g, '/').replace(/\s/g, '/')
+					return item.image_url
+				})
+				console.log(imageList)
+				this.swiperList = imageList
+			},
+			// 请求公告
+			async requestNotice() {
+				var res = await request.post('/jobs/lists', {
+					limit: 100,
+					page: 1,
+					type: 0
+				})
+				this.noticeList = res.data.map(i=>i.title)
 			},
 			// 待办事项处理
 			async requestTodoWork() {
 				var res = await request.post('/backlog')
-				var list = Object.entries(res.data)
-					.map(([type, items]) => {
-						items.forEach(item => {item.__TYPE = type})
-						return items
-					})
-					.reduce((prev, item) => [...prev, ...item], [])
-				console.log(list)
-				this.todoList = list
-				this.todoCount = list.length
+				this.todoList = res.data
+				this.todoCount = Object.values(res.data).reduce((p,i)=>[...p, ...i], []).length
 			}
 		},
 		onLoad: async function() {
@@ -172,14 +203,30 @@
 						}
 					})
 				}
-				else{
+				else if(res.code == 1){
 					var token = res.data.token
 					// 存储token
 					uni.setStorageSync('token', token)
 					this.$store.commit('setBaseUrl', res.data.request_url)
 					this.$store.commit('setUserInfo', res.data)
-					console.log(res)
+					// 请求banner
+					await this.requestBanner()
+					// 请求公告列表
+					await this.requestNotice()
+					// 请求代办事项
 					await this.requestTodoWork()
+				}
+				else {
+					setTimeout(() => {
+						uni.showModal({
+							showCancel: false,
+							title: '登录失败',
+							content: '账号登录失败，即将前往绑定页面重新登录',
+							success() {
+								_this_.handleLinkBind()
+							}
+						})
+					}, 1200)
 				}
 			}catch(e){
 				console.log(e)
@@ -229,6 +276,12 @@
 		margin: 0 30rpx 0 45rpx;
 		width: 36rpx;
 		height: 32rpx;
+	}
+	.notice-empty{
+		color: #999999;
+		font-size: 26rpx;
+		display: flex;
+		align-items: center;
 	}
 	.notice-swiper{
 		width: calc(100% - 120rpx);
@@ -289,5 +342,14 @@
 		color: #000000;
 		background-color: #FFFFFF;
 		border-bottom: solid 1px #EEEEEE;
+		position: sticky;
+		top: 0;
+		left: 0;
+	}
+	
+	.todos-list{
+		padding-top: 0.5px;
+		padding-bottom: 30rpx;
+		background-color: #FFFFFF;
 	}
 </style>

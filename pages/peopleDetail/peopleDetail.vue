@@ -31,9 +31,22 @@
 				@change="handleSwiperChange"
 			>
 				<swiper-item v-for="(tab, index) in tabs" :key="index">
+					<!-- 维保 -->
 					<scroll-view class="list-container" :scroll-y="listScroll">
-						<view v-for="item in dataSource" :key="item.id">
-							<RepairCard :record="item" />
+						<view v-for="maint in maintList" :key="maint.id">
+							<RepairCard :record="maint" type="maint" />
+						</view>
+					</scroll-view>
+					<!-- 急修 -->
+					<scroll-view class="list-container" :scroll-y="listScroll">
+						<view v-for="repair in repairList" :key="repair.id">
+							<RepairCard :record="repair" type="repair" />
+						</view>
+					</scroll-view>
+					<!-- 上报 -->
+					<scroll-view class="list-container" :scroll-y="listScroll">
+						<view v-for="maint in maintList" :key="maint.id">
+							<RepairCard :record="maint" type="maint" />
 						</view>
 					</scroll-view>
 				</swiper-item>
@@ -63,7 +76,8 @@
 		mixins: [pageScrollMixin],
 		data: () => ({
 			tabs: ['维保工单', '急修工单', '上报故障'],
-			dataSource: {},
+			maintList: {},
+			dataSource: {}
 			// record
 		}),
 		methods: {

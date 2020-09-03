@@ -10,13 +10,13 @@
 			<!-- 表单主体 -->
 			<view class="form-container">
 				<FormItem label="请输入旧密码" >
-					<input class="input" type="password" value="" placeholder="请输入"/>
+					<input class="input" type="password" v-model="oldPs" placeholder="请输入"/>
 				</FormItem>
 				<FormItem label="请输入新密码" >
-					<input class="input" type="password" value="" placeholder="请输入"/>
+					<input class="input" type="password" v-model="newPs" placeholder="请输入"/>
 				</FormItem>
-				<FormItem label="请确认旧密码" >
-					<input class="input" type="password" value="" placeholder="请输入"/>
+				<FormItem label="请确认新密码" >
+					<input class="input" type="password" v-model="rePs" @blur="handleValidate" placeholder="请输入"/>
 				</FormItem>
 			</view>
 			
@@ -25,11 +25,11 @@
 			
 			<!-- 反馈 -->
 			<Feedback
-				:visible="visible"
-				@close="visible = false"
-				title="正在提交"
-				mode="loading"
-				tip="为您拼命加载中..."
+				:visible="feedback.visible"
+				:title="feedback.title"
+				:mode="feedback.mode"
+				:tip="feedback.tip"
+				@close="feedback.visible = false"
 			/>
 			
 	</view>
@@ -40,6 +40,8 @@
 	import FormItem from '../../components/FormItem/FormItem.vue'
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
 	import Feedback from '../../components/Feedback/Feedback.vue'
+	import request from '../../service/request.js'
+	import md5 from 'md5'
 	
 	export default {
 		components: {
@@ -49,7 +51,15 @@
 			Feedback
 		},
 		data: () => ({
-			visible: false
+			feedback: {
+				visible: false,
+				title: '',
+				mode: '',
+				tip: ''
+			},
+			oldPs: '',
+			newPs: '',
+			rePs: ''
 		}),
 		computed: {
 			info() {
@@ -57,8 +67,68 @@
 			}
 		},
 		methods: {
-			handleSubmit() {
-				this.visible = true
+			// 校验两次密码是否输入一致
+			handleValidate() {
+				if(this.newPs !== this.rePs) {
+					uni.showModal({
+						showCancel: false,
+						title: '两次密码输入不一致'
+					})
+				}
+			},
+			async handleSubmit() {
+				var _this_ = this
+				// 1. 校验
+				this.handleValidate()
+				// 2. 验证旧密码
+				var res = await request.post('/user_info/val_password', {
+					password: md5(_this_.oldPs)
+				})
+				if(res.code != 1){
+					uni.showModal({
+						showCancel: false,
+						title: '旧密码不正确，请重新输入'
+					})
+					return
+				}
+				// 3. 原密码与新密码是否相同
+				if(this.oldPs === this.newPs) {
+					uni.showModal({
+						showCancel: false,
+						title: '新密码不能与原密码相同!'
+					})
+					return
+				}
+				// 4. 修改新密码
+				this.feedback = {
+					visible: true,
+					title: '修改中',
+					mode: 'loading',
+					tip: '正在修改...'
+				}
+				var resUpdate = await request.post('/user_info/up_password', {
+					password: md5(_this_.newPs)
+				})
+				if(res.code == 1) {
+					this.feedback = {
+						visible: true,
+						title: '修改成功',
+						mode: 'success',
+						tip: '恭喜您，密码重置成功!'
+					}
+					setTimeout(()=>{
+						uni.switchTab({
+							url: '/pages/mine/mine'
+						})
+					}, 1000)
+				} else {
+					this.feedback = {
+						visible: true,
+						title: '修改失败',
+						mode: 'error',
+						tip: '很遗憾，密码重置失败请重试!'
+					}
+				}
 			}
 		}
 	}

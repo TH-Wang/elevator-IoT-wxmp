@@ -2,8 +2,13 @@
 	<view class="container">
 			<!-- 头像 -->
 			<view class="avatar">
-				<image class="avatar-image" :src="'http://' + info.head_img" />
-				<view class="avatar-button">
+				<image
+					class="avatar-image"
+					:src="'http://' + info.head_img"
+					@click="handlePreviewHeadImage"
+					mode="aspectFill"
+				/>
+				<view class="avatar-button" @click="handleChooseImage">
 					<view class="avatar-text">选择头像</view>
 					<image class="avatar-right-icon" src="../../static/icon/right.png" />
 				</view>
@@ -56,6 +61,7 @@
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import FormItem from '../../components/FormItem/FormItem.vue'
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -86,14 +92,76 @@
 					default: return '普通人员'
 				}
 			},
-			handleSubmit() {
+			// 提交
+			handleSubmit: async function() {
 				var _this_ = this
-				console.log('----保存资料----')
-				console.log({
+				var data = {
 					realname: _this_.realname,
-					sex: _this_.sex,
+					sex: Number(_this_.sex),
 					phone: _this_.phone,
 					email: _this_.email
+				}
+				var res = await request.post('/user_info/up_user', data)
+				if(res.code == 1) {
+					this.$store.commit('setUserInfo', {
+						..._this_.info,
+						...data
+					})
+					uni.showToast({
+						icon: 'success',
+						title: '修改成功',
+						mask: true
+					})
+				} else {
+					uni.showModal({
+						title: '修改失败，请稍后再试',
+						showCancel: false
+					})
+				}
+			},
+			// 预览头像
+			handlePreviewHeadImage() {
+				var url = 'http://' + this.info.head_img
+				uni.previewImage({
+					urls: [url]
+				})
+			},
+			// 选择头像
+			handleChooseImage() {
+				var _this_ = this
+				uni.chooseImage({
+					sourceType: ['album', 'camera'],
+					success: function(res) {
+						_this_.handleUpdateAvatar(res)
+					}
+				})
+			},
+			// 修改头像
+			handleUpdateAvatar(res) {
+				var _this_ = this
+				var avatar = res.tempFilePaths[0]
+				uni.uploadFile({
+					url: `${_this_.$store.state.request.url}/api/user_info/up_head`,
+					filePath: avatar,
+					name: 'head_img',
+					header: {
+						"token": uni.getStorageSync('token'),
+						"Content-Type": "multipart/form-data"
+					},
+					success: function(res) {
+						var result = JSON.parse(res.data)
+						console.log(result)
+						if(result.code == 1) {
+							uni.showToast({
+								title: '修改成功',
+								icon: 'success'
+							})
+							_this_.$store.commit('setUserInfo', {
+								..._this_.info,
+								head_img: result.data.image
+							})
+						}
+					}
 				})
 			}
 		},

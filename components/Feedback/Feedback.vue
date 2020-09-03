@@ -97,6 +97,13 @@
 		color: #FF3B30;
 	}
 	
+	.show-enter-active, .show-leave-active {
+	  transition: opacity .5s;
+	}
+	.show-enter, .fade-leave-to {
+	  opacity: 0;
+	}
+	
 	.container{
 		width: 100vw;
 		height: 100vh;

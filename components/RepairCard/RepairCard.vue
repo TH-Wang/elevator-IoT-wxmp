@@ -1,10 +1,10 @@
 <template>
-	<view class="container" :style="'background-color:' + background" @click="$emit('click')">
+	<view class="container" :style="containerStyle" @click="$emit('click')">
 		<!-- 头部 -->
 		<view class="header">
 			<view v-if="hasTag" :class="'header-tag ' + 'tag-' + type">{{getHeaderTagText()}}</view>
 			<text class="title ellipsis">{{record.ele_name}}</text>
-			<text class="time">{{record.fault_start_time}}</text>
+			<text class="time">{{timeText()}}</text>
 		</view>
 		
 		<!-- 维保 -->
@@ -12,7 +12,7 @@
 			电梯编码: {{record.elevator_number}}
 		</view>
 		<!-- 急修 -->
-		<view v-elseif="type == 'repair'" class="detail ellipsis">
+		<view v-else-if="type == 'repair'" class="detail ellipsis">
 			<text>{{record.fault_code}}</text>
 			<text class="space-point">·</text>
 			<text>{{record.fault_syn}}</text>
@@ -27,6 +27,8 @@
 </template>
 
 <script>
+	import formatDate from '../../utils/formatDate.js'
+	
 	export default {
 		props: {
 			record: {
@@ -41,19 +43,51 @@
 			type: String,
 			hasButton: Boolean
 		},
+		data: () => ({
+			buttonClass: ''
+		}),
 		computed: {
-			buttonClass() {
-				return 'type-button ' + 'button-' + (this.record.repair_type >= 4 ? 4 : this.record.repair_type)
+			containerStyle() {
+				return 'background-color:' + (this.type=='repair'?'rgba(65,144,245,.05)':'rgba(253,144,38,.05)')
 			}
 		},
 		methods: {
+			timeText() {
+				if(this.type == 'repair') {
+					var time = this.record.fault_start_time
+					if(typeof time == 'number') {
+						return formatDate('YYYY-mm-dd', new Date(time))
+					} else {
+						return time
+					}
+				}
+				else if(this.type == 'maint') {
+					var time = this.record.maint_time
+					if(typeof time == 'number') {
+						return formatDate('YYYY-mm-dd', new Date(time))
+					} else {
+						return time
+					}
+				}
+			},
 			getButtonText() {
-				switch(this.record.repair_type) {
-					case 1: return '待接警';
-					case 2: return '待处理';
-					case 3: return '进行中';
-					case 4: return '已完成';
-					default: return '已完成';
+				if(this.type == 'repair'){
+					switch(this.record.repair_type) {
+						case 1: return '待接警';
+						case 2: return '待处理';
+						case 3: return '进行中';
+						case 4: return '已完成';
+						default: return '已完成';
+					}
+				}
+				else if(this.type == 'maint') {
+					switch(this.record.is_maintain) {
+						case 1: return '待维保';
+						case 2: return '已维保';
+						case 3: return '进行中';
+						case 4: return '逾期签到';
+						default: return '待维保';
+					}
 				}
 			},
 			getHeaderTagText() {
@@ -65,6 +99,17 @@
 					default: return '提示';
 				}
 			}
+		},
+		mounted() {
+			var idx = null
+			if(this.type == 'repair'){
+				idx = this.record.repair_type >= 4 ? 4 : this.record.repair_type
+			}
+			else if(this.type == 'maint') {
+				idx = this.record.is_maintain >= 4 ? 4 : this.record.is_maintain
+			}
+			
+			this.buttonClass = 'type-button ' + 'button-' + idx
 		}
 	}
 </script>
@@ -124,6 +169,7 @@
 	.time, .type-button{
 		width: 22%;
 		font-size: 22rpx;
+		color: #999999;
 	}
 	
 	.space-point{
@@ -147,7 +193,7 @@
 		text-align: center;
 	}
 	/* 按钮 */
-	.button-1{background-color: #E19877; color: #FFFFFF}
+	.button-1{background-color: #ff4d4d; color: #FFFFFF}
 	.button-2{background-color: #4190F5; color: #FFFFFF}
 	.button-3{background-color: #FD9026; color: #FFFFFF}
 	.button-4{background-color: #EEEEEE; color: #999999}

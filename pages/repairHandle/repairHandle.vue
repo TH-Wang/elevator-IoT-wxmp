@@ -5,8 +5,8 @@
 			<!-- 故障属性选择器 -->
 				<view class="form-item">
 					<view class="label">故障属性</view>
-					<picker class="picker" :value="porpPickerIndex" :range="propRange" @change="handlePropPickerChange">
-						<text class="pickered-text">{{propRange[porpPickerIndex]}}</text>
+					<picker class="picker" :value="propPickerIndex" :range="propRange" @change="handlePropPickerChange">
+						<text class="pickered-text">{{propRange[propPickerIndex]}}</text>
 						<image class="picker-icon" src="../../static/icon/right.png" />
 					</picker>
 				</view>
@@ -14,8 +14,8 @@
 				<!-- 配件更换选择器 -->
 				<view class="form-item">
 					<view class="label">配件更换</view>
-					<picker class="picker" :value="safePickerIndex" :range="safeRange" @change="handleSafePickerChange">
-						<text class="pickered-text">{{safeRange[safePickerIndex]}}</text>
+					<picker class="picker" :value="replacePickerIndex" :range="replaceRange" @change="handleSafePickerChange">
+						<text class="pickered-text">{{replaceRange[replacePickerIndex]}}</text>
 						<image class="picker-icon" src="../../static/icon/right.png" />
 					</picker>
 				</view>
@@ -23,8 +23,8 @@
 				<!-- 急修建议选择器 -->
 				<view class="form-item">
 					<view class="label">急修建议</view>
-					<picker class="picker" :value="trappedPickerIndex" :range="trappedRange" @change="handleTrappedPickerChange">
-						<text class="pickered-text">{{trappedRange[trappedPickerIndex]}}</text>
+					<picker class="picker" :value="proposePickerIndex" :range="proposeRange" @change="handleTrappedPickerChange">
+						<text class="pickered-text">{{proposeRange[proposePickerIndex]}}</text>
 						<image class="picker-icon" src="../../static/icon/right.png" />
 					</picker>
 				</view>
@@ -45,12 +45,12 @@
 				<view
 					class="image-container"
 					v-for="(video, idx) in videoList"
-					:key="video"
+					:key="video.id"
 					@click="handlePreviewVideo($event, idx)"
 				>
 					<video
-						:id="video"
-						:src="video"
+						:id="video.file_url"
+						:src="video.file_url"
 						:controls="videoControl[idx]"
 						:show-center-play-btn="false"
 						@fullscreenchange="handleVideoScreenChange($event, idx)"
@@ -73,15 +73,15 @@
 		
 		<!-- 图片 -->
 		<view class="upload-container">
-			<view class="label" style="margin-right: 30rpx;">视频</view>
+			<view class="label" style="margin-right: 30rpx;">图片</view>
 			<view class="box">
 				<view
 					class="image-container"
 					v-for="(img, idx) in imageList"
-					:key="img"
+					:key="img.id"
 					@click="handlePreview(idx)"
 				>
-					<image class="preview-image" :src="img" mode="aspectFill"></image>
+					<image class="preview-image" :src="img.file_url" mode="aspectFill"></image>
 					<image
 						class="remove-button"
 						src="../../static/icon/remove.png"
@@ -95,35 +95,35 @@
 		</view>
 		
 		<!-- 签字确认 -->
-		<view class="picker-container">
-			<view class="text-container">
-				<view class="form-item">
-					<view class="label">签字确认</view>
-				</view>
-				<view class="sing-confirm"></view>
-			</view>
+		<view class="sign-container">
+			<view class="sign-label">签字</view>
+			<SignBoard ref="sign" />
 		</view>
 		
 		<!-- 提交按钮 -->
-		<CommonButton text="确认提交" />
+		<CommonButton text="确认提交" @click="handleSubmit" />
 		
 	</view>
 </template>
 
 <script>
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import SignBoard from '../../components/SignBoard/SignBoard.vue'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
-			CommonButton
+			CommonButton,
+			SignBoard
 		},
 		data: () => ({
-			propRange: [],
-			porpPickerIndex: 0,
-			safeRange: ['一级', '二级', '三级', '四级', '五级'],
-			safePickerIndex: 0,
-			trappedRange: ['是', '否'],
-			trappedPickerIndex: 0,
+			orderId: null,
+			attrs: [],
+			propPickerIndex: 0,
+			replaceRange: ['未更换', '更换'],
+			replacePickerIndex: 0,
+			proposeRange: ['停梯', '运行'],
+			proposePickerIndex: 0,
 			describe: '',
 			// 选择图片列表
 			imageList: [],
@@ -134,14 +134,71 @@
 			// 视频空间是否显示
 			videoControl: []
 		}),
+		computed: {
+			propRange() {
+				return this.attrs.map(i=>i.name)
+			},
+			propId() {
+				return this.attrs.map(i=>i.id)
+			}
+		},
 		methods: {
+			// 选择故障属性
+			handlePropPickerChange(e) {
+				this.propPickerIndex = e.target.value
+			},
+			// 选择是否更换配件
+			handleSafePickerChange(e) {
+				this.replacePickerIndex = e.target.value
+			},
+			// 选择急修建议
+			handleTrappedPickerChange(e) {
+				this.proposePickerIndex = e.target.value
+			},
 			// 选择图片
 			handleChooseImage() {
 				var _this_ = this
 				uni.chooseImage({
 					count: 1,
 					success(res) {
-						_this_.imageList.push(res.tempFilePaths[0])
+						var filePath = res.tempFilePaths[0]
+						uni.showLoading({title: '正在上传...'})
+						// 上传
+						uni.uploadFile({
+							url: `${_this_.$store.state.request.url}/api/upload_file`,
+							filePath: res.tempFilePaths[0],
+							name: 'file',
+							header: {
+								"token": uni.getStorageSync('token')
+							},
+							formData: {
+								order_id: _this_.orderId,
+								file_type: 3,
+								file_belong: 1
+							},
+							success(res) {
+								var result = JSON.parse(res.data)
+								console.log(result)
+								if(result.code == 1) {
+									_this_.imageList = result.data
+								}
+								else {
+									uni.showModal({
+										title: '上传失败，请稍后重试',
+										showCancel: false
+									})
+								}
+							},
+							fail(err) {
+								uni.showModal({
+									title: '上传失败，请稍后重试',
+									showCancel: false
+								})
+							},
+							complete() {
+								uni.hideLoading()
+							}
+						})
 					}
 				})
 			},
@@ -154,7 +211,9 @@
 				})
 			},
 			// 删除图片
-			handleImageRemove(e, idx) {
+			handleImageRemove: async function(e, idx) {
+				var id = this.imageList[idx].id
+				await request.post('/upload_file/del', { id })
 				this.imageList.splice(idx, 1)
 			},
 			// 选择视频
@@ -163,9 +222,51 @@
 				uni.chooseVideo({
 					success(res) {
 						var path = res.tempFilePath
-						_this_.videoList.push(path)
-						_this_.videoContext.push(uni.createVideoContext(path))
-						_this_.videoControl.push(false)
+						uni.showLoading({title: '上传中...'})
+						// 上传
+						uni.uploadFile({
+							url: `${_this_.$store.state.request.url}/api/upload_file`,
+							filePath: path,
+							name: 'file',
+							header: {
+								"token": uni.getStorageSync('token')
+							},
+							formData: {
+								order_id: _this_.orderId,
+								file_type: 1,
+								file_belong: 1
+							},
+							success: function(res) {
+								// _this_.videoList.push(res.data[0])
+								// _this_.videoContext.push(uni.createVideoContext(path))
+								// _this_.videoControl.push(false)
+								var result = JSON.parse(res.data)
+								console.log(result)
+								if(result.code == 1){
+									var dataList = result.data
+									_this_.videoList = dataList
+									_this_.videoContext = dataList.map(item => {
+										return uni.createVideoContext(item.file_url)
+									})
+									_this_.videoControl = new Array(dataList.length).fill(false)
+								}
+								else {
+									uni.showModal({
+										title: '上传失败，请稍后重试',
+										showCancel: false
+									})
+								}
+							},
+							fail: function(err) {
+								uni.showModal({
+									title: '上传失败，请稍后重试',
+									showCancel: false
+								})
+							},
+							complete: function() {
+								uni.hideLoading()
+							}
+						})
 					}
 				})
 			},
@@ -192,16 +293,75 @@
 				}
 			},
 			// 删除视频
-			handleVideoRemove(e, idx) {
+			handleVideoRemove: async function(e, idx) {
+				var id = this.videoList[idx].id
+				await request.post('/upload_file/del', { id })
 				this.videoList.splice(idx, 1)
 				this.videoContext.splice(idx, 1)
 				this.videoControl.splice(idx, 1)
-			}
+			},
+			// 提交
+			handleSubmit: async function() {
+				var _this_ = this
+				var data = {
+					id: _this_.orderId,
+					content: _this_.describe,
+					type: 4,
+					fault_attr: _this_.propId[_this_.propPickerIndex],
+					is_replace: _this_.replacePickerIndex + 1,
+					suggest: _this_.proposePickerIndex
+				}
+				var filePath = await this.$refs.sign.finish()
+				uni.showLoading({title: '提交中...'})
+				uni.uploadFile({
+					url: `${_this_.$store.state.request.url}/api/maint/fault_submit`,
+					filePath: filePath,
+					name: 'image',
+					header: {
+						"token": uni.getStorageSync('token'),
+						"Content-Type": "multipart/form-data"
+					},
+					formData: data,
+					success: function(res) {
+						var result = JSON.parse(res.data)
+						console.log(result)
+						if(result.code == 1) {
+							uni.showModal({
+								title: '提交成功',
+								showCancel: false,
+								success(res) {
+									uni.redirectTo({ url: '/pages/repairDetail/repairDetail?id=' + _this_.orderId })
+								}
+							})
+						} else {
+							console.log('----收到response----')
+							uni.showModal({
+								showCancel: false,
+								title: '提交失败，请稍后重试'
+							})
+						}
+					},
+					fail: function(err) {
+						console.log('----请求失败----')
+						uni.showModal({
+							showCancel: false,
+							title: '提交失败，请稍后重试'
+						})
+					},
+					complete: function() {
+						uni.hideLoading()
+					}
+				})
+			},
 		},
-		onLoad: async function() {
+		onLoad: async function(option) {
+			// 拿到工单id
+			var { id } = option
+			this.orderId = id
+			
+			// 请求故障属性
 			var res = await request.post('/maint/fault_attr')
-			console.log(res)
-			this.propRange = res.data.map(item => item.name)
+			this.attrs = res.data
 		}
 	}
 </script>
@@ -244,7 +404,7 @@
 	.label{
 		flex-shrink: 0;
 	}
-	.label, .pickered-text{
+	.label, .pickered-text, .sign-label{
 		font-size: 24rpx;
 		color: #000000;
 	}
@@ -351,6 +511,17 @@
 		top: -14rpx;
 		right: -14rpx;
 		z-index: 2000;
+	}
+	
+	.sign-container{
+		margin-top: 20rpx;
+		padding: 30rpx;
+		box-sizing: border-box;
+		background-color: #FFFFFF;
+	}
+	.sign-label{
+		height: 80rpx;
+		line-height: 80rpx;
 	}
 </style>
 

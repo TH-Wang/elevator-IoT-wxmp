@@ -14,13 +14,27 @@
 					</view>
 					<view class="info">
 						<image src="../../static/icon/repair/address.png" />
-						<text>故障地址：{{record.address}}</text>
+						<text>故障地址：{{ele.address}}</text>
 					</view>
 				</view>
 				<!-- 右侧按钮 -->
 				<view class="handle-button">
-					<view class="button primary" @click="handleAlarm">接警</view>
-					<view class="button secondary">导航</view>
+					<!-- 接警按钮 -->
+					<view
+						v-if="authority && record.repair_type == 1"
+						class="button primary"
+						@click="handleAlarm"
+					>接警</view>
+					<!-- 签到按钮 -->
+					<view
+						v-if="authority && record.repair_type == 2"
+						class="button primary"
+						@click="handleSignIn"
+					>签到</view>
+					<view
+						v-if="authority && record.repair_type <= 2"
+						class="button secondary"
+					>导航</view>
 				</view>
 			</view>
 			
@@ -57,8 +71,20 @@
 				</view>
 			</view>
 			
-			<CommonButton text="去处理" @click="handleLinkHandlePage" />
+			<CommonButton
+				v-if="authority && record.repair_type == 3"
+				text="去处理"
+				@click="handleLinkHandlePage($event, 'submit')"
+			/>
 			
+			<CommonButton
+				v-if="record.repair_type == 4"
+				text="故障详情"
+				@click="handleLinkDetailInfo($event, 'preview')"
+			/>
+			
+			<!-- 签到成功弹窗 -->
+			<SignInModal :visible="signInSuccess" @close="signInSuccess = false" />
 	</view>
 </template>
 
@@ -66,17 +92,19 @@
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Steps from '../../components/Steps/Steps.vue'
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import SignInModal from '../../components/SignInModal/SignInModal.vue'
 	import repairData from '../../data/repair.js'
 	import request from '../../service/request.js'
+	import formatDate from '../../utils/formatDate.js'
 	
 	export default {
 		components: {
 			NavHeader,
 			Steps,
-			CommonButton
+			CommonButton,
+			SignInModal
 		},
 		data: () => ({
-			// repairId: null,
 			steps: [
 				{
 					type: 1,
@@ -100,7 +128,8 @@
 				}
 			],
 			record: {},
-			ele: {}
+			ele: {},
+			signInSuccess: false
 		}),
 		computed: {
 			fault_source() {
@@ -108,29 +137,54 @@
 			},
 			jobs() {
 				return this.$store.state.user.info.jobs
+			},
+			authority() {
+				return Boolean(this.record.is_authority)
 			}
 		},
 		methods: {
-			handleLinkHandlePage() {
+			handleLinkHandlePage(e) {
+				var id = this.record.id
 				uni.navigateTo({
-					url: '/pages/repairHandle/repairHandle'
+					url: `/pages/repairHandle/repairHandle?id=${id}`
+				})
+			},
+			handleLinkDetailInfo(e) {
+				var id = this.record.id
+				uni.navigateTo({
+					url: `/pages/repairSubmitInfo/repairSubmitInfo?id=${id}`
 				})
 			},
 			// 点击接警
 			async handleAlarm() {
+				await this.updateTicketState(2)
+			},
+			// 点击签到
+			async handleSignIn() {
+				await this.updateTicketState(3)
+				this.signInSuccess = true
+			},
+			// 变更工单
+			async updateTicketState(type) {
 				var _this_ = this
 				var res = await request.post('/maint/fault_submit', {
 					id: _this_.record.id,
-					type: 3
+					type,
+					content: ''
 				})
-				console.log(res)
+				if(res.code == 1) {
+					this.steps = this.steps.map(item => {
+						if(item.type == type) item.time = formatDate('YYYY-mm-dd HH:MM:SS', new Date())
+						return item
+					})
+					this.record.repair_type = type
+				}
 			}
 		},
 		onLoad: async function(option) {
 			var _this_ = this
 			var { id } = option
 			var res = await request.post('/maint/fault_one', {id})
-			console.log(res)
 			this.record = res.data.repair
 			this.ele = res.data.ele
 			var newSteps = this.steps
