@@ -82,6 +82,7 @@
 					text="签字确认"
 					size="small"
 					:margin="false"
+					@click="handleOpenSignModal($event, 'safe')"
 				/>
 				<view v-else class="wait-text">等待签字</view>
 			</view>
@@ -97,23 +98,34 @@
 					text="签字确认"
 					size="small"
 					:margin="false"
+					@click="handleOpenSignModal($event, 'property')"
 				/>
 				<view v-else class="wait-text">等待签字</view>
 			</view>
 		</view>
 		
+		<!-- 签字板弹窗 -->
+		<SignBoardModal
+			:title="signModal.title"
+			:visible="signModal.visible"
+			:showCancel="false"
+			@close="signModal.visible = false"
+			@save="handleGetSignFile"
+		/>
 	</view>
 </template>
 
 <script>
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
 	import SignBoard from '../../components/SignBoard/SignBoard.vue'
+	import SignBoardModal from '../../components/SignBoardModal/SignBoardModal.vue'
 	import request from '../../service/request.js'
 	
 	export default {
 		components: {
 			CommonButton,
-			SignBoard
+			SignBoard,
+			SignBoardModal
 		},
 		data: () => ({
 			orderId: null,
@@ -127,7 +139,12 @@
 			// 视频实例
 			videoContext: [],
 			// 视频空间是否显示
-			videoControl: []
+			videoControl: [],
+			signModal: {
+				title: '',
+				visible: false,
+				type: 1
+			}
 		}),
 		computed: {
 			hasSafeSign() {
@@ -167,6 +184,53 @@
 						return item
 					})
 				}
+			},
+			// 弹出签字板弹窗
+			handleOpenSignModal(e, type) {
+				var title = type == 'safe' ? '安全人员签字' : '物业人员签字'
+				var repairType = type == 'safe' ? 1 : 3
+				this.signModal = {
+					title,
+					visible: true,
+					type: repairType
+				}
+			},
+			// 关闭签字板弹窗
+			handleCloseSignModal() {
+				this.signModal.visible = false
+			},
+			// 提交签字事件
+			handleGetSignFile(filePath) {
+				var _this_ = this
+				uni.uploadFile({
+					url: `${this.$store.state.request.url}/api/maint/fault_signature`,
+					formData: {
+						id: _this_.orderId,
+						type: _this_.signModal.type
+					},
+					name: 'image',
+					filePath,
+					success: function(res) {
+						if(res.code == 1){
+							// 将图片更新到页面
+							var key = _this_.signModal.type == 1 ? 'signature_img_one' : 'signature_img_three'
+							_this_.dataSource[key] = res.data.image
+							// 提示成功
+							uni.showToast({
+								icon: 'success',
+								title: '提交成功'
+							})
+							// 关闭签字板
+							_this_.signModal.visible = false
+						} else {
+							// 提交失败
+							uni.showToast({
+								icon: 'none',
+								title: '提交失败，请稍后再试！'
+							})
+						}
+					}
+				})
 			}
 		},
 		onLoad: async function(option) {
