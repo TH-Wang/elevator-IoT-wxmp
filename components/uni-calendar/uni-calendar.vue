@@ -52,8 +52,7 @@
 				</view>
 				<view class="uni-calendar__weeks" v-for="(item,weekIndex) in weeks" :key="weekIndex">
 					<view class="uni-calendar__weeks-item" v-for="(weeks,weeksIndex) in item" :key="weeksIndex">
-						<!-- @change="choiceDate" -->
-						<calendar-item class="uni-calendar-item--hook" :weeks="weeks" :calendar="calendar" :selected="selected" :lunar="lunar" ></calendar-item>
+						<calendar-item class="uni-calendar-item--hook" :weeks="weeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></calendar-item>
 					</view>
 				</view>
 			</view>
@@ -149,7 +148,6 @@
 				this.cale.resetEndDate(val)
 			},
 			selected(newVal) {
-				console.log(newVal)
 				this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
 				// console.log(this.cale.weeks)
 				this.weeks = this.cale.weeks
@@ -157,6 +155,7 @@
 		},
 		created() {
 			// 获取日历方法实例
+			this.$parent.active=1
 			this.cale = new Calendar({
 				// date: new Date(),
 				selected: this.selected,
@@ -166,19 +165,29 @@
 			})
 			// 选中某一天
 			// this.cale.setDate(this.date)
-			this.init(this.date)
+			const value  = this.cale.getDate(this.nowDate.fullDate, +0, 'month').year.toString()+'-'+this.cale.getDate(this.nowDate.fullDate, +0, 'month').month.toString()+'-'+'01'
+		
+			// console.log(this.date)
+			this.init(value)
+			
 			// this.setDay
 		},
 		methods: {
 			// 取消穿透
 			clean() {},
 			bindDateChange(e) {
-				const value = e.detail.value + '-1'
+				// const value = e.detail.value + '-1'
 				// console.log(this.cale.getDate(value));
 				// this.init(this.cale.getDate(value).year)
-				const preDate = this.cale.getDate(value).fullDate
-				this.setDate(preDate)
-				this.monthSwitch()
+				// const preDate = this.cale.getDate(value).fullDate
+				// this.setDate(preDate)
+				// this.monthSwitch()
+				
+				const value = e.detail.value + '-1'
+				this.$parent.caltime(value)
+				this.$parent.chantime=value
+				this.init(value)
+				this.$parent.getList(this.$parent.type,1,value,1)
 				
 			},
 			/**
@@ -189,6 +198,7 @@
 				this.cale.setDate(date)
 				this.weeks = this.cale.weeks
 				this.nowDate = this.calendar = this.cale.getInfo(date)
+				
 			},
 			/**
 			 * 打开日历弹窗
@@ -237,7 +247,7 @@
 			 * 选择月份触发
 			 */
 			monthSwitch() {
-				console.log(222)
+				
 				let {
 					year,
 					month
@@ -286,7 +296,6 @@
 			 * 回到今天
 			 */
 			backtoday() {
-				console.log(this.cale.getDate(new Date()).fullDate);
 				let date = this.cale.getDate(new Date()).fullDate
 				// this.cale.setDate(date)
 				this.init(date)
@@ -297,24 +306,43 @@
 			 */
 			pre() {
 				// console.log(this.cale.getDate(this.nowDate.fullDate, -1, 'month'))
-				const preDate = this.cale.getDate(this.nowDate.fullDate, -1, 'month').fullDate
-				this.setDate(preDate)
-				this.monthSwitch()
+				// const preDate = this.cale.getDate(this.nowDate.fullDate, -1, 'month').fullDate
+				// this.setDate(preDate)
+				// this.monthSwitch()
+				
+				// const value  = this.cale.getDate(this.nowDate.fullDate, -1, 'month').fullDate
+				// console.log(this.cale.getDate(value));
+				const value  = this.cale.getDate(this.nowDate.fullDate, -1, 'month').year.toString()+'-'+this.cale.getDate(this.nowDate.fullDate, -1, 'month').month.toString()+'-'+'01'
+				
+				this.init(value)
+				this.$parent.caltime(value)
+				this.$parent.chantime=value
+				this.$parent.getList(this.$parent.type,1,value,1)
 
 			},
 			/**
 			 * 下个月
 			 */
 			next() {
-				const nextDate = this.cale.getDate(this.nowDate.fullDate, +1, 'month').fullDate
-				this.setDate(nextDate)
-				this.monthSwitch()
+				// const nextDate = this.cale.getDate(this.nowDate.fullDate, +1, 'month').fullDate
+				// this.setDate(nextDate)
+				// this.monthSwitch()
+				// const value = e.detail.value + '-1'
+				
+				// const value  = this.cale.getDate(this.nowDate.fullDate, +1, 'month').fullDate
+				const value  = this.cale.getDate(this.nowDate.fullDate, +1, 'month').year.toString()+'-'+this.cale.getDate(this.nowDate.fullDate, +1, 'month').month.toString()+'-'+'01'
+				
+				this.init(value)
+				this.$parent.caltime(value)
+				this.$parent.chantime=value
+				this.$parent.getList(this.$parent.type,1,value,1)
 			},
 			/**
 			 * 设置日期
 			 * @param {Object} date
 			 */
 			setDate(date) {
+				
 				this.cale.setDate(date)
 				this.weeks = this.cale.weeks
 				this.nowDate = this.cale.getInfo(date)
@@ -324,6 +352,9 @@
 </script>
 
 <style scoped>
+	.uni-calendar-item--checked{
+		color: #fff !important;
+	}
 	.uni-calendar {
 		/* #ifndef APP-NVUE */
 		display: flex;
