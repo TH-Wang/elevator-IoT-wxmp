@@ -1,35 +1,35 @@
 <template>
 	<view class="contsf">
-		<view class="wbxmbox">
+		<view class="wbxmbox" v-if="datalist>=1">
 			<view class="wblet">维保项目</view>
-			<view class="">
+			<!-- <view class="">
 				<van-dropdown-menu>
 					<van-dropdown-item v-model="value2" :options="option2" />
 				</van-dropdown-menu>
-			</view>
+			</view> -->
 		</view>
-		<view class="typebox">
-			<view class="headtype">当前分类找到<text>5</text>条结果</view>
+		<view class="typebox" v-if="datalist.length>=1">
+			<!-- <view class="headtype">当前分类找到<text>5</text>条结果</view> -->
 			
 			
-			<view class="jiuccont" v-for="(item,index) of datalist" v-key="index" @click="workdel">
+			<view class="jiuccont" v-for="(item,index) of datalist" :key="index" @click="workdel">
 				<view class="jchead">
 					<view class="jeadtop">
-						<view class="helettxt">{{item.title}}</view>
-						<view class="rigthimg" v-if="item.status==1">
+						<view class="helettxt">{{item.project_content}}</view>
+						<view class="rigthimg" v-if="item.is_qualified==0">
 							<image src="../../static/icon/feedback/success.png"></image>
-							<view class="successwc">完成</view>
+							<view class="successwc">合格</view>
 						</view>
-						<view class="rigthimg" v-if="item.status==2">
+						<view class="rigthimg" v-if="item.is_qualified==1">
 							<image src="../../static/icon/feedback/error.png"></image>
 							<view class="nohege">不合格</view>
 						</view>
-						<view class="rigthimg" v-if="item.status==3">
+						<!-- <view class="rigthimg" v-if="item.status==3">
 							<image src="../../static/icon/feedback/error.png"></image>
 							<view class="jianxtxt">检修</view>
-						</view>
+						</view> -->
 					</view>
-					<view class="numhome">{{item.cont}}</view>
+					<view class="numhome" v-if="item.pill_remark!=null">{{item.pill_remark}}</view>
 				</view>
 				<view class="imglist">
 					<view class="imgbos" @click.stop="imgqhbtn(index)">
@@ -58,20 +58,31 @@
 				<view class="imglist">
 					<view class="imgbos">
 						<view class="lettxtimg">备注</view>
-						<view class="marktxt">{{item.mark}}</view>
+						<view class="marktxt">{{item.project_syn}}</view>
 					</view>
 				</view>
 			</view>
+		    
+			<view class="footbtn">提交</view>
 		</view>
-
-		<view class="footbtn">提交</view>
+        <!-- 没有数据 -->
+        <view class="null" v-if="datalist<=0">
+        	<Null :title="title"></Null>
+        </view>
+		
 	</view>
 </template>
 
 <script>
+	import Null from '@/components/uni-null/uni-null.vue'
+	import request from '@/service/request.js'
 	export default {
+		components: {
+			Null
+		},
 		data() {
 			return {
+				title:'暂无维保项目',
 				false:false,
 				value2: 'a',
 				option2: [{
@@ -97,39 +108,30 @@
 						imgfal: true,
 						vidofal: false,
 					},
-					{
-						title: '层门门锁电气触点',
-						status: '2',
-						cont: '房间号胜多负少的束带结发圣诞房间号胜',
-						imglist: [],
-						vdio: [],
-						mark: '递四方速递扣干净市分公司倒海翻江第三方',
-						imgfal: false,
-						vidofal: false,
-					}, {
-						title: '层门门锁电气触点',
-						status: '3',
-						cont: '房间号胜多负少的束带结发圣诞房间号胜',
-						imglist: [],
-						vdio: [],
-						mark: '递四方速递扣干净市分公司倒海翻江第三方',
-						imgfal: false,
-						vidofal: false,
-					}, {
-						title: '层门门锁电气触点',
-						status: '3',
-						cont: '房间号胜多负少的束带结发圣诞房间号胜',
-						imglist: [],
-						vdio: [],
-						mark: '递四方速递扣干净市分公司倒海翻江第三方',
-						imgfal: false,
-						vidofal: false,
-					},
+					
 				],
 				fileList: []
 			}
 		},
+		onLoad(data){
+			console.log(data)
+			this.wblist(data.id,data.maint_id,0)
+		},
 		methods: {
+			// 维保项目列表
+			wblist(id,maint_id,type){
+				var that=this
+				request.post('/maint/main_xm',{
+					id:id,
+					maint_id:maint_id,
+					type:type,
+				}).then((res) =>{
+					if(res.code == 1){
+						console.log(res)
+						this.datalist=res.data
+					}
+				})
+			},
 			// workdel(){
 			// 	uni.navigateTo({
 			// 		url: '/pages/workdel/workdel'

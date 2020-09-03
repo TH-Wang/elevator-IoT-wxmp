@@ -53,6 +53,11 @@
         },
         "uniStatistics" : {
             "enable" : false
+        },
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "定位"
+            }
         }
     },
     "uniStatistics" : {

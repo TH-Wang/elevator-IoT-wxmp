@@ -4,7 +4,8 @@ import request from 'service/request.js'
 	
 export default {
 	globalData: {
-		url: 'http://jiujiu.xdiot.net'
+		url: 'http://jiujiu.xdiot.net',
+		isHeader: false
 	},
 	onLaunch: async function() {
 		uni.getSystemInfo({

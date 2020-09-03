@@ -148,7 +148,6 @@
 				this.cale.resetEndDate(val)
 			},
 			selected(newVal) {
-				console.log(newVal)
 				this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
 				// console.log(this.cale.weeks)
 				this.weeks = this.cale.weeks
@@ -156,6 +155,7 @@
 		},
 		created() {
 			// 获取日历方法实例
+			this.$parent.active=1
 			this.cale = new Calendar({
 				// date: new Date(),
 				selected: this.selected,
@@ -165,7 +165,11 @@
 			})
 			// 选中某一天
 			// this.cale.setDate(this.date)
-			this.init(this.date)
+			const value  = this.cale.getDate(this.nowDate.fullDate, +0, 'month').year.toString()+'-'+this.cale.getDate(this.nowDate.fullDate, +0, 'month').month.toString()+'-'+'01'
+		
+			// console.log(this.date)
+			this.init(value)
+			
 			// this.setDay
 		},
 		methods: {
@@ -180,8 +184,10 @@
 				// this.monthSwitch()
 				
 				const value = e.detail.value + '-1'
-				console.log(value)
+				this.$parent.caltime(value)
+				this.$parent.chantime=value
 				this.init(value)
+				this.$parent.getList(this.$parent.type,1,value,1)
 				
 			},
 			/**
@@ -290,7 +296,6 @@
 			 * 回到今天
 			 */
 			backtoday() {
-				console.log(this.cale.getDate(new Date()).fullDate);
 				let date = this.cale.getDate(new Date()).fullDate
 				// this.cale.setDate(date)
 				this.init(date)
@@ -308,9 +313,11 @@
 				// const value  = this.cale.getDate(this.nowDate.fullDate, -1, 'month').fullDate
 				// console.log(this.cale.getDate(value));
 				const value  = this.cale.getDate(this.nowDate.fullDate, -1, 'month').year.toString()+'-'+this.cale.getDate(this.nowDate.fullDate, -1, 'month').month.toString()+'-'+'01'
-				console.log(value);
-				this.init(value)
 				
+				this.init(value)
+				this.$parent.caltime(value)
+				this.$parent.chantime=value
+				this.$parent.getList(this.$parent.type,1,value,1)
 
 			},
 			/**
@@ -324,8 +331,11 @@
 				
 				// const value  = this.cale.getDate(this.nowDate.fullDate, +1, 'month').fullDate
 				const value  = this.cale.getDate(this.nowDate.fullDate, +1, 'month').year.toString()+'-'+this.cale.getDate(this.nowDate.fullDate, +1, 'month').month.toString()+'-'+'01'
-				console.log(value);
+				
 				this.init(value)
+				this.$parent.caltime(value)
+				this.$parent.chantime=value
+				this.$parent.getList(this.$parent.type,1,value,1)
 			},
 			/**
 			 * 设置日期
