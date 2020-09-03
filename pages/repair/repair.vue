@@ -24,16 +24,17 @@
 					v-for="item in repairType"
 					:key="item.code"
 				>
-					<!-- <scroll-view :scroll-y="true" class="list-container"> -->
-						<RepairCard
-							v-for="record in dataSource[item.key]"
-							:key="record.id"
-							:record="record"
-							hasButton
-							type="repair"
-							@click="handleLinkDetail($event, record.id)"
-						/>
-					<!-- </scroll-view> -->
+					<!-- 空数据 -->
+					<Empty v-if="dataSource[item.key].length == 0" :title="'暂无' + item.label + '工单'" />
+					<!-- 急修工单列表 -->
+					<RepairCard
+						v-for="record in dataSource[item.key]"
+						:key="record.id"
+						:record="record"
+						hasButton
+						type="repair"
+						@click="handleLinkDetail($event, record.id)"
+					/>
 				</swiper-item>
 			</swiper>
 		</scroll-view>
@@ -44,10 +45,10 @@
 	import Tabs from '../../components/Tabs/Tabs.vue'
 	import Search from '../../components/Search/Search.vue'
 	import RepairCard from '../../components/RepairCard/RepairCard.vue'
+	import Empty from '../../components/Empty/Empty.vue'
 	import pageScrollMixin from '../../mixin/pageScroll.js'
 	import repairData from '../../data/repair.js'
 	import request from '../../service/request.js'
-	import List from './list.vue'
 	
 	export default {
 		components: {
@@ -55,7 +56,7 @@
 			Tabs,
 			Search,
 			RepairCard,
-			List
+			Empty
 		},
 		mixins: [pageScrollMixin],
 		data: () => ({

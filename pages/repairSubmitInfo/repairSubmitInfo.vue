@@ -78,7 +78,7 @@
 			<image v-if="hasSafeSign" :src="'http://'+dataSource.signature_img_one" />
 			<view v-else class="sign-content">
 				<CommonButton
-					v-if="dataSource.iden == 2"
+					v-if="dataSource.iden == 1"
 					text="签字确认"
 					size="small"
 					:margin="false"
@@ -209,12 +209,16 @@
 						type: _this_.signModal.type
 					},
 					name: 'image',
+					header: {
+						"token": uni.getStorageSync('token')
+					},
 					filePath,
 					success: function(res) {
-						if(res.code == 1){
+						var result = JSON.parse(res.data)
+						if(result.code == 1){
 							// 将图片更新到页面
 							var key = _this_.signModal.type == 1 ? 'signature_img_one' : 'signature_img_three'
-							_this_.dataSource[key] = res.data.image
+							_this_.dataSource[key] = result.data.image
 							// 提示成功
 							uni.showToast({
 								icon: 'success',

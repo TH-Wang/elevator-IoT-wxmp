@@ -15,7 +15,7 @@
 		<view v-else-if="type == 'repair'" class="detail ellipsis">
 			<text>{{record.fault_code}}</text>
 			<text class="space-point">·</text>
-			<text>{{record.fault_syn}}</text>
+			<text class="ellipsis">{{record.fault_syn}}</text>
 		</view>
 		
 		<!-- 底部 -->

@@ -30,6 +30,7 @@
 				@change="handleSwiperChange"
 			>
 				<swiper-item>
+					<Empty v-if="maintList.length == 0" title="暂无数据" />
 					<!-- 维保 -->
 					<scroll-view class="list-container" :scroll-y="listScroll">
 						<view v-for="maint in maintList" :key="maint.id">
@@ -39,6 +40,7 @@
 					</scroll-view>
 				</swiper-item>
 				<swiper-item>
+					<Empty v-if="repairList.length == 0" title="暂无数据" />
 					<!-- 急修 -->
 					<scroll-view class="list-container" :scroll-y="listScroll">
 						<view v-for="repair in repairList" :key="repair.repair_id">
@@ -48,6 +50,7 @@
 					</scroll-view>
 				</swiper-item>
 				<swiper-item>
+					<Empty v-if="reportList.length == 0" title="暂无数据" />
 					<!-- 上报 -->
 					<scroll-view class="list-container" :scroll-y="listScroll">
 						<view v-for="(report, index) in reportList" :key="index">
@@ -69,6 +72,7 @@
 	import Tabs from '../../components/Tabs/Tabs.vue'
 	import RepairCard from '../../components/RepairCard/RepairCard.vue'
 	import ReportCard from '../../components/ReportCard/ReportCard.vue'
+	import Empty from '../../components/Empty/Empty.vue'
 	import pageScrollMixin from '../../mixin/pageScroll.js'
 	import request from '../../service/request.js'
 	
@@ -78,7 +82,8 @@
 			Tabs,
 			PersonCard,
 			RepairCard,
-			ReportCard
+			ReportCard,
+			Empty
 		},
 		mixins: [pageScrollMixin],
 		data: () => ({

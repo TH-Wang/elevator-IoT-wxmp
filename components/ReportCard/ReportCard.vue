@@ -3,7 +3,7 @@
 		class="list-item"
 	>
 		<view class="header">
-			<view class="title ellipsis">{{record.fautlt_attr}}</view>
+			<view class="title ellipsis">{{record.name}}</view>
 			<view class="time">{{record.fault_start_time}}</view>
 		</view>
 		
@@ -11,10 +11,10 @@
 		
 		<view class="info">
 			<view class="info-item">
-				安全等级: {{record.security_level}}
+				安全等级: {{safeLevel}}
 			</view>
 			<view class="info-item">
-				是否困人: {{record.is_tiring}}
+				是否困人: {{isTiring}}
 			</view>
 		</view>
 	</view>
@@ -28,11 +28,13 @@
 				default: () => ({})
 			}
 		},
-		data: () => ({
-			
-		}),
 		computed: {
-			
+			safeLevel() {
+				return this.record.security_level ? `${this.record.security_level}级` : ''
+			},
+			isTiring() {
+				return this.record.is_tiring == 0 ? '否' : '是'
+			}
 		},
 		methods: {
 			

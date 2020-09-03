@@ -1,7 +1,12 @@
 <template>
 	<view class="container">
 		<view class="avatar">
-			<image class="avatar-image" :src="'http://'+user.head_img" mode="aspectFill" />
+			<image
+				class="avatar-image"
+				:src="'http://'+user.head_img"
+				mode="aspectFill"
+				@click="handlePreviewHeadImg"
+			/>
 		</view>
 		<view class="realname" @click="handleLinkEditInfo">
 			<text>{{user.realname}}</text>
@@ -36,7 +41,8 @@
 					sex: 0,
 					phone: "",
 					email: "",
-					company_name: ""
+					company_name: "",
+					head_img: ""
 				})
 			}
 		},
@@ -58,6 +64,13 @@
 			handleLinkEditInfo() {
 				uni.navigateTo({
 					url: '/pages/editInfo/editInfo'
+				})
+			},
+			handlePreviewHeadImg() {
+				var avatar = 'http://' + this.user.head_img
+				uni.previewImage({
+					current: 0,
+					urls: [avatar]
 				})
 			}
 		}

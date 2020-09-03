@@ -1,36 +1,35 @@
 <template>
-	<!-- <TabbarPage :header="{title: '我的', hasBack: false}" :tabbar="{active: 3}"> -->
-		<scroll-view :scroll-y="true" class="main">
-			<!-- 用户信息卡片 -->
-			<PersonCard allowEidt :user="user" />
-			
-			<!-- 功能列表 -->
-			<view class="list-container">
-				<view
-					class="list-item"
-					v-for="(item, index) in list"
-					:key="index"
-					:style="item.space ? 'margin-top:20rpx' : ''"
-					@click="handleLink(item.path)"
-				>
-					<view class="list-item-box">
-						<view class="icon-box">
-							<image class="icon-image" :src="item.iconImage" />
-						</view>
-						<text class="text">{{item.label}}</text>
-						<image class="arrow-right" src="../../static/icon/right.png" />
+	<view>
+		<!-- 用户信息卡片 -->
+		<PersonCard allowEidt :user="user" />
+		
+		<!-- 功能列表 -->
+		<view class="list-container">
+			<view
+				class="list-item"
+				v-for="(item, index) in list"
+				:key="index"
+				:style="item.space ? 'margin-top:20rpx' : ''"
+				@click="handleLink(item.path)"
+			>
+				<view class="list-item-box">
+					<view class="icon-box">
+						<image class="icon-image" :src="item.iconImage" />
 					</view>
+					<text class="text">{{item.label}}</text>
+					<image class="arrow-right" src="../../static/icon/right.png" />
 				</view>
-				
-				<!-- 退出登录按钮 -->
-				<CommonButton
-					class="singout-button"
-					text="退出登录"
-					@click="handleClickSingOutBtn"
-				/>
 			</view>
-		</scroll-view>
-	<!-- </TabbarPage> -->
+			
+			<!-- 退出登录按钮 -->
+			<CommonButton
+				class="singout-button"
+				text="退出登录"
+				@click="handleClickSingOutBtn"
+			/>
+		</view>
+		
+	</view>
 </template>
 
 <script>
@@ -83,7 +82,6 @@
 
 <style scoped>	
 	.list-container{
-		height: auto;
 		background-color: #F9F9F9;
 		padding-bottom: 1px;
 	}

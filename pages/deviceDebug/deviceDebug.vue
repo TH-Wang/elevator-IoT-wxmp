@@ -4,7 +4,7 @@
 		<!-- 顶部搜索框、按钮 -->
 		<view class="header">
 			<view class="search-box">
-				<ModalSearch placeholder="搜索SIM-IEMI或电梯编码" @search="handleSearch" />
+				<ModalSearch placeholder="SIM-IEMI、电梯编码" @search="handleSearch" />
 			</view>
 			<view class="scan-button">
 				<image class="header-icon" src="../../static/icon/device/monitor.png" />
