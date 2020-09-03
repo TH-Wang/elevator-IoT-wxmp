@@ -36,18 +36,21 @@
 						<view v-for="maint in maintList" :key="maint.id">
 							<RepairCard :record="maint" type="maint" />
 						</view>
+						<view style="height: 30rpx" />
 					</scroll-view>
 					<!-- 急修 -->
 					<scroll-view class="list-container" :scroll-y="listScroll">
 						<view v-for="repair in repairList" :key="repair.id">
 							<RepairCard :record="repair" type="repair" />
 						</view>
+						<view style="height: 30rpx" />
 					</scroll-view>
 					<!-- 上报 -->
 					<scroll-view class="list-container" :scroll-y="listScroll">
 						<view v-for="maint in maintList" :key="maint.id">
 							<RepairCard :record="maint" type="maint" />
 						</view>
+						<view style="height: 30rpx" />
 					</scroll-view>
 				</swiper-item>
 			</swiper>
