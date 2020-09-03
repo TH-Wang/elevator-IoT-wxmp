@@ -58,9 +58,6 @@ const request = {
 	
 	// POST
 	post: (url, data) => {
-		uni.showLoading({
-			title:'加载中...'
-		})
 		return new Promise((resolve, reject) => {
 			var reqUrl = store.state.request.url + '/api' + url
 			console.log('发送请求：' + reqUrl)
@@ -76,15 +73,9 @@ const request = {
 				data: data,
 				success: res => {
 					resolve(res.data)
-					uni.hideLoading();
 				},
 				fail: (err) => {
 					reject(err)
-					uni.hideLoading();
-					uni.showToast({
-						title:'参数错误',
-						icon:'none'
-					})
 				}
 			});
 		})

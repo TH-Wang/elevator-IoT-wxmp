@@ -13,22 +13,22 @@
 			<view class="qdlist">
 				<view class="qdlettxt">
 					<image src="../../static/icon/tabbar/mine-active.png"></image>
-					<text>维保人员：{{datadel.basis.user_name}}</text>
+					<text>维保人员：{{datadel.basis.user_name || '--'}}</text>
 				</view>
-				<view class="qdbtns" @click="onClickShow">签名</view>
-			</view>
-			<view class="qdlist topmar">
-				<view class="qdlettxt">
-					<image src="../../static/icon/repair/time.png"></image>
-					<text>维保时间：{{datadel.basis.maint_end_time}}</text>
-				</view>
+				<!-- 	<view class="qdbtns" @click="onClickShow">签名</view> -->
 				<view class="qdbtns qdindes"  v-if="is_qanfal">已签到</view>
 				<view class="qdbtns " @click="qiandaobtn" v-if="!is_qanfal">签到</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
+					<image src="../../static/icon/repair/time.png"></image>
+					<text>维保时间：{{datadel.basis.maint_end_time || '处理中'}}</text>
+				</view>
+			</view>
+			<view class="qdlist topmar">
+				<view class="qdlettxt">
 					<image src="../../static/icon/repair/address.png"></image>
-					<text>所在小区：{{datadel.ele.village_name}}</text>
+					<text>所在小区：{{datadel.ele.village_name || '--'}}</text>
 				</view>
 			</view>
 		</view>
@@ -42,9 +42,9 @@
 				<view class="wbnavcont" v-for="(item,index) of wblist" :key="item.name" @click="workOrderbtn(item.id)">
 					<view class="wbname"  >{{item.name}}</view>
 					<view class="wbrightnum">
-						<view class="znum" >总数<text class="texcol1">{{quanbus[index]}}</text></view>/
-						<view class="znum" >合格<text class="texcol2">{{hegenum[index]}}</text></view>/
-						<view class="znum" >不合格<text class="texcol3">{{wxbnum[index]}}</text></view>
+						<view class="znum" >总数<text class="texcol1">{{item.num1}}</text></view>/
+						<view class="znum" >合格<text class="texcol2">{{item.num2}}</text></view>/
+						<view class="znum" >不合格<text class="texcol3">{{item.num3}}</text></view>
 						<van-icon name="arrow" />
 					</view>
 				</view>
@@ -96,8 +96,8 @@
 		  datadel:'',
 		  wblist:[   //项目列表
 		  			  // {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			 
-		  ],
+		  		],
+			getList:[],
 		  is_qanfal:false,
 	      active: 0,
 		  steps: [
@@ -121,18 +121,20 @@
 		  
 	  },
 	  onLoad(cont) {
-	  	this.ctx = uni.createCanvasContext("mycanvas",this);   //创建绘图对象
-	  	//设置画笔样式
-	  	this.ctx.lineWidth = 4;
-	  	this.ctx.lineCap = "round"
-	  	this.ctx.lineJoin = "round"
-		console.log(cont)
-		this.contdel(cont.id)
-		this.dataid=cont.id
+		  let that = this;
+	 //  	that.ctx = uni.createCanvasContext("mycanvas",that);   //创建绘图对象
+	 //  	// 设置画笔样式
+	 //  	that.ctx.lineWidth = 4;
+	 //  	that.ctx.lineCap = "round"
+	 //  	that.ctx.lineJoin = "round"
+		// console.log(cont)
+		that.contdel(cont.id)
+		that.dataid=cont.id
+		console.log('text',cont.id)
+		//获取列表
+		that.getHuoquList(cont.id)
 		
-		
-		this.xmlist(cont.id)
-		this.falqiand(cont.id)
+		that.falqiand(cont.id)
 	  },
 	  mounted() {
 	  	
@@ -157,7 +159,7 @@
 			  }).then((res) =>{
 			  	if(res.code == 1){
 					this.falqiand()
-					this.contdel(dataid)
+					this.contdel(that.dataid)
 			  		uni.showToast({
 			  			title:'签到成功',
 						duration:1500
@@ -182,55 +184,62 @@
 			})  
 		  },
 	    // 项目列表
-		xmlist(id){
+		 async xmlist(id){
 			var that=this
-			request.post('/maint/xm_classify',{
-				id:id,
-				type:0
-			}).then((data) =>{
-				console.log(data)
-				if(data.code == 1){
-					
-					for(var i=0;i<data.data.length;i++){
+			let data = that.getList;
+					for(var i=0;i<data.length;i++){
 						
-						request.post('/maint/main_xm',{
-							id:data.data[i].id,
+						await request.post('/maint/main_xm',{
+							id:data[i].id,
 							maint_id:id,
 							type:0
 						}).then((res) =>{
 							if(res.code == 1){
-								that.quanbus.push(res.data.length)
+								console.log('1',res.data.length)
+								data[i]['num1'] = res.data.length
 							}
-						})
-						request.post('/maint/main_xm',{
-							id:data.data[i].id,
+						});
+						await request.post('/maint/main_xm',{
+							id:data[i].id,
 							maint_id:id,
 							type:1
 						}).then((res) =>{
 							if(res.code == 1){
-								that.wxbnum.push(res.data.length)
+								console.log('2',res.data.length)
+								data[i]['num2'] = res.data.length
 							}
-						})
-						request.post('/maint/main_xm',{
-							id:data.data[i].id,
+						});
+					 	await request.post('/maint/main_xm',{
+							id:data[i].id,
 							maint_id:id,
 							type:2
 						}).then((res) =>{
 							if(res.code == 1){
-								that.hegenum.push(res.data.length)
+								console.log('3',res.data.length)
+								data[i]['num3'] = res.data.length
 							}
 						})
+						console.log(data[i])
 						
 					}
-					that.wblist=data.data
-					console.log(that.quanbus)
+					that.wblist=data
+					uni.hideLoading()
+					console.log(data)
 					
-				}else{
-					uni.showToast({
-						title:res.message,
-						icon:"none"
-					})
-				}
+
+		},
+		async getHuoquList(id){
+			let that = this
+			uni.showLoading({
+				title:'加载中...'
+			})
+			await request.post('/maint/xm_classify',{
+				id:id,
+				type:0
+			}).then((res) =>{
+				console.log('ddd',res)
+				that.getList = res.data
+				that.xmlist(id)
 			})
 		},
 		// 详情

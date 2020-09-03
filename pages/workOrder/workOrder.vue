@@ -1,15 +1,15 @@
 <template>
 	<view class="contsf">
-		<view class="wbxmbox" v-if="datalist>=1">
+		<view class="wbxmbox" v-if="datalist.length>0">
 			<view class="wblet">维保项目</view>
-			<!-- <view class="">
+			<view class="">
 				<van-dropdown-menu>
 					<van-dropdown-item v-model="value2" :options="option2" />
 				</van-dropdown-menu>
-			</view> -->
+			</view>
 		</view>
 		<view class="typebox" v-if="datalist.length>=1">
-			<!-- <view class="headtype">当前分类找到<text>5</text>条结果</view> -->
+			<view class="headtype">当前分类找到<text>5</text>条结果</view>
 			
 			
 			<view class="jiuccont" v-for="(item,index) of datalist" :key="index" @click="workdel">
@@ -66,7 +66,7 @@
 			<view class="footbtn">提交</view>
 		</view>
         <!-- 没有数据 -->
-        <view class="null" v-if="datalist<=0">
+        <view class="null" v-else>
         	<Null :title="title"></Null>
         </view>
 		
@@ -128,15 +128,10 @@
 				}).then((res) =>{
 					if(res.code == 1){
 						console.log(res)
-						this.datalist=res.data
+						// this.datalist=res.data
 					}
 				})
 			},
-			// workdel(){
-			// 	uni.navigateTo({
-			// 		url: '/pages/workdel/workdel'
-			// 	})
-			// },
 			// 上传视频
 			opvideobtn(res) {
 				console.log(res)
