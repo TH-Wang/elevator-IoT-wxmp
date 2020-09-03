@@ -20,7 +20,7 @@
 		
 		<!-- 底部 -->
 		<view class="footer">
-			<text class="address ellipsis">{{record.address}}</text>
+			<text class="address ellipsis">{{getAddress()}}</text>
 			<view v-if="hasButton" :class="buttonClass">{{getButtonText()}}</view>
 		</view>
 	</view>
@@ -41,7 +41,11 @@
 			},
 			hasTag: Boolean,
 			type: String,
-			hasButton: Boolean
+			hasButton: Boolean,
+			detailAddress: {
+				type: Boolean,
+				default: false
+			}
 		},
 		data: () => ({
 			buttonClass: ''
@@ -76,8 +80,10 @@
 						case 1: return '待接警';
 						case 2: return '待处理';
 						case 3: return '进行中';
-						case 4: return '已完成';
-						default: return '已完成';
+						case 4: return '维修完成';
+						case 5: return '误报确认';
+						case 6: return '自动修复';
+						default: return '维修完成';
 					}
 				}
 				else if(this.type == 'maint') {
@@ -97,6 +103,14 @@
 					case 'prompt': return '到期';
 					case 'answer': return '反应';
 					default: return '提示';
+				}
+			},
+			getAddress() {
+				if(this.detailAddress) {
+					var { p_name, c_name, a_name, address } = this.record
+					return `${p_name}${c_name}${a_name}${address}`
+				} else {
+					return this.record.address
 				}
 			}
 		},

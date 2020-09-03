@@ -50,7 +50,7 @@
 				>
 					<video
 						:id="video.file_url"
-						:src="video.file_url"
+						:src="'http://' + video.file_url"
 						:controls="videoControl[idx]"
 						:show-center-play-btn="false"
 						@fullscreenchange="handleVideoScreenChange($event, idx)"
@@ -81,7 +81,7 @@
 					:key="img.id"
 					@click="handlePreview(idx)"
 				>
-					<image class="preview-image" :src="img.file_url" mode="aspectFill"></image>
+					<image class="preview-image" :src="'http://' + img.file_url" mode="aspectFill"></image>
 					<image
 						class="remove-button"
 						src="../../static/icon/remove.png"
