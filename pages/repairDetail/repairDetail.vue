@@ -158,6 +158,10 @@
 			// 点击接警
 			async handleAlarm() {
 				await this.updateTicketState(2)
+				uni.showToast({
+					title: '接警成功',
+					icon: 'success'
+				})
 			},
 			// 点击签到
 			async handleSignIn() {

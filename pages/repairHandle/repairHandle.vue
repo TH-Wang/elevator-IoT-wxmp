@@ -308,10 +308,11 @@
 					content: _this_.describe,
 					type: 4,
 					fault_attr: _this_.propId[_this_.propPickerIndex],
-					is_replace: _this_.replacePickerIndex + 1,
-					suggest: _this_.proposePickerIndex
+					is_replace: _this_.replacePickerIndex,
+					suggest: Number(_this_.proposePickerIndex) + 1
 				}
 				var filePath = await this.$refs.sign.finish()
+				console.log(data)
 				uni.showLoading({title: '提交中...'})
 				uni.uploadFile({
 					url: `${_this_.$store.state.request.url}/api/maint/fault_submit`,
@@ -326,11 +327,16 @@
 						var result = JSON.parse(res.data)
 						console.log(result)
 						if(result.code == 1) {
-							uni.showModal({
+							uni.showToast({
 								title: '提交成功',
-								showCancel: false,
-								success(res) {
-									uni.redirectTo({ url: '/pages/repairDetail/repairDetail?id=' + _this_.orderId })
+								icon: 'success',
+								success() {
+									uni.navigateBack({
+										delta: 1
+									})
+									uni.redirectTo({
+										url: '/pages/repairDetail/repairDetail?id=' + _this_.orderId
+									})
 								}
 							})
 						} else {

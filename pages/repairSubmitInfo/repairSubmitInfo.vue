@@ -5,7 +5,7 @@
 			<!-- 故障属性选择器 -->
 				<view class="form-item">
 					<view class="label">故障属性</view>
-					<view class=""></view>
+					<view class="">{{dataSource.name}}</view>
 				</view>
 				
 				<!-- 配件更换选择器 -->
@@ -17,13 +17,13 @@
 				<!-- 急修建议选择器 -->
 				<view class="form-item">
 					<view class="label">急修建议</view>
-					<view class="">{{proposeRange[dataSource.suggest - 1]}}</view>
+					<view class="">{{proposeRange[Number(dataSource.suggest) - 1]}}</view>
 				</view>
 				
 				<!-- 描述 -->
 				<view class="form-item border-top">
 					<view class="label">备注信息</view>
-					<view class=""></view>
+					<view class="">{{dataSource.content}}</view>
 				</view>
 		</view>
 	
@@ -140,6 +140,7 @@
 			videoContext: [],
 			// 视频空间是否显示
 			videoControl: [],
+			// 签字弹窗
 			signModal: {
 				title: '',
 				visible: false,
@@ -162,6 +163,14 @@
 					current: idx,
 					urls: _this_.imageList
 				})
+			},
+			// 初始化视频控件
+			handleInitVideo(data) {
+				this.videoList = data
+				this.videoContext = data.map(item => {
+					return uni.createVideoContext(item.file_url)
+				})
+				this.videoControl = new Array(data.length).fill(false)
 			},
 			// 预览视频
 			handlePreviewVideo(e, idx) {
@@ -244,8 +253,14 @@
 			
 			// 请求详细数据
 			var res = await request.post('/maint/fault_one', {id})
-			console.log(res.data.repair)
-			this.dataSource = res.data.repair
+			console.log(res)
+			var result = res.data.repair
+			// 数据
+			this.dataSource = result
+			// 图片
+			this.imageList = result.image
+			// 初始化视频
+			this.handleInitVideo(result.video)
 		}
 	}
 </script>
@@ -287,7 +302,7 @@
 	.label{
 		flex-shrink: 0;
 	}
-	.label, .pickered-text, .sign-label{
+	.form-item, .label, .pickered-text, .sign-label{
 		font-size: 24rpx;
 		color: #000000;
 	}
