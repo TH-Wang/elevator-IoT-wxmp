@@ -1,6 +1,6 @@
 <template>
 	<view class="cptbox">
-		<Steps :steps="steps" :type="1" />
+		<Steps :steps="steps" :type="dataSource.basis.is_maintain" />
 		
 		<view class="qdcont">
 			<view class="qdlist">
@@ -8,14 +8,14 @@
 					<image src="../../static/icon/repair/people.png"></image>
 					<text>维保人员：{{dataSource.basis.user_name}}</text>
 				</view>
+				<view class="qdbtns qdindes"  v-if="signed">已签到</view>
+				<view class="qdbtns " @click="qiandaobtn" v-if="!signed">签到</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
 					<image src="../../static/icon/repair/time.png"></image>
 					<text>维保时间：{{dataSource.basis.maint_end_time}}</text>
 				</view>
-				<view class="qdbtns qdindes"  v-if="is_qanfal">已签到</view>
-				<view class="qdbtns " @click="qiandaobtn" v-if="!is_qanfal">签到</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
@@ -31,7 +31,7 @@
 				<view class="rigtwbnum">（{{wblist.length}}）</view>
 			</view>
 			<view class="wblist">
-				<view class="wbnavcont" v-for="(item,index) of wblist" :key="item.name" @click="workOrderbtn(item.id)">
+				<view class="wbnavcont" v-for="(item,index) in wblist" :key="item.name" @click="workOrderbtn(item.id)">
 					<view class="wbname"  >{{item.name}}</view>
 					<view class="wbrightnum">
 						<view class="znum" >总数<text class="texcol1">{{quanbus[index]}}</text></view>/
@@ -63,23 +63,18 @@
 			SignInModal
 		},
 	  data: () => ({
+			orderId: null,
 			quanbus:[],//全部
 			wxbnum:[],//不合格
 			hegenum:[],//合格
 			coniden:'',//签字人员：1安全人员；2维保员；3物业；（有参数signature_image，就必须有本参数）
 			dataid:'',//详情ID
-			marcont:'',//签字备注
-			ctx:'',         //绘图图像
-			points:[],       //路径点集合 
 			show:false,
 		  // 维保项目
-		  dataSource:'',
-		  wblist:[   //项目列表
-		  			  // {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  			 
-		  ],
-		  is_qanfal:false,
-	      active: 0,
+		  dataSource: {},
+		  wblist:[],
+		  signed:false,
+			active: 0,
 		  steps: [
 				{
 					type: 1,
@@ -87,42 +82,46 @@
 					time: ''
 				},
 				{
-					type: 2,
+					type: 3,
 					title: '进行中',
 					time: ''
 				},
 				{
-					type: 3,
+					type: 2,
 					title: '已完成',
 					time: ''
 				}
 			]
 		}),
-	  onLoad(cont) {
-	  	this.ctx = uni.createCanvasContext("mycanvas",this);   //创建绘图对象
-	  	//设置画笔样式
-	  	this.ctx.lineWidth = 4;
-	  	this.ctx.lineCap = "round"
-	  	this.ctx.lineJoin = "round"
-			console.log(cont)
-			this.contdel(cont.id)
-			this.dataid=cont.id
+		computed: {
 			
-			
-			this.xmlist(cont.id)
-			this.falqiand(cont.id)
-	  },
+		},
 	  methods:{
-		  // 维保项目
-		workOrderbtn(id){
-			uni.navigateTo({
-				url:'../workOrder/workOrder?id='+id+'&maint_id='+this.dataid
-			})
-		}, 
-		//提交
-		  qdbtns(){
-			  
+			// 请求详情信息
+			handleRequestDetailInfo: async function(id) {
+				var res = await request.post('/maint/maint_one', {id})
+				this.dataSource = res.data
+				// 更新时间
+				this.steps = this.steps.map(item => {
+					var t = res.data.log_time.find(i=>i.type == item.title)
+					if(t) item.time = t.time
+					return item
+				})
+			},
+		  // 判断是否签到
+		  confirmSingIn: async function(){
+				var _this_=this
+				var res = await request.post('/maint/verify_location',{ id:_this_.orderId, })
+				this.signed = Boolean(res.data.is_qan)
 		  },
+		  // 维保项目
+			workOrderbtn(id){
+				uni.navigateTo({
+					url:'../workOrder/workOrder?id='+id+'&maint_id='+this.dataid
+				})
+			}, 
+			//提交
+		  qdbtns(){},
 		  // 签到
 		  qiandaobtn(){
 			  var _this_=this
@@ -131,7 +130,7 @@
 			  	is_qan:1
 			  }).then((res) =>{
 			  	if(res.code == 1){
-					this.falqiand()
+					this.confirmSingIn()
 					this.contdel(dataid)
 			  		uni.showToast({
 			  			title:'签到成功',
@@ -140,244 +139,94 @@
 			  	}
 			  })
 		  },
-		  // 判断是否签到
-		  falqiand(){
-			var _this_=this
-			request.post('/maint/verify_location',{
-				id:_this_.dataid,
-			}).then((res) =>{
-				if(res.code == 1){
-					console.log(res)
-					if( res.data.is_qan==1){
-						_this_.is_qanfal=true
-					}else{
-						_this_.is_qanfal=false
-					}
-				}
-			})  
-		  },
 	    // 项目列表
-		xmlist(id){
-			var _this_=this
-			request.post('/maint/xm_classify',{
-				id:id,
-				type:0
-			}).then((data) =>{
-				console.log(data)
-				if(data.code == 1){
-					
-					for(var i=0;i<data.data.length;i++){
+			xmlist(id){
+				var _this_=this
+				request.post('/maint/xm_classify',{
+					id:id,
+					type:0
+				}).then((data) =>{
+					console.log(data)
+					if(data.code == 1){
 						
-						request.post('/maint/main_xm',{
-							id:data.data[i].id,
-							maint_id:id,
-							type:0
-						}).then((res) =>{
-							if(res.code == 1){
-								_this_.quanbus.push(res.data.length)
-							}
-						})
-						request.post('/maint/main_xm',{
-							id:data.data[i].id,
-							maint_id:id,
-							type:1
-						}).then((res) =>{
-							if(res.code == 1){
-								_this_.wxbnum.push(res.data.length)
-							}
-						})
-						request.post('/maint/main_xm',{
-							id:data.data[i].id,
-							maint_id:id,
-							type:2
-						}).then((res) =>{
-							if(res.code == 1){
-								_this_.hegenum.push(res.data.length)
-							}
-						})
-						
-					}
-					_this_.wblist=data.data
-					console.log(_this_.quanbus)
-					
-				}else{
-					uni.showToast({
-						title:res.message,
-						icon:"none"
-					})
-				}
-			})
-		},
-		// 详情
-		contdel(id){
-			var _this_=this
-			this.steps=[]
-			request.post('/maint/maint_one',{
-				id:id
-			}).then((res) =>{
-				console.log(res)
-				if(res.code == 1){
-					_this_.dataSource=res.data
-					_this_.coniden=res.data.basis.iden
-					for(var i=0;i<res.data.log_time.length;i++){
-						_this_.steps.push({text:res.data.log_time[i].time,desc:res.data.log_time[i].type})
-					}
-					
-					
-					for(var i=0;i<res.data.log_time.length;i++){
-						console.log(res.data.log_time[i].time)
-						if(res.data.log_time[i].time==''){
-							return _this_.active=i-1 
-						}
-					}
-					
-					
-					
-				}else{
-					uni.showToast({
-						title:res.message,
-						icon:"none"
-					})
-				}
-			})
-		},
-		  
-		//触摸开始，获取到起点
-		touchstart:function(e){
-			let startX = e.changedTouches[0].x;
-			let startY = e.changedTouches[0].y;
-			let startPoint = {X:startX,Y:startY};
-			this.points.push(startPoint);
-			//每次触摸开始，开启新的路径
-			this.ctx.beginPath();
-		},
-		
-		//触摸移动，获取到路径点
-		touchmove:function(e){
-			let moveX = e.changedTouches[0].x;
-			let moveY = e.changedTouches[0].y;
-			let movePoint = {X:moveX,Y:moveY};
-			this.points.push(movePoint);       //存点
-			let len = this.points.length;
-			if(len>=2){
-				this.draw();                   //绘制路径
-			}
-			
-		},
-		
-		// 触摸结束，将未绘制的点清空防止对后续路径产生干扰
-		touchend:function(){                   
-			this.points=[];
-		},
-		
-		/* ***********************************************
-		#   绘制笔迹
-		#	1.为保证笔迹实时显示，必须在移动的同时绘制笔迹
-		#	2.为保证笔迹连续，每次从路径集合中区两个点作为起点（moveTo）和终点(lineTo)
-		#	3.将上一次的终点作为下一次绘制的起点（即清除第一个点）
-		************************************************ */
-		draw: function() {
-			let point1 = this.points[0]
-			let point2 = this.points[1]
-			this.points.shift()
-			this.ctx.moveTo(point1.X, point1.Y)
-			this.ctx.lineTo(point2.X, point2.Y)
-			this.ctx.stroke()
-			this.ctx.draw(true)
-		},
-		
-		//清空画布
-		clear:function(){
-			let _this_ = this;
-			uni.getSystemInfo({
-				success: function(res) {
-					let canvasw = res.windowWidth;
-					let canvash = res.windowHeight;
-					_this_.ctx.clearRect(0, 0, canvasw, canvash);
-					_this_.ctx.draw(true);
-				},
-			})
-		},
-		
-		//完成绘画并保存到本地
-		finish:function(){
-			var _this_=this
-			
-			uni.canvasToTempFilePath({
-			  canvasId: 'mycanvas',
-			  success: function(res) {
-				  console.log(res)
-			    let path = res.tempFilePath;
-				app.globalData.isHeader = true;
-				var token = uni.getStorageSync('token')
-				uni.uploadFile({
-				          url: 'https://wcs.xdiot.net/api/upload_file' , //仅为示例，非真实的接口地址
-				          filePath: path,
-				          name: "file",
-				          header: {
-				          "Content-Type": "multipart/form-data",
-						  "token": token,
-				          },
-				          formData: {
-							order_id:_this_.dataid,
-							file_type:'3',
-							file_belong:'2',
-							file:'file',
-				          },
-				          success: function (res) {
-				            var data = res.data
-							console.log(data)
-							var dataw=JSON.parse(data)
-				            console.log(dataw.data.length )
-							//发送请求
-							uni.request({
-								url: 'https://wcs.xdiot.net/api/maint/signature',
-								method: 'POST',
-								header: {
-									"token": token,
-									'Content-Type':'multipart/form-data',
-								},
-								data:{
-									id:_this_.dataid,
-									image:dataw.data[dataw.data.length-1].file_url,
-									type:_this_.coniden,
-									remark:_this_.marcont
-								},
-								success: res => {
-									console.log(res.data)
-									if(res.data.code==1){
-										_this_.clear()
-										_this_.show=false
-									}
-									
-								},
-								fail: (err) => {
-								}
-							});
+						for(var i=0;i<data.data.length;i++){
 							
-				          }
-				        })
-				
-				
-				
-				
-				
-				// uni.saveImageToPhotosAlbum({
-				// 	filePath:path,
-				// })
-			  } 
-			})
-		},
-				
-				
-		   onClickShow() {
-			  
-		      this.show=true;
-		    },
-			onClickHide() {
-			    this.show=false;
+							request.post('/maint/main_xm',{
+								id:data.data[i].id,
+								maint_id:id,
+								type:0
+							}).then((res) =>{
+								if(res.code == 1){
+									_this_.quanbus.push(res.data.length)
+								}
+							})
+							request.post('/maint/main_xm',{
+								id:data.data[i].id,
+								maint_id:id,
+								type:1
+							}).then((res) =>{
+								if(res.code == 1){
+									_this_.wxbnum.push(res.data.length)
+								}
+							})
+							request.post('/maint/main_xm',{
+								id:data.data[i].id,
+								maint_id:id,
+								type:2
+							}).then((res) =>{
+								if(res.code == 1){
+									_this_.hegenum.push(res.data.length)
+								}
+							})
+							
+						}
+						_this_.wblist=data.data
+						console.log(_this_.quanbus)
+						
+					}else{
+						uni.showToast({
+							title:res.message,
+							icon:"none"
+						})
+					}
+				})
 			},
-
+			// 详情
+			contdel(id){
+				var _this_=this
+				// this.steps=[]
+				request.post('/maint/maint_one',{
+					id:id
+				}).then((res) =>{
+					console.log(res)
+					if(res.code == 1){
+						_this_.dataSource=res.data
+						_this_.coniden=res.data.basis.iden
+						// for(var i=0;i<res.data.log_time.length;i++){
+						// 	_this_.steps.push({text:res.data.log_time[i].time,desc:res.data.log_time[i].type})
+						// }
+						
+						for(var i=0;i<res.data.log_time.length;i++){
+							console.log(res.data.log_time[i].time)
+							if(res.data.log_time[i].time==''){
+								return _this_.active=i-1 
+							}
+						}
+						
+					}else{
+						uni.showToast({
+							title:res.message,
+							icon:"none"
+						})
+					}
+				})
+			},
+	  },
+	  onLoad: async function(option) {
+			var { id } = option
+			this.orderId = id
+			await this.handleRequestDetailInfo(id)
+			await this.confirmSingIn(id)
 	  }
 	}
 </script>

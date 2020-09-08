@@ -1,43 +1,42 @@
 <template>
-		<scroll-view
-			:scroll-y="true"
+	<view>
+		<!-- 搜索框 -->
+		<Search button />
+		
+		<!-- 分类导航栏 -->
+		<Tabs
+			:tabs="tabs"
+			:active="active"
+			@switch="handleSwitchTab"
+		/>
+		
+		<!-- 列表 -->
+		<swiper
+			:current="active"
+			class="page-list-container"
+			:duration="300"
+			@change="handleSwiperChange"
 		>
-			<!-- 搜索框 -->
-			<Search button />
-			
-			<!-- 分类导航栏 -->
-			<Tabs
-				:tabs="tabs"
-				:active="active"
-				@switch="handleSwitchTab"
-			/>
-			
-			<!-- 列表 -->
-			<swiper
-				:current="active"
-				class="page-list-container"
-				:duration="300"
-				@change="handleSwiperChange"
+			<swiper-item
+				class="swiper-item"
+				v-for="item in repairType"
+				:key="item.code"
 			>
-				<swiper-item
-					class="swiper-item"
-					v-for="item in repairType"
-					:key="item.code"
-				>
-					<!-- 空数据 -->
-					<Empty v-if="dataSource[item.key].length == 0" :title="'暂无' + item.label + '工单'" />
-					<!-- 急修工单列表 -->
-					<RepairCard
-						v-for="record in dataSource[item.key]"
-						:key="record.id"
-						:record="record"
-						hasButton
-						type="repair"
-						@click="handleLinkDetail($event, record.id)"
-					/>
-				</swiper-item>
-			</swiper>
-		</scroll-view>
+				<!-- 空数据 -->
+				<Empty v-if="dataSource[item.key].length == 0" :title="'暂无' + item.label + '工单'" />
+				<!-- 急修工单列表 -->
+				<RepairCard
+					v-for="record in dataSource[item.key]"
+					:key="record.id"
+					:record="record"
+					hasButton
+					type="repair"
+					@click="handleLinkDetail($event, record.id)"
+				/>
+			</swiper-item>
+		</swiper>
+		
+	</view>
 </template>
 
 <script>
@@ -152,13 +151,6 @@
 		overflow-y: scroll;
 		height: 100%;
 		padding-bottom: 30rpx;
-		box-sizing: border-box;
-		background-color: #FFFFFF;
-	}
-	.list-container{
-		height: 100%;
-		margin-top: 20rpx;
-		padding: 1rpx 0 30rpx 0;
 		box-sizing: border-box;
 		background-color: #FFFFFF;
 	}

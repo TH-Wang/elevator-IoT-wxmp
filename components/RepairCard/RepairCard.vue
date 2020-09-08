@@ -21,7 +21,10 @@
 		<!-- 底部 -->
 		<view class="footer">
 			<text class="address ellipsis">{{getAddress()}}</text>
-			<view v-if="hasButton" :class="buttonClass">{{getButtonText()}}</view>
+			<view v-if="hasButton">
+				<view v-if="type == 'repair'" :class="repairBtnClass">{{getRepairBtnText()}}</view>
+				<view v-else-if="type == 'maint'" :class="maintBtnClass">{{getMaintBtnText()}}</view>
+			</view>
 		</view>
 	</view>
 </template>
@@ -48,7 +51,8 @@
 			}
 		},
 		data: () => ({
-			buttonClass: ''
+			repairBtnClass: '',
+			maintBtnClass: ''
 		}),
 		computed: {
 			containerStyle() {
@@ -74,27 +78,25 @@
 					}
 				}
 			},
-			getButtonText() {
-				if(this.type == 'repair'){
-					switch(this.record.repair_type) {
-						case 0: return '待审核'
-						case 1: return '待接警';
-						case 2: return '待处理';
-						case 3: return '进行中';
-						case 4: return '维修完成';
-						case 5: return '误报确认';
-						case 6: return '自动修复';
-						default: return '维修完成';
-					}
+			getRepairBtnText() {
+				switch(this.record.repair_type) {
+					case 0: return '待审核'
+					case 1: return '待接警';
+					case 2: return '待处理';
+					case 3: return '进行中';
+					case 4: return '维修完成';
+					case 5: return '误报确认';
+					case 6: return '自动修复';
+					default: return '维修完成';
 				}
-				else if(this.type == 'maint') {
-					switch(this.record.is_maintain) {
-						case 1: return '待维保';
-						case 2: return '已维保';
-						case 3: return '进行中';
-						case 4: return '逾期签到';
-						default: return '待维保';
-					}
+			},
+			getMaintBtnText() {
+				switch(this.record.is_maintain) {
+					case 1: return '待处理';
+					case 2: return '已完成';
+					case 3: return '进行中';
+					case 4: return '逾期签到';
+					default: return '已完成';
 				}
 			},
 			getHeaderTagText() {
@@ -115,22 +117,22 @@
 				}
 			},
 			computeButtonClass() {
-				var idx = null
-				var typeId = null
 				if(this.type == 'repair'){
-					typeId = this.record.repair_type
+					var typeId = this.record.repair_type
+					idx = (typeId > 0 && typeId < 4) ? typeId : 4
+					this.repairBtnClass = 'type-button ' + 'button-' + idx
 				}
-				else {
-					typeId = this.record.is_maintain
+				else if(this.type == 'maint') {
+					// 默认为已完成状态
+					var idx = 4
+					switch(this.record.is_maintain) {
+						case 1: idx = 2;break;
+						case 2: idx = 4;break;
+						case 3: idx = 3;break;
+						default: idx = 4
+					}
+					this.maintBtnClass = 'type-button ' + 'button-' + idx
 				}
-				
-				if(typeId > 0 && typeId < 4){
-					idx = typeId
-				} else {
-					idx = 4
-				}
-				
-				this.buttonClass = 'type-button ' + 'button-' + idx
 			}
 		},
 		mounted() {
@@ -216,7 +218,7 @@
 	}
 	
 	.type-button{
-		width: 20%;
+		width: 120rpx;
 		height: 50rpx;
 		line-height: 50rpx;
 		border-radius: 25rpx;

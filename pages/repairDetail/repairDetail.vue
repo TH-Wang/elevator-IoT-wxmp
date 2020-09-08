@@ -208,12 +208,11 @@
 				var res = await request.post('/maint/fault_one', {id})
 				this.record = res.data.repair
 				this.ele = res.data.ele
-				var newSteps = this.steps
-				newSteps.forEach(item => {
-					var hasTime = res.data.repair.log_time.find(i=>i.type==item.type)
+				this.steps = this.steps.map(item => {
+					var hasTime = res.data.repair.log_time.reverse().find(i=>i.type==item.type)
 					if(hasTime) item.time = hasTime.time
+					return item
 				})
-				this.steps = newSteps
 			}
 		},
 		onLoad: function(option) {
