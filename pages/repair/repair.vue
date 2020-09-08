@@ -84,18 +84,13 @@
 					key: 'all'
 				}
 			],
-			dataSource: {
-				wait: [],
-				pending: [],
-				doing: [],
-				finish: [],
-				all: []
-			},
-			// dataSource: repairData
 		}),
 		computed: {
 			tabs() {
 				return this.repairType.map(i=>i.label)
+			},
+			dataSource() {
+				return this.$store.state.repair.list
 			}
 		},
 		methods: {
@@ -134,11 +129,14 @@
 				}
 			}
 		},
+		// onShow: async function() {
+		// 	await this.handleRequestData()
+		// },		
 		onLoad: async function() {
-			await this.handleRequestData()
+			await this.$store.dispatch('refreshRepair')
 		},
 		onPullDownRefresh: async function() {
-			await this.handleRequestData()
+			await this.$store.dispatch('refreshRepair')
 			uni.stopPullDownRefresh()
 		}
 	}

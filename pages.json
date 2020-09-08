@@ -1,19 +1,16 @@
 {
 	"pages": [
+		// {
+		// 	"path": "pages/test/test",				//测试
+		// 	"style": {
+		// 		"navigationBarTitleText": "测试"
+		// 	}
+		// },
 		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "首页",
 				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/test/test",				//测试
-			"style": {
-				"navigationBarTitleText": "测试",
-				"usingComponents": {
-				  "van-icon": "/wxcomponents/vant/dist/icon/index"
-				}
 			}
 		},
 		{

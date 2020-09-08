@@ -96,6 +96,7 @@
 	import repairData from '../../data/repair.js'
 	import request from '../../service/request.js'
 	import formatDate from '../../utils/formatDate.js'
+	import isEmpty from '../../utils/isEmpty.js'
 	
 	export default {
 		components: {
@@ -105,6 +106,7 @@
 			SignInModal
 		},
 		data: () => ({
+			orderId: null,
 			steps: [
 				{
 					type: 1,
@@ -129,7 +131,8 @@
 			],
 			record: {},
 			ele: {},
-			signInSuccess: false
+			signInSuccess: false,
+			backRefresh: false
 		}),
 		computed: {
 			fault_source() {
@@ -155,7 +158,7 @@
 					url: `/pages/repairSubmitInfo/repairSubmitInfo?id=${id}`
 				})
 			},
-			// 点击接警
+			// 点击接警 --> 2
 			async handleAlarm() {
 				await this.updateTicketState(2)
 				uni.showToast({
@@ -163,7 +166,7 @@
 					icon: 'success'
 				})
 			},
-			// 点击签到
+			// 点击签到 --> 3
 			async handleSignIn() {
 				await this.updateTicketState(3)
 				this.signInSuccess = true
@@ -181,22 +184,44 @@
 						if(item.type == type) item.time = formatDate('YYYY-mm-dd HH:MM:SS', new Date())
 						return item
 					})
+					// 旧的状态
+					var oldType = this.record.repair_type
+					// 更新后的状态
 					this.record.repair_type = type
+					// 变更故障列表中数据的状态
+					if(!isEmpty(this.$store.state.repair.list)) {
+						this.$store.commit('updateRepairState', {
+							id: _this_.record.id,
+							oldType: oldType,
+							newType: type
+						})
+					}
+					// 变更待办事项中故障工单的状态
+					this.$store.commit('todoListUpdateRepair', {
+						id: _this_.record.id,
+						type: type
+					})
 				}
+			},
+			handleLoadData: async function(id) {
+				var _this_ = this
+				var res = await request.post('/maint/fault_one', {id})
+				this.record = res.data.repair
+				this.ele = res.data.ele
+				var newSteps = this.steps
+				newSteps.forEach(item => {
+					var hasTime = res.data.repair.log_time.find(i=>i.type==item.type)
+					if(hasTime) item.time = hasTime.time
+				})
+				this.steps = newSteps
 			}
 		},
-		onLoad: async function(option) {
-			var _this_ = this
+		onLoad: function(option) {
 			var { id } = option
-			var res = await request.post('/maint/fault_one', {id})
-			this.record = res.data.repair
-			this.ele = res.data.ele
-			var newSteps = this.steps
-			newSteps.forEach(item => {
-				var hasTime = res.data.repair.log_time.find(i=>i.type==item.type)
-				if(hasTime) item.time = hasTime.time
-			})
-			this.steps = newSteps
+			this.orderId = id
+		},
+		onShow: async function() {
+			await this.handleLoadData(this.orderId)
 		}
 	}
 </script>

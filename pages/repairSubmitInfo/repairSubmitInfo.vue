@@ -39,7 +39,7 @@
 				>
 					<video
 						:id="video.file_url"
-						:src="video.file_url"
+						:src="'http://'+video.file_url"
 						:controls="videoControl[idx]"
 						:show-center-play-btn="false"
 						@fullscreenchange="handleVideoScreenChange($event, idx)"
@@ -61,7 +61,7 @@
 					:key="img.id"
 					@click="handlePreview(idx)"
 				>
-					<image class="preview-image" :src="img.file_url" mode="aspectFill"></image>
+					<image class="preview-image" :src="'http://'+img.file_url" mode="aspectFill"></image>
 				</view>
 			</view>
 		</view>
@@ -161,7 +161,7 @@
 				var _this_ = this
 				uni.previewImage({
 					current: idx,
-					urls: _this_.imageList
+					urls: _this_.imageList.map(i => `http://${i.file_url}`)
 				})
 			},
 			// 初始化视频控件
@@ -174,7 +174,9 @@
 			},
 			// 预览视频
 			handlePreviewVideo(e, idx) {
-				this.videoContext[idx].requestFullScreen()
+				this.videoContext[idx].requestFullScreen({
+					direction: 0
+				})
 			},
 			// 视频全屏切换事件
 			handleVideoScreenChange(e, idx) {

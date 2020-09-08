@@ -111,6 +111,29 @@ const request = {
 			});
 		})
 	},
+	
+	// Upload
+	upload: function({url, name, filePath, data}) {
+		return new Promise((resolve, reject) => {
+			var reqUrl = store.state.request.url + '/api' + url
+			uni.uploadFile({
+				url: reqUrl,
+				header: {
+					"token": uni.getStorageSync('token'),
+					"Content-Type": "multipart/form-data"
+				},
+				name,
+				filePath,
+				formData: data,
+				success: function(res) {
+					resolve(JSON.parse(res.data))
+				},
+				fail: function(err) {
+					reject(err)
+				}
+			})
+		})
+	}
 }
 
 export default request

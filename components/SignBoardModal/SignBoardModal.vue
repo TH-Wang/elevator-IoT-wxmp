@@ -19,7 +19,7 @@
 					<!-- 尾部 -->
 					<view class="footer" :style="footerStyle">
 						<!-- 取消按钮 -->
-						<view class="button cancel-button" v-if="showCancel">
+						<view class="button cancel-button" v-if="showCancel" @click="$emit('cancel')">
 							取消
 						</view>
 						<!-- 确认按钮 -->
@@ -81,6 +81,7 @@
 		position: fixed;
 		top: 0;
 		left: 0;
+		z-index: 1000000;
 		background-color: rgba(0, 0, 0, .5);
 	}
 	.card-container{

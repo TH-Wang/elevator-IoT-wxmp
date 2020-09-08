@@ -1,26 +1,18 @@
 <template>
 	<view class="cptbox">
+		<Steps :steps="steps" :type="1" />
 		
-		<view class="buzcont">
-			<van-steps
-			  :steps="steps "
-			  :active="active"
-			  direction="horizontal "
-			  active-color="#4190F5"
-			/>
-		</view>
 		<view class="qdcont">
 			<view class="qdlist">
 				<view class="qdlettxt">
-					<image src="../../static/icon/tabbar/mine-active.png"></image>
-					<text>维保人员：{{datadel.basis.user_name}}</text>
+					<image src="../../static/icon/repair/people.png"></image>
+					<text>维保人员：{{dataSource.basis.user_name}}</text>
 				</view>
-				<view class="qdbtns" @click="onClickShow">签名</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
 					<image src="../../static/icon/repair/time.png"></image>
-					<text>维保时间：{{datadel.basis.maint_end_time}}</text>
+					<text>维保时间：{{dataSource.basis.maint_end_time}}</text>
 				</view>
 				<view class="qdbtns qdindes"  v-if="is_qanfal">已签到</view>
 				<view class="qdbtns " @click="qiandaobtn" v-if="!is_qanfal">签到</view>
@@ -28,7 +20,7 @@
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
 					<image src="../../static/icon/repair/address.png"></image>
-					<text>所在小区：{{datadel.ele.village_name}}</text>
+					<text>所在小区：{{dataSource.ele.village_name}}</text>
 				</view>
 			</view>
 		</view>
@@ -51,38 +43,26 @@
 			</view>
 		</view>
 	
-	    <!-- <view class="tjbtns" @click="qdbtns">提交</view> -->
-		
-		<van-popup  :show="show" @close="onClickHide" >
-			<view class="wrapper">
-			  <view class="qrbtnqz">签字确认</view>
-			  <van-icon name="close" class="closebtns" @click="onClickHide" />
-			  <input type="text" placeholder="请输入备信息" v-model="marcont" class="bzcont" />
-			  <view class="qzban">
-				  	<canvas class="mycanvas" canvas-id="mycanvas" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend"></canvas>
-				  	
-				  	<view class="right" @click="clear">清除</view>
-			  </view>
-			  <view class="btncontqr" @click="finish">确认</view>
-			</view>
-		</van-popup>
-		
-		
-		
-		
-		
-		
+	  <SignInModal :visible="signInSuccess" @close="signInSuccess = false" />
 	</view>
 </template>
 
 <script>
 	var x = 20;
 	var y =20;
+	import Steps from '../../components/Steps/Steps.vue'
 	import request from '@/service/request.js'
+	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import SignInModal from '../../components/SignInModal/SignInModal.vue'
 	import app from '../../App.vue'
+	
 	export default {
-	  data() {
-	    return {
+		components: {
+			Steps,
+			CommonButton,
+			SignInModal
+		},
+	  data: () => ({
 			quanbus:[],//全部
 			wxbnum:[],//不合格
 			hegenum:[],//合格
@@ -93,7 +73,7 @@
 			points:[],       //路径点集合 
 			show:false,
 		  // 维保项目
-		  datadel:'',
+		  dataSource:'',
 		  wblist:[   //项目列表
 		  			  // {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
 		  			 
@@ -101,41 +81,36 @@
 		  is_qanfal:false,
 	      active: 0,
 		  steps: [
-		        {
-		          text: '待处理',
-		          desc: '04-11 15:11:23',
-		        },
-		        {
-		          text: '进行中',
-		          desc: '04-11 15:11:23',
-		        },
-		        {
-		          text: '已完成',
-		          desc: '04-11 15:11:23',
-		        },
-		       
-		      ],
-	    }
-	  
-	      
-		  
-	  },
+				{
+					type: 1,
+					title: '待处理',
+					time: ''
+				},
+				{
+					type: 2,
+					title: '进行中',
+					time: ''
+				},
+				{
+					type: 3,
+					title: '已完成',
+					time: ''
+				}
+			]
+		}),
 	  onLoad(cont) {
 	  	this.ctx = uni.createCanvasContext("mycanvas",this);   //创建绘图对象
 	  	//设置画笔样式
 	  	this.ctx.lineWidth = 4;
 	  	this.ctx.lineCap = "round"
 	  	this.ctx.lineJoin = "round"
-		console.log(cont)
-		this.contdel(cont.id)
-		this.dataid=cont.id
-		
-		
-		this.xmlist(cont.id)
-		this.falqiand(cont.id)
-	  },
-	  mounted() {
-	  	
+			console.log(cont)
+			this.contdel(cont.id)
+			this.dataid=cont.id
+			
+			
+			this.xmlist(cont.id)
+			this.falqiand(cont.id)
 	  },
 	  methods:{
 		  // 维保项目
@@ -150,9 +125,9 @@
 		  },
 		  // 签到
 		  qiandaobtn(){
-			  var that=this
+			  var _this_=this
 			  request.post('/maint/sign_in',{
-			  	id:that.dataid,
+			  	id:_this_.dataid,
 			  	is_qan:1
 			  }).then((res) =>{
 			  	if(res.code == 1){
@@ -167,23 +142,23 @@
 		  },
 		  // 判断是否签到
 		  falqiand(){
-			var that=this
+			var _this_=this
 			request.post('/maint/verify_location',{
-				id:that.dataid,
+				id:_this_.dataid,
 			}).then((res) =>{
 				if(res.code == 1){
 					console.log(res)
 					if( res.data.is_qan==1){
-						that.is_qanfal=true
+						_this_.is_qanfal=true
 					}else{
-						that.is_qanfal=false
+						_this_.is_qanfal=false
 					}
 				}
 			})  
 		  },
 	    // 项目列表
 		xmlist(id){
-			var that=this
+			var _this_=this
 			request.post('/maint/xm_classify',{
 				id:id,
 				type:0
@@ -199,7 +174,7 @@
 							type:0
 						}).then((res) =>{
 							if(res.code == 1){
-								that.quanbus.push(res.data.length)
+								_this_.quanbus.push(res.data.length)
 							}
 						})
 						request.post('/maint/main_xm',{
@@ -208,7 +183,7 @@
 							type:1
 						}).then((res) =>{
 							if(res.code == 1){
-								that.wxbnum.push(res.data.length)
+								_this_.wxbnum.push(res.data.length)
 							}
 						})
 						request.post('/maint/main_xm',{
@@ -217,13 +192,13 @@
 							type:2
 						}).then((res) =>{
 							if(res.code == 1){
-								that.hegenum.push(res.data.length)
+								_this_.hegenum.push(res.data.length)
 							}
 						})
 						
 					}
-					that.wblist=data.data
-					console.log(that.quanbus)
+					_this_.wblist=data.data
+					console.log(_this_.quanbus)
 					
 				}else{
 					uni.showToast({
@@ -235,24 +210,24 @@
 		},
 		// 详情
 		contdel(id){
-			var that=this
+			var _this_=this
 			this.steps=[]
 			request.post('/maint/maint_one',{
 				id:id
 			}).then((res) =>{
 				console.log(res)
 				if(res.code == 1){
-					that.datadel=res.data
-					that.coniden=res.data.basis.iden
+					_this_.dataSource=res.data
+					_this_.coniden=res.data.basis.iden
 					for(var i=0;i<res.data.log_time.length;i++){
-						that.steps.push({text:res.data.log_time[i].time,desc:res.data.log_time[i].type})
+						_this_.steps.push({text:res.data.log_time[i].time,desc:res.data.log_time[i].type})
 					}
 					
 					
 					for(var i=0;i<res.data.log_time.length;i++){
 						console.log(res.data.log_time[i].time)
 						if(res.data.log_time[i].time==''){
-							return that.active=i-1 
+							return _this_.active=i-1 
 						}
 					}
 					
@@ -313,20 +288,20 @@
 		
 		//清空画布
 		clear:function(){
-			let that = this;
+			let _this_ = this;
 			uni.getSystemInfo({
 				success: function(res) {
 					let canvasw = res.windowWidth;
 					let canvash = res.windowHeight;
-					that.ctx.clearRect(0, 0, canvasw, canvash);
-					that.ctx.draw(true);
+					_this_.ctx.clearRect(0, 0, canvasw, canvash);
+					_this_.ctx.draw(true);
 				},
 			})
 		},
 		
 		//完成绘画并保存到本地
 		finish:function(){
-			var that=this
+			var _this_=this
 			
 			uni.canvasToTempFilePath({
 			  canvasId: 'mycanvas',
@@ -344,7 +319,7 @@
 						  "token": token,
 				          },
 				          formData: {
-							order_id:that.dataid,
+							order_id:_this_.dataid,
 							file_type:'3',
 							file_belong:'2',
 							file:'file',
@@ -363,16 +338,16 @@
 									'Content-Type':'multipart/form-data',
 								},
 								data:{
-									id:that.dataid,
+									id:_this_.dataid,
 									image:dataw.data[dataw.data.length-1].file_url,
-									type:that.coniden,
-									remark:that.marcont
+									type:_this_.coniden,
+									remark:_this_.marcont
 								},
 								success: res => {
 									console.log(res.data)
 									if(res.data.code==1){
-										that.clear()
-										that.show=false
+										_this_.clear()
+										_this_.show=false
 									}
 									
 								},

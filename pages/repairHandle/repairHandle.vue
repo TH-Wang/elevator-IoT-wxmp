@@ -97,24 +97,47 @@
 		<!-- 签字确认 -->
 		<view class="sign-container">
 			<view class="sign-label">签字</view>
-			<SignBoard ref="sign" />
+			<SignBoard v-if="waitSign" ref="sign" />
+			<image v-else class="sign-success-image" :src="signImage" mode="scaleToFill" />
 		</view>
 		
 		<!-- 提交按钮 -->
 		<CommonButton text="确认提交" @click="handleSubmit" />
 		
+		<!-- 安全人员签字板弹窗 -->
+		<SignBoardModal
+			title="安全人员签字"
+			:visible="safeSignVisible"
+			:showCancel="true"
+			@close="safeSignVisible = false"
+			@save="handleSafeSignFile"
+			@cancel="handleSafeCancel"
+		/>
+		
+		<!-- 物业人员签字板 -->
+		<SignBoardModal
+			title="物业人员签字"
+			:visible="properSignVisible"
+			:showCancel="true"
+			@close="properSignVisible = false"
+			@save="handleProperSignFile"
+			@cancel="handleProperCancel"
+		/>
 	</view>
 </template>
 
 <script>
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
 	import SignBoard from '../../components/SignBoard/SignBoard.vue'
+	import SignBoardModal from '../../components/SignBoardModal/SignBoardModal.vue'
 	import request from '../../service/request.js'
+	import isEmpty from '../../utils/isEmpty.js'
 	
 	export default {
 		components: {
 			CommonButton,
-			SignBoard
+			SignBoard,
+			SignBoardModal
 		},
 		data: () => ({
 			orderId: null,
@@ -132,7 +155,14 @@
 			// 视频实例
 			videoContext: [],
 			// 视频空间是否显示
-			videoControl: []
+			videoControl: [],
+			// 等待签字
+			waitSign: true,
+			// 签字图片
+			signImage: null,
+			// 签字弹窗
+			safeSignVisible: false,
+			properSignVisible: false
 		}),
 		computed: {
 			propRange() {
@@ -207,7 +237,7 @@
 				var _this_ = this
 				uni.previewImage({
 					current: idx,
-					urls: _this_.imageList
+					urls: _this_.imageList.map(i=>`http://${i.file_url}`)
 				})
 			},
 			// 删除图片
@@ -313,52 +343,115 @@
 				}
 				var filePath = await this.$refs.sign.finish()
 				console.log(data)
-				uni.showLoading({title: '提交中...'})
-				uni.uploadFile({
-					url: `${_this_.$store.state.request.url}/api/maint/fault_submit`,
-					filePath: filePath,
+				var res = await request.upload({
+					url: '/maint/fault_submit',
 					name: 'image',
-					header: {
-						"token": uni.getStorageSync('token'),
-						"Content-Type": "multipart/form-data"
-					},
-					formData: data,
-					success: function(res) {
-						var result = JSON.parse(res.data)
-						console.log(result)
-						if(result.code == 1) {
-							uni.showToast({
-								title: '提交成功',
-								icon: 'success',
-								success() {
-									uni.navigateBack({
-										delta: 1
-									})
-									uni.redirectTo({
-										url: '/pages/repairDetail/repairDetail?id=' + _this_.orderId
-									})
-								}
-							})
-						} else {
-							console.log('----收到response----')
-							uni.showModal({
-								showCancel: false,
-								title: '提交失败，请稍后重试'
+					filePath,
+					data
+				})
+				if(res.code == 1) {
+					uni.showToast({
+						title: '提交成功',
+						icon: 'success',
+						mask: true,
+						success() {
+							_this_.waitSign = false
+							_this_.signImage = filePath
+							_this_.safeSignVisible = true
+						}
+					})
+				} else {
+					console.log('----收到response----')
+					uni.showModal({
+						showCancel: false,
+						title: '提交失败，请稍后重试'
+					})
+				}
+			},
+			// 安全人员签字
+			handleSafeSignFile: async function (filePath) {
+				var _this_ = this
+				try{
+					var res = await request.upload({
+						url: "/maint/fault_signature",
+						name: "image",
+						filePath,
+						data: {
+							id: _this_.orderId,
+							type: 1
+						}
+					})
+					uni.showToast({
+						mask: true,
+						title: '签字成功',
+						icon: 'success'
+					})
+					_this_.safeSignVisible = false
+					_this_.properSignVisible = true
+				} catch(e) {
+					uni.showToast({ title: '签字失败，请重试！', icon: 'none' })
+				}
+			},
+			// 物业人员签字
+			handleProperSignFile: async function(filePath) {
+				var _this_ = this
+				try{
+					var res = await request.upload({
+						url: "/maint/fault_signature",
+						name: "image",
+						filePath,
+						data: {
+							id: _this_.orderId,
+							type: 3
+						}
+					})
+					uni.showToast({
+						mask: true,
+						title: '签字成功',
+						icon: 'success'
+					})
+					_this_.properSignVisible = false
+					_this_.handleRedirectTo()
+				} catch(e) {
+					uni.showToast({ title: '签字失败，请重试！', icon: 'none' })
+				}
+			},
+			// 跳转页面
+			handleRedirectTo() {
+				var _this_ = this
+				try{
+					uni.navigateBack({
+						delta: 1,
+						success: async function() {
+							// 变更故障列表中数据的状态
+							if(!isEmpty(_this_.$store.state.repair.list)) {
+								_this_.$store.commit('updateRepairState', {
+									id: _this_.orderId,
+									oldType: 3,
+									newType: 4
+								})
+							}
+							// 变更待办事项中故障工单的状态
+							_this_.$store.commit('todoListUpdateRepair', {
+								id: _this_.orderId,
+								type: 4
 							})
 						}
-					},
-					fail: function(err) {
-						console.log('----请求失败----')
-						uni.showModal({
-							showCancel: false,
-							title: '提交失败，请稍后重试'
-						})
-					},
-					complete: function() {
-						uni.hideLoading()
-					}
-				})
+					})
+				}catch(e){
+					console.log(e)
+				}
 			},
+			// 安全人员取消签字
+			handleSafeCancel() {
+				this.safeSignVisible = false
+				this.properSignVisible = true
+			},
+			// 物业人员取消签字
+			handleProperCancel() {
+				this.properSignVisible = false
+				this.handleRedirectTo()
+			}
 		},
 		onLoad: async function(option) {
 			// 拿到工单id
@@ -375,8 +468,6 @@
 <style scoped>
 	.container{
 		background-color: #F9F9F9;
-		height: 100vh;
-		overflow-y: scroll;
 	}
 	
 	.picker-container{
@@ -528,6 +619,11 @@
 	.sign-label{
 		height: 80rpx;
 		line-height: 80rpx;
+	}
+	
+	.sign-success-image{
+		width: 100%;
+		height: 294rpx;
 	}
 </style>
 

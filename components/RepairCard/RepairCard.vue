@@ -77,6 +77,7 @@
 			getButtonText() {
 				if(this.type == 'repair'){
 					switch(this.record.repair_type) {
+						case 0: return '待审核'
 						case 1: return '待接警';
 						case 2: return '待处理';
 						case 3: return '进行中';
@@ -112,18 +113,33 @@
 				} else {
 					return this.record.address
 				}
+			},
+			computeButtonClass() {
+				var idx = null
+				var typeId = null
+				if(this.type == 'repair'){
+					typeId = this.record.repair_type
+				}
+				else {
+					typeId = this.record.is_maintain
+				}
+				
+				if(typeId > 0 && typeId < 4){
+					idx = typeId
+				} else {
+					idx = 4
+				}
+				
+				this.buttonClass = 'type-button ' + 'button-' + idx
 			}
 		},
 		mounted() {
-			var idx = null
-			if(this.type == 'repair'){
-				idx = this.record.repair_type >= 4 ? 4 : this.record.repair_type
+			this.computeButtonClass()
+		},
+		watch: {
+			record: function() {
+				this.computeButtonClass()
 			}
-			else if(this.type == 'maint') {
-				idx = this.record.is_maintain >= 4 ? 4 : this.record.is_maintain
-			}
-			
-			this.buttonClass = 'type-button ' + 'button-' + idx
 		}
 	}
 </script>

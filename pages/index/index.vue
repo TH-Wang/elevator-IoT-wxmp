@@ -102,7 +102,6 @@
 	import gridConfig from './gridConfig.js'
 	import debounce from '../../utils/debounce.js'
 	import request from '../../service/request.js'
-	import todos from '../../data/todos.js'
 	
 	export default {
 		components: {
@@ -115,10 +114,16 @@
 			swiperList: [],
 			noticeList: [],
 			gridConfig,
-			value: '',
-			todoList: {},
-			todoCount: 0
+			value: ''
 		}),
+		computed: {
+			todoList() {
+				return this.$store.state.todos.list
+			},
+			todoCount() {
+				return Object.values(this.$store.state.todos.list).reduce((p,i)=>[...p, ...i], []).length
+			}
+		},
 		methods: {
 			handleNavigateLink(path, isTabbarPage) {
 				const option = {url: path}
@@ -166,11 +171,10 @@
 				})
 				this.noticeList = res.data.map(i=>i.title)
 			},
-			// 待办事项处理
+			// 请求待办事项
 			async requestTodoWork() {
-				var res = await request.post('/backlog')
-				this.todoList = res.data
-				this.todoCount = Object.values(res.data).reduce((p,i)=>[...p, ...i], []).length
+				await this.$store.dispatch('requestTodos')
+				console.log(this.$store.state.todos)
 			}
 		},
 		onLoad: async function() {
