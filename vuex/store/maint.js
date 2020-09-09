@@ -32,6 +32,17 @@ export default {
 			state[key].dataSource.push(...data)
 			state[key].page++
 			console.log(`追加数据${key}: 当前第 ${state[key].page-1} 页，当前 ${state[key].dataSource.length} 条数据`)
+		},
+		updateMaintState(state, { id, oldType, newType }) {
+			var oldKey = typeId[oldType]
+			var newKey = typeId[newType]
+			state[oldKey].dataSource.forEach((item, index) => {
+				if(item.id == id) {
+					item.is_maintain = newType,
+					state[newKey].dataSource.unshift(item)
+					state[oldKey].dataSource.splice(index, 1)
+				}
+			})
 		}
 	},
 	

@@ -52,11 +52,11 @@
 			"path": "pages/workOrder/workOrder",
 			"style": {
 				"navigationBarTitleText": "维保工单",
+				"backgroundColor": "#F9F9F9",
 				"usingComponents":{
 					"van-dropdown-menu": "/wxcomponents/vant/dist/dropdown-menu/index",
 					"van-dropdown-item": "/wxcomponents/vant/dist/dropdown-item/index",
-					"van-icon": "/wxcomponents/vant/dist/icon/index",
-					"van-uploader": "/wxcomponents/vant/dist/uploader/index"
+					"van-icon": "/wxcomponents/vant/dist/icon/index"
 				}
 			}
 		},
@@ -151,13 +151,7 @@
 			"path": "pages/maintainList/maintainList",
 			"style": {
 				"navigationBarTitleText": "电梯保养",
-				"enablePullDownRefresh":true,//开启下拉刷新
-				"onReachBottomDistance": 100,	
-				"usingComponents":{
-					"van-button": "/wxcomponents/vant/dist/button/index",
-					"van-tab": "/wxcomponents/vant/dist/tab/index",
-					"van-tabs": "/wxcomponents/vant/dist/tabs/index"
-				}
+				"enablePullDownRefresh":true
 			}
 		},
 		{
@@ -250,7 +244,7 @@
 	 	"color": "#7A7E83",
 	 	"selectedColor": "#4190F5",
 	 	"borderStyle": "white",
-	 	"backgroundColor": "#f8f8f8",
+	 	// "backgroundColor": "#f8f8f8",
 	 		"list": [{
 	 				"pagePath": "pages/index/index",
 	 				"iconPath": "static/icon/tabbar/home.png",

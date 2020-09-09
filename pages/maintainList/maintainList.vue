@@ -29,7 +29,7 @@
 					@scrolltolower="handleAddData(item.code)"
 				>
 					<!-- 空数据 -->
-					<Empty v-if="dataSource[item.key].length == 0" :title="'暂无' + item.label + '工单'" />
+					<Empty v-if="dataSource[item.key].dataSource.length == 0" :title="'暂无' + item.label + '工单'" />
 					<!-- 维保工单列表 -->
 					<RepairCard
 						v-for="record in dataSource[item.key].dataSource"
@@ -39,6 +39,7 @@
 						type="maint"
 						@click="handleLinkDetail(record.id)"
 					/>
+					<view style="height: 30rpx;"></view>
 				</scroll-view>
 			</swiper-item>
 		</swiper>
@@ -128,6 +129,9 @@
 		onPullDownRefresh() {
 			this.active = 0
 			this.handleAddData(this.activeType)
+			setTimeout(() => {
+				uni.stopPullDownRefresh()
+			}, 1000)
 		}
 	}
 </script>
@@ -140,7 +144,6 @@
 	}
 	.swiper-item{
 		height: 100%;
-		padding-bottom: 30rpx;
 		box-sizing: border-box;
 		background-color: #FFFFFF;
 	}
