@@ -1,34 +1,26 @@
 <template>
 	<view class="cptbox">
+		<Steps :steps="steps" :type="dataSource.basis.is_maintain" />
 		
-		<view class="buzcont">
-			<van-steps
-			  :steps="steps "
-			  :active="active"
-			  direction="horizontal "
-			  active-color="#4190F5"
-			/>
-		</view>
 		<view class="qdcont">
 			<view class="qdlist">
 				<view class="qdlettxt">
-					<image src="../../static/icon/tabbar/mine-active.png"></image>
-					<text>维保人员：{{datadel.basis.user_name || '--'}}</text>
+					<image src="../../static/icon/repair/people.png"></image>
+					<text>维保人员：{{dataSource.basis.user_name}}</text>
 				</view>
-				<!-- 	<view class="qdbtns" @click="onClickShow">签名</view> -->
-				<view class="qdbtns qdindes"  v-if="is_qanfal">已签到</view>
-				<view class="qdbtns " @click="qiandaobtn" v-if="!is_qanfal">签到</view>
+				<view class="qdbtns qdindes"  v-if="signed">已签到</view>
+				<view class="qdbtns " @click="qiandaobtn" v-if="!signed">签到</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
 					<image src="../../static/icon/repair/time.png"></image>
-					<text>维保时间：{{datadel.basis.maint_end_time || '处理中'}}</text>
+					<text>维保时间：{{dataSource.basis.maint_end_time}}</text>
 				</view>
 			</view>
 			<view class="qdlist topmar">
 				<view class="qdlettxt">
 					<image src="../../static/icon/repair/address.png"></image>
-					<text>所在小区：{{datadel.ele.village_name || '--'}}</text>
+					<text>所在小区：{{dataSource.ele.village_name}}</text>
 				</view>
 			</view>
 		</view>
@@ -39,127 +31,107 @@
 				<view class="rigtwbnum">（{{wblist.length}}）</view>
 			</view>
 			<view class="wblist">
-				<view class="wbnavcont" v-for="(item,index) of wblist" :key="item.name" @click="workOrderbtn(item.id)">
+				<view class="wbnavcont" v-for="(item,index) in wblist" :key="item.name" @click="workOrderbtn(item.id)">
 					<view class="wbname"  >{{item.name}}</view>
 					<view class="wbrightnum">
-						<view class="znum" >总数<text class="texcol1">{{item.num1}}</text></view>/
-						<view class="znum" >合格<text class="texcol2">{{item.num2}}</text></view>/
-						<view class="znum" >不合格<text class="texcol3">{{item.num3}}</text></view>
+						<view class="znum" >总数<text class="texcol1">{{quanbus[index]}}</text></view>/
+						<view class="znum" >合格<text class="texcol2">{{hegenum[index]}}</text></view>/
+						<view class="znum" >不合格<text class="texcol3">{{wxbnum[index]}}</text></view>
 						<van-icon name="arrow" />
 					</view>
 				</view>
 			</view>
 		</view>
 	
-	    <!-- <view class="tjbtns" @click="qdbtns">提交</view> -->
-		
-		<van-popup  :show="show" @close="onClickHide" >
-			<view class="wrapper">
-			  <view class="qrbtnqz">签字确认</view>
-			  <van-icon name="close" class="closebtns" @click="onClickHide" />
-			  <input type="text" placeholder="请输入备信息" v-model="marcont" class="bzcont" />
-			  <view class="qzban">
-				  	<canvas class="mycanvas" canvas-id="mycanvas" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend"></canvas>
-				  	
-				  	<view class="right" @click="clear">清除</view>
-			  </view>
-			  <view class="btncontqr" @click="finish">确认</view>
-			</view>
-		</van-popup>
-		
-		
-		
-		
-		
-		
+	  <SignInModal :visible="signInSuccess" @close="signInSuccess = false" />
 	</view>
 </template>
 
 <script>
 	var x = 20;
 	var y =20;
+	import Steps from '../../components/Steps/Steps.vue'
 	import request from '@/service/request.js'
+	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import SignInModal from '../../components/SignInModal/SignInModal.vue'
 	import app from '../../App.vue'
+	
 	export default {
-	  data() {
-	    return {
+		components: {
+			Steps,
+			CommonButton,
+			SignInModal
+		},
+	  data: () => ({
+			orderId: null,
 			quanbus:[],//全部
 			wxbnum:[],//不合格
 			hegenum:[],//合格
 			coniden:'',//签字人员：1安全人员；2维保员；3物业；（有参数signature_image，就必须有本参数）
 			dataid:'',//详情ID
-			marcont:'',//签字备注
-			ctx:'',         //绘图图像
-			points:[],       //路径点集合 
 			show:false,
 		  // 维保项目
-		  datadel:'',
-		  wblist:[   //项目列表
-		  			  // {name:'机房',znum:'103',hgnum:'100',nhgnum:'3' },
-		  		],
-			getList:[],
-		  is_qanfal:false,
-	      active: 0,
+		  dataSource: {},
+		  wblist:[],
+		  signed:false,
+			active: 0,
 		  steps: [
-		        {
-		          text: '待处理',
-		          desc: '04-11 15:11:23',
-		        },
-		        {
-		          text: '进行中',
-		          desc: '04-11 15:11:23',
-		        },
-		        {
-		          text: '已完成',
-		          desc: '04-11 15:11:23',
-		        },
-		       
-		      ],
-	    }
-	  
-	      
-		  
-	  },
-	  onLoad(cont) {
-		  let that = this;
-	 //  	that.ctx = uni.createCanvasContext("mycanvas",that);   //创建绘图对象
-	 //  	// 设置画笔样式
-	 //  	that.ctx.lineWidth = 4;
-	 //  	that.ctx.lineCap = "round"
-	 //  	that.ctx.lineJoin = "round"
-		// console.log(cont)
-		that.contdel(cont.id)
-		that.dataid=cont.id
-		console.log('text',cont.id)
-		//获取列表
-		that.getHuoquList(cont.id)
-		
-		that.falqiand(cont.id)
-	  },
-	  mounted() {
-	  	
-	  },
+				{
+					type: 1,
+					title: '待处理',
+					time: ''
+				},
+				{
+					type: 3,
+					title: '进行中',
+					time: ''
+				},
+				{
+					type: 2,
+					title: '已完成',
+					time: ''
+				}
+			]
+		}),
+		computed: {
+			
+		},
 	  methods:{
-		  // 维保项目
-		workOrderbtn(id){
-			uni.navigateTo({
-				url:'../workOrder/workOrder?id='+id+'&maint_id='+this.dataid
-			})
-		}, 
-		//提交
-		  qdbtns(){
-			  
+			// 请求详情信息
+			handleRequestDetailInfo: async function(id) {
+				var res = await request.post('/maint/maint_one', {id})
+				this.dataSource = res.data
+				// 更新时间
+				this.steps = this.steps.map(item => {
+					var t = res.data.log_time.find(i=>i.type == item.title)
+					if(t) item.time = t.time
+					return item
+				})
+			},
+		  // 判断是否签到
+		  confirmSingIn: async function(){
+				var _this_=this
+				var res = await request.post('/maint/verify_location',{ id:_this_.orderId, })
+				this.signed = Boolean(res.data.is_qan)
 		  },
+		  // 维保项目
+			workOrderbtn(id){
+				uni.navigateTo({
+					url:'../workOrder/workOrder?id='+id+'&maint_id='+this.dataid
+				})
+			}, 
+			//提交
+		  qdbtns(){},
 		  // 签到
 		  qiandaobtn(){
-			  var that=this
+			  var _this_=this
 			  request.post('/maint/sign_in',{
-			  	id:that.dataid,
+			  	id:_this_.dataid,
 			  	is_qan:1
 			  }).then((res) =>{
 			  	if(res.code == 1){
-					this.falqiand()
-					this.contdel(that.dataid)
+					this.confirmSingIn()
+					this.contdel(dataid)
 			  		uni.showToast({
 			  			title:'签到成功',
 						duration:1500
@@ -167,251 +139,94 @@
 			  	}
 			  })
 		  },
-		  // 判断是否签到
-		  falqiand(){
-			var that=this
-			request.post('/maint/verify_location',{
-				id:that.dataid,
-			}).then((res) =>{
-				if(res.code == 1){
-					console.log(res)
-					if( res.data.is_qan==1){
-						that.is_qanfal=true
-					}else{
-						that.is_qanfal=false
-					}
-				}
-			})  
-		  },
 	    // 项目列表
-		 async xmlist(id){
-			var that=this
-			let data = that.getList;
-					for(var i=0;i<data.length;i++){
-						
-						await request.post('/maint/main_xm',{
-							id:data[i].id,
-							maint_id:id,
-							type:0
-						}).then((res) =>{
-							if(res.code == 1){
-								console.log('1',res.data.length)
-								data[i]['num1'] = res.data.length
-							}
-						});
-						await request.post('/maint/main_xm',{
-							id:data[i].id,
-							maint_id:id,
-							type:1
-						}).then((res) =>{
-							if(res.code == 1){
-								console.log('2',res.data.length)
-								data[i]['num2'] = res.data.length
-							}
-						});
-					 	await request.post('/maint/main_xm',{
-							id:data[i].id,
-							maint_id:id,
-							type:2
-						}).then((res) =>{
-							if(res.code == 1){
-								console.log('3',res.data.length)
-								data[i]['num3'] = res.data.length
-							}
-						})
-						console.log(data[i])
-						
-					}
-					that.wblist=data
-					uni.hideLoading()
+			xmlist(id){
+				var _this_=this
+				request.post('/maint/xm_classify',{
+					id:id,
+					type:0
+				}).then((data) =>{
 					console.log(data)
-					
-
-		},
-		async getHuoquList(id){
-			let that = this
-			uni.showLoading({
-				title:'加载中...'
-			})
-			await request.post('/maint/xm_classify',{
-				id:id,
-				type:0
-			}).then((res) =>{
-				console.log('ddd',res)
-				that.getList = res.data
-				that.xmlist(id)
-			})
-		},
-		// 详情
-		contdel(id){
-			var that=this
-			this.steps=[]
-			request.post('/maint/maint_one',{
-				id:id
-			}).then((res) =>{
-				console.log(res)
-				if(res.code == 1){
-					that.datadel=res.data
-					that.coniden=res.data.basis.iden
-					for(var i=0;i<res.data.log_time.length;i++){
-						that.steps.push({text:res.data.log_time[i].time,desc:res.data.log_time[i].type})
-					}
-					
-					
-					for(var i=0;i<res.data.log_time.length;i++){
-						console.log(res.data.log_time[i].time)
-						if(res.data.log_time[i].time==''){
-							return that.active=i-1 
-						}
-					}
-					
-					
-					
-				}else{
-					uni.showToast({
-						title:res.message,
-						icon:"none"
-					})
-				}
-			})
-		},
-		  
-		//触摸开始，获取到起点
-		touchstart:function(e){
-			let startX = e.changedTouches[0].x;
-			let startY = e.changedTouches[0].y;
-			let startPoint = {X:startX,Y:startY};
-			this.points.push(startPoint);
-			//每次触摸开始，开启新的路径
-			this.ctx.beginPath();
-		},
-		
-		//触摸移动，获取到路径点
-		touchmove:function(e){
-			let moveX = e.changedTouches[0].x;
-			let moveY = e.changedTouches[0].y;
-			let movePoint = {X:moveX,Y:moveY};
-			this.points.push(movePoint);       //存点
-			let len = this.points.length;
-			if(len>=2){
-				this.draw();                   //绘制路径
-			}
-			
-		},
-		
-		// 触摸结束，将未绘制的点清空防止对后续路径产生干扰
-		touchend:function(){                   
-			this.points=[];
-		},
-		
-		/* ***********************************************
-		#   绘制笔迹
-		#	1.为保证笔迹实时显示，必须在移动的同时绘制笔迹
-		#	2.为保证笔迹连续，每次从路径集合中区两个点作为起点（moveTo）和终点(lineTo)
-		#	3.将上一次的终点作为下一次绘制的起点（即清除第一个点）
-		************************************************ */
-		draw: function() {
-			let point1 = this.points[0]
-			let point2 = this.points[1]
-			this.points.shift()
-			this.ctx.moveTo(point1.X, point1.Y)
-			this.ctx.lineTo(point2.X, point2.Y)
-			this.ctx.stroke()
-			this.ctx.draw(true)
-		},
-		
-		//清空画布
-		clear:function(){
-			let that = this;
-			uni.getSystemInfo({
-				success: function(res) {
-					let canvasw = res.windowWidth;
-					let canvash = res.windowHeight;
-					that.ctx.clearRect(0, 0, canvasw, canvash);
-					that.ctx.draw(true);
-				},
-			})
-		},
-		
-		//完成绘画并保存到本地
-		finish:function(){
-			var that=this
-			
-			uni.canvasToTempFilePath({
-			  canvasId: 'mycanvas',
-			  success: function(res) {
-				  console.log(res)
-			    let path = res.tempFilePath;
-				app.globalData.isHeader = true;
-				var token = uni.getStorageSync('token')
-				uni.uploadFile({
-				          url: 'https://wcs.xdiot.net/api/upload_file' , //仅为示例，非真实的接口地址
-				          filePath: path,
-				          name: "file",
-				          header: {
-				          "Content-Type": "multipart/form-data",
-						  "token": token,
-				          },
-				          formData: {
-							order_id:that.dataid,
-							file_type:'3',
-							file_belong:'2',
-							file:'file',
-				          },
-				          success: function (res) {
-				            var data = res.data
-							console.log(data)
-							var dataw=JSON.parse(data)
-				            console.log(dataw.data.length )
-							//发送请求
-							uni.request({
-								url: 'https://wcs.xdiot.net/api/maint/signature',
-								method: 'POST',
-								header: {
-									"token": token,
-									'Content-Type':'multipart/form-data',
-								},
-								data:{
-									id:that.dataid,
-									image:dataw.data[dataw.data.length-1].file_url,
-									type:that.coniden,
-									remark:that.marcont
-								},
-								success: res => {
-									console.log(res.data)
-									if(res.data.code==1){
-										that.clear()
-										that.show=false
-									}
-									
-								},
-								fail: (err) => {
-								}
-							});
+					if(data.code == 1){
+						
+						for(var i=0;i<data.data.length;i++){
 							
-				          }
-				        })
-				
-				
-				
-				
-				
-				// uni.saveImageToPhotosAlbum({
-				// 	filePath:path,
-				// })
-			  } 
-			})
-		},
-				
-				
-		   onClickShow() {
-			  
-		      this.show=true;
-		    },
-			onClickHide() {
-			    this.show=false;
+							request.post('/maint/main_xm',{
+								id:data.data[i].id,
+								maint_id:id,
+								type:0
+							}).then((res) =>{
+								if(res.code == 1){
+									_this_.quanbus.push(res.data.length)
+								}
+							})
+							request.post('/maint/main_xm',{
+								id:data.data[i].id,
+								maint_id:id,
+								type:1
+							}).then((res) =>{
+								if(res.code == 1){
+									_this_.wxbnum.push(res.data.length)
+								}
+							})
+							request.post('/maint/main_xm',{
+								id:data.data[i].id,
+								maint_id:id,
+								type:2
+							}).then((res) =>{
+								if(res.code == 1){
+									_this_.hegenum.push(res.data.length)
+								}
+							})
+							
+						}
+						_this_.wblist=data.data
+						console.log(_this_.quanbus)
+						
+					}else{
+						uni.showToast({
+							title:res.message,
+							icon:"none"
+						})
+					}
+				})
 			},
-
+			// 详情
+			contdel(id){
+				var _this_=this
+				// this.steps=[]
+				request.post('/maint/maint_one',{
+					id:id
+				}).then((res) =>{
+					console.log(res)
+					if(res.code == 1){
+						_this_.dataSource=res.data
+						_this_.coniden=res.data.basis.iden
+						// for(var i=0;i<res.data.log_time.length;i++){
+						// 	_this_.steps.push({text:res.data.log_time[i].time,desc:res.data.log_time[i].type})
+						// }
+						
+						for(var i=0;i<res.data.log_time.length;i++){
+							console.log(res.data.log_time[i].time)
+							if(res.data.log_time[i].time==''){
+								return _this_.active=i-1 
+							}
+						}
+						
+					}else{
+						uni.showToast({
+							title:res.message,
+							icon:"none"
+						})
+					}
+				})
+			},
+	  },
+	  onLoad: async function(option) {
+			var { id } = option
+			this.orderId = id
+			await this.handleRequestDetailInfo(id)
+			await this.confirmSingIn(id)
 	  }
 	}
 </script>

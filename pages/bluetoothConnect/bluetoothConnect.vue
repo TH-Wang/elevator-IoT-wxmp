@@ -35,7 +35,11 @@
 					{{connectingId == device.deviceId ? '连接中...' : '连接'}}
 				</view>
 				<!-- 已连接设备 -->
-				<view v-if="deviceConnectId == device.deviceId" class="bt-close-button">断开</view>
+				<view
+					v-if="deviceConnectId == device.deviceId"
+					class="bt-close-button"
+					@click="handleBreakConnect"
+				>断开</view>
 				<view
 					v-if="deviceConnectId == device.deviceId"
 					class="bt-bind-button"
@@ -226,7 +230,19 @@
 					}
 				})
 			},
-			// 监听characteristic变化
+			// 断开连接
+			handleBreakConnect() {
+				var _this_ = this
+				uni.closeBLEConnection({
+					deviceId: _this_.deviceId,
+					success() {
+						uni.showToast({
+							title: '蓝牙已断开',
+							icon: 'none'
+						})
+					}
+				})
+			},
 			
 			// 转16进制
 			toHEX(value) {

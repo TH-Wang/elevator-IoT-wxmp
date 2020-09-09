@@ -126,7 +126,12 @@
 			}
 		},
 		onLoad() {
-			// this.videoContext = uni.createVideoContext('video')
+			uni.switchTab({
+				url: '/pages/mine/mine',
+				success(res) {
+					console.log(res)
+				}
+			})
 		}
 	}
 </script>

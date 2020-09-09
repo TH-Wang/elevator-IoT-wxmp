@@ -601,9 +601,10 @@
 	.menu-cs-list4-li{
 		padding: 20rpx 20rpx 20rpx 60rpx;
 		box-sizing: border-box;
-		display: flex;
+		border-bottom: 2rpx solid #eee;
+		/* display: flex;
 		justify-content: space-between;
-		align-items: center;
+		align-items: center; */
 	}
 	.menu-cs-list4-li-title{
 		flex: 1;
@@ -746,4 +747,22 @@
 		justify-content: space-between;
 		align-items: center;
 		flex-wrap: wrap;
+	}
+	
+	/* 补充 */
+	.menu-cs-list4-li-title{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.menu-cs-list5-li-title{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20rpx 20rpx 20rpx 80rpx;
+		box-sizing: border-box;
+		border-bottom: 2rpx solid #eee;
+	}
+	.menu-cs-list5{
+		
 	}

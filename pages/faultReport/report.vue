@@ -172,7 +172,7 @@
 				var data = {
 					ele_id: _this_.liftId,
 					security_level: _this_.safePickerIndex,
-					faultl_attr: _this_.propRange[_this_.porpPickerIndex],
+					fault_attr: _this_.propRange[_this_.porpPickerIndex],
 					is_tiring: _this_.trappedPickerIndex,
 					describe: _this_.describe
 				}

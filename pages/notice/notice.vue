@@ -20,7 +20,7 @@
 <script>
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Empty from '../../components/Empty/Empty.vue'
-	// import noticeData from '../../data/notice.js'
+	import noticeData from '../../data/notice.js'
 	import request from '../../service/request.js'
 	
 	export default {
@@ -34,7 +34,7 @@
 			}
 		},
 		data: () => ({
-			dataSource: []
+			dataSource: noticeData
 		}),
 		methods: {
 			handleLinkDetail(id) {
@@ -43,12 +43,12 @@
 			}
 		},
 		onLoad: async function() {
-			var res = await request.post('/jobs/lists', {
-				limit: 10,
-				page: 1,
-				type: 0
-			})
-			this.dataSource = res.data
+			// var res = await request.post('/jobs/lists', {
+			// 	limit: 10,
+			// 	page: 1,
+			// 	type: 0
+			// })
+			// this.dataSource = res.data
 		}
 	}
 </script>

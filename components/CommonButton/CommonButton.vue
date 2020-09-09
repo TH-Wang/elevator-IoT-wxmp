@@ -1,5 +1,9 @@
 <template>
-	<view class="button" @click="$emit('click')">
+	<view
+		:class="viewClass"
+		:style="margin ? 'margin: 80rpx auto 30rpx auto;' : ''"
+		@click="$emit('click')"
+	>
 		{{text}}
 	</view>
 </template>
@@ -10,6 +14,19 @@
 			text: {
 				type: String,
 				default: '常用按钮'
+			},
+			size: {
+				type: String,
+				default: 'default'
+			},
+			margin: {
+				type: Boolean,
+				default: true
+			}
+		},
+		computed: {
+			viewClass() {
+				return 'button ' + 'button-' + this.size
 			}
 		}
 	}
@@ -17,14 +34,22 @@
 
 <style scoped>
 	.button{
-		margin: 80rpx auto 30rpx auto;
-		width: 530rpx;
-		height: 80rpx;
-		line-height: 80rpx;
 		border-radius: 5px;
 		text-align: center;
 		background-color: #4190F5;
-		font-size: 32rpx;
 		color: #FFFFFF;
+	}
+	
+	.button-default{
+		width: 530rpx;
+		height: 80rpx;
+		line-height: 80rpx;
+		font-size: 32rpx;
+	}
+	.button-small{
+		width: 320rpx;
+		height: 70rpx;
+		line-height: 70rpx;
+		font-size: 24rpx;
 	}
 </style>

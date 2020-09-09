@@ -1,277 +1,147 @@
 <template>
 	<view class="main">
-		<view class="main-list-tab" :class="float?'topPost':''">
-			<van-tabs :active="active" color="#4190F5" @click="onChange">
-				<van-tab title="待处理" :name="1"></van-tab>
-				<van-tab title="进行中" :name="3"></van-tab>
-				<van-tab title="已完成" :name="2"></van-tab>
-				<van-tab title="全部" :name="0"></van-tab>
-			</van-tabs>
-		</view>
-		<view class="main-list" v-if="list.length > 0">
-			<navigator v-for="(item,index) in list" :key="index" :url="'/pages/workdel/workdel?id='+item.id">
-				<view class="main-list-li">
-					<view class="main-list-li-ttle">
-						<view class="main-list-li-ttle-name">{{ item.ele_name }}</view>
-						<view class="main-list-li-ttle-time">{{ item.maint_time }}</view>
-					</view>
-					<view class="main-list-li-num">
-						电梯编号: {{ item.elevator_number }} <text v-if="item.register_code">【{{ item.register_code }}】</text>
-					</view>
-					<view class="main-list-li-fot">
-						<view class="main-list-li-fot-addres">
-							{{ item.address }}
-						</view>
-						<view class="main-list-li-fot-btn">
-							<text class="main-list-li-fot-btn-d" v-if="item.is_maintain==1">待处理</text>
-							<text class="main-list-li-fot-btn-z" v-if="item.is_maintain==3">进行中</text>
-							<text class="main-list-li-fot-btn-w" v-if="item.is_maintain==2">已完成</text>
-						</view>
-					</view>
-				</view>
-			</navigator>
-			<!-- 加载中/没有更多数据 -->
-			<uni-load-more iconType="snow" :iconSize="14" :status="status" />
-		</view>
-		<!-- 没有数据 -->
-		<view class="null" v-else>
-			<Null :title="title"></Null>
-		</view>
+		<!-- 搜索框 -->
+		<Search button />
+		
+		<!-- 分类导航栏 -->
+		<Tabs
+			:tabs="tabs"
+			:active="active"
+			@switch="handleSwitchTab"
+		/>
+		
+		<!-- 列表 -->
+		<swiper
+			:current="active"
+			class="page-list-container"
+			:duration="300"
+			@change="handleSwiperChange"
+		>
+			<swiper-item
+				class="swiper-item"
+				v-for="item in maintType"
+				:key="item.code"
+			>
+				<scroll-view
+					scroll-y="true"
+					style="height: 100%;"
+					lower-threshold="100"
+					@scrolltolower="handleAddData(item.code)"
+				>
+					<!-- 空数据 -->
+					<Empty v-if="dataSource[item.key].length == 0" :title="'暂无' + item.label + '工单'" />
+					<!-- 维保工单列表 -->
+					<RepairCard
+						v-for="record in dataSource[item.key].dataSource"
+						:key="record.id"
+						:record="record"
+						hasButton
+						type="maint"
+						@click="handleLinkDetail(record.id)"
+					/>
+				</scroll-view>
+			</swiper-item>
+		</swiper>
 	</view>
 </template>
 
 <script>
-	import Null from '@/components/uni-null/uni-null.vue'
-	import uniLoadMore from "@/components/uni-load-more/uni-load-more.vue"
-	import request from '@/service/request.js'
+	import TabbarPage from '../../components/TabbarPage/TabbarPage.vue'
+	import Tabs from '../../components/Tabs/Tabs.vue'
+	import Search from '../../components/Search/Search.vue'
+	import RepairCard from '../../components/RepairCard/RepairCard.vue'
+	import Empty from '../../components/Empty/Empty.vue'
+	import repairData from '../../data/repair.js'
+	import request from '../../service/request.js'
+	
 	export default {
 		components:{
-			Null,uniLoadMore
+			TabbarPage,
+			Tabs,
+			Search,
+			RepairCard,
+			Empty
 		},
 		data() {
 			return {
-				type: 1,
-				page: 1,
-				size: 10,
-				isMore: true, //是否可以可以上拉
-				status: 'more',
-				active: 1,
-				float: false,
-				title: '暂无数据',
-				list: [
-					// {
-					// 	title: '这是电梯名称',
-					// 	time: '2020-11-11',
-					// 	num: '23000300',
-					// 	addres: '重庆市九龙坡区歇台子渝州路126号',
-					// 	studes: '1'
-					// }
+				active: 0,
+				maintType: [
+					{
+						code: 1,
+						label: '待处理',
+						key: 'pending'
+					}, 
+					{
+						code: 3,
+						label: '进行中',
+						key: 'doing'
+					}, {
+						code: 2,
+						label: '已完成',
+						key: 'finish'
+					}, {
+						code: 0,
+						label: '全部',
+						key: 'all'
+					}
 				],
-				contentText: {
-				    contentdown: '上拉加载更多',
-				    contentrefresh: '加载中',
-				    contentnomore: '没有更多'
-				}
 			}
 		},
-		onLoad(){
-			let that = this;
-			that.getList(that.type,1);
+		computed: {
+			tabs() {
+				return this.maintType.map(i=>i.label)
+			},
+			dataSource() {
+				return this.$store.state.maint
+			},
+			activeType() {
+				return this.maintType[this.active].code
+			}
 		},
 		methods: {
-			onChange(event) {
-				let that = this,
-				 id = event.detail.name;
-				that.type = id;
-				that.page = 1;
-				that.isMore = true;
-				that.status = 'more';
-				// 切换tab设置页面返回顶部
-				uni.pageScrollTo({ 
-				　　scrollTop: 0, duration: 300 
-				}); 
-				that.getList(id,that.page,0);
+			handleSwitchTab(idx) {
+				this.active = idx
 			},
-			getList(type,page,isla){
-				//type 数据类型
-				//page 页数
-				//isla 0正常加载 1下拉刷新 2上拉加载
-				let that = this;
-				let data = {
-					type: type,
-					page: page,
-					limit: that.size
-				};
-				request.post('/maint/main_order',data).then((res) =>{
-					if(res.code == 1){
-						if(res.data.length < 10){
-							that.isMore = false;
-							that.status = 'noMore'
-						}
-						console.log(that.isMore)
-						if(isla == 0){
-							that.list = [];
-							that.list = res.data;
-						}else if(isla == 1){
-							that.list = [];
-							that.list = res.data;
-							uni.stopPullDownRefresh();
-						}else{
-							that.list = that.list.concat(res.data)
-						}
-					}else{
-						uni.showToast({
-							title:res.message,
-							icon:"none"
-						})
-					}
+			handleSwiperChange(e) {
+				this.active = e.detail.current
+			},
+			handleAddData: function(type) {
+				this.$store.dispatch('requestMaintList', { type })
+			},
+			handleLinkDetail(id) {
+				uni.navigateTo({
+					url: '/pages/workdel/workdel?id=' + id
 				})
 			}
 		},
-		onPullDownRefresh(){
-			let that = this;
-			that.page = 1;
-			that.isMore = true;
-			that.status = 'loading';
-			that.getList(that.type,that.page,1);
-		},
-		onReachBottom(){
-			let that = this;
-			if(that.isMore == true){
-				let pageNumber = that.page + 1;
-				that.status = 'loading';
-				that.page = pageNumber;
-				console.log(pageNumber)
-				that.getList(that.type,pageNumber,2)
+		watch: {
+			active: function(newValue, oldValue) {
+				var key = this.maintType[newValue].key
+				if(this.$store.state.maint[key].dataSource.length == 0) {
+					this.handleAddData(this.activeType)
+				}
 			}
 		},
-		/**
-		 * 屏幕滚动监听
-		 */
-		onPageScroll(event) {
-			let that = this;
-			if (event.scrollTop > 44 && !that.float) {
-				that.float = true; 
-			} else if (event.scrollTop < 5 && that.float) {
-				that.float = false; 
-			}
+		onLoad: function(){
+			this.handleAddData(this.activeType)
 		},
+		onPullDownRefresh() {
+			this.active = 0
+			this.handleAddData(this.activeType)
+		}
 	}
 </script>
 
 <style scoped>
-	.main{
-		min-height: 100vh;
-	}
-	/** 动画 */
-	@keyframes show {
-		0% {
-			transform: translateY(-100%);
-			opacity: 0.5;
-		}
-
-		100% {
-			transform: translateY(0);
-			opacity: 1;
-		}
-	}
-
-	.topPost {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		animation: show 0.3s;
-	}
-
-	.main-list {
-		padding: 0rpx 30rpx 30rpx;
+	.page-list-container{
+		height: calc(100vh - 200rpx);
+		padding-top: 1px;
 		box-sizing: border-box;
-		background-color: #fff;
 	}
-
-	.main-list-li {
-		padding: 30rpx;
+	.swiper-item{
+		height: 100%;
+		padding-bottom: 30rpx;
 		box-sizing: border-box;
-		background-color: #FFF9F4;
-		border-radius: 8rpx;
-		margin-top: 30rpx;
-	}
-
-/* 	.main-list-li:first-of-type {
-		margin-top: 0rpx;
-	} */
-
-	.main-list-li-ttle {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.main-list-li-ttle-name {
-		flex: 1;
-		font-size: 28rpx;
-		font-weight: bolder;
-		color: #333;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.main-list-li-ttle-time {
-		font-size: 24rpx;
-		color: #999;
-		margin-left: 40rpx;
-	}
-
-	.main-list-li-num {
-		font-size: 28rpx;
-		color: #666;
-		margin-top: 20rpx;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.main-list-li-fot {
-		margin-top: 20rpx;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.main-list-li-fot-addres {
-		flex: 1;
-		font-size: 28rpx;
-		color: #333;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.main-list-li-fot-btn {
-		margin-left: 40rpx;
-	}
-
-	.main-list-li-fot-btn text {
-		font-size: 22rpx;
-		padding: 6rpx 18rpx;
-		box-sizing: border-box;
-		border-radius: 40rpx;
-	}
-
-	.main-list-li-fot-btn-d {
-		background-color: #4190F5;
-		color: #fff;
-	}
-
-	.main-list-li-fot-btn-z {
-		background-color: #4190F5;
-		color: #FD9026;
-	}
-
-	.main-list-li-fot-btn-w {
-		background-color: #eeeeee;
-		color: #999;
+		background-color: #FFFFFF;
 	}
 </style>

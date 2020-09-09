@@ -332,13 +332,26 @@
 										</view>
 									</view>
 									<view class="menu-cs-list4" v-if="item.argu_value == '' && twoIdLi == item.id">
-										<view class="menu-cs-list4-li" v-for="(j,index) in dtCsArrListTwo" :key="j.id">
-											<view class="menu-cs-list4-li-title">
-												{{ j.argu_name }}
+										<view class="menu-cs-list4-li " v-for="(j,index) in dtCsArrListTwo" :key="j.id">
+											<view class="menu-cs-list4-li-title" @click="getDtXjThreeTap(j.id,j.elevator_number,j.s_id,j.is_node)">
+												<view class="menu-cs-list4-li-title">
+													{{ j.argu_name }}
+												</view>
+												<view class="menu-cs-list-tile-right">
+													<image :class="threeCs == item.id?'xz':''" src="../../static/image/wxj/up.png" mode=""></image>
+												</view>
 											</view>
-											<view class="menu-cs-list4-li-btn">
-												<view class="menu-cs-list4-li-btn-num">{{ j.argu_value || 0}}</view>
-												<view class="menu-cs-list4-li-btn-text">下达</view>
+											
+											<view class="menu-cs-list5" v-if="j.is_node == 1 && threeCs == j.id">
+												<view class="menu-cs-list5-li-title" v-for="(k,index) in dtCsArrListThree" :key="k.argu_name">
+													<view class="menu-cs-list4-li-title">
+														{{ k.argu_name }}
+													</view>
+													<view class="menu-cs-list4-li-btn">
+														<view class="menu-cs-list4-li-btn-num">{{ k.argu_value || 0}}</view>
+														<view class="menu-cs-list4-li-btn-text">下达</view>
+													</view>
+												</view>
 											</view>
 										</view>
 									</view>
@@ -437,6 +450,8 @@
 		},
 		data() {
 			return {
+				// 三级参数
+				threeCs: 0,
 				// 参数获取时间
 				newTime: '未知',
 				//故障
@@ -562,6 +577,8 @@
 				dtCsArrList:[],
 				//二级电梯参数列表
 				dtCsArrListTwo:[],
+				//三级电梯参数列表
+				dtCsArrListThree:[],
 				//电梯参数故障记录
 				gzArrList: [],
 				// 维保记录
@@ -679,6 +696,23 @@
 					}
 				}
 			},
+			// 电梯参数第三级数据
+			getDtXjThreeTap: function(a,b,c,d){
+				let that = this
+				if(d==1){
+					if(that.threeCs == a){
+						that.threeCs = 0
+					}else{
+						that.threeCs = a;
+						that.getDtXjThree(b,c)
+					}
+				}else{
+					uni.showToast({
+						title:'没有下级数据',
+						icon: 'none'
+					})
+				}
+			},
 			openTapBar() {
 				let that = this;
 				that.isBar = true;
@@ -749,13 +783,16 @@
 			//获取电梯故障记录
 			getGzArr(dtId,isSla){
 				let that = this;
+				uni.showLoading({
+					title: '加载中...'
+				})
 				let data = {
 					elevator_id: dtId,
 					limit: that.size,
 					page: that.gzPage
 				};
 				request.post('/maint/fault_info',data).then((res) => {
-					console.log(res)
+					uni.hideLoading()
 					if(res.code == 1){
 						if(res.data.length < 10){
 							that.gzIsMore = false;
@@ -773,13 +810,16 @@
 			// 获取维保记录
 			getWbArr(dtId,isSla){
 				let that = this;
+				uni.showLoading({
+					title: '加载中...'
+				})
 				let data = {
 					elevator_id: dtId,
 					limit: that.size,
 					page: that.wbPage
 				};
 				request.post('/maint/maint_info',data).then((res) => {
-					console.log('1',res)
+					uni.hideLoading()
 					if(res.code == 1){
 						if(res.data.length < 10){
 							that.wbIsMore = false;
@@ -797,11 +837,14 @@
 			// 累计运行统计
 			getLjTj(){
 				let that = this;
+				uni.showLoading({
+					title: '加载中...'
+				})
 				let data ={
 					code: that.dtBhNum
 				};
 				request.post('/lift/get_run',data).then((res) =>{
-					console.log(res)
+					uni.hideLoading()
 					if(res.code == 1){
 						that.yxTowJson = res.data
 					}
@@ -810,12 +853,15 @@
 			//获取电梯详情/lift/one_info
 			getDtInfo(){
 				let that = this;
+				uni.showLoading({
+					title: '加载中...'
+				})
 				let data = {
 					elevator_id: that.dtId,
 					is_archives: 1
 				};
 				request.post('/lift/one_info',data).then((res) => {
-					console.log(res)
+					uni.hideLoading()
 					if(res.code == 1){
 						that.dtInfo = res.data
 					}
@@ -824,27 +870,51 @@
 			// 获取电梯参数
 			getDtCs(){
 				let that = this;
+				uni.showLoading({
+					title: '加载中...'
+				})
 				let data = {
 					code: that.dtBhNum
 				};
 				request.post('/Com/parameter',data).then((res) =>{
-					console.log(res)
+					uni.hideLoading()
 					if(res.code == 1){
 						that.newTime = res.data.time;
 						that.dtCsArrList = res.data.array;
 					}
 				})
 			},
-			// 获取电梯下级参数
+			// 获取电梯二级参数
 			getDtXjcs(isd){
 				let that = this;
+				uni.showLoading({
+					title: '加载中...'
+				})
 				let data = {
 					code: that.dtBhNum,
 					id: isd
 				};
 				request.post('/Com/child_parameter',data).then((res)=>{
+					uni.hideLoading()
 					if(res.code == 1){
 						that.dtCsArrListTwo = res.data
+					}
+				})
+			},
+			// 获取第三级电梯参数
+			getDtXjThree(code,id){
+				let that = this;
+				uni.showLoading({
+					title: '加载中...'
+				})
+				let data = {
+					code: code,
+					id: id
+				};
+				request.post('/Com/child_parameter',data).then((res)=>{
+					uni.hideLoading()
+					if(res.code == 1){
+						that.dtCsArrListThree = res.data
 					}
 				})
 			},

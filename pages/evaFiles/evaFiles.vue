@@ -38,11 +38,11 @@
 					</view>
 					
 					<view class="info ellipsis">电梯编号：{{item.elevator_number}}</view>
-					<view class="info ellipsis">使用单位：{{item.company}}</view>
+					<view class="info ellipsis">使用单位：{{item.company_name ? item.company_name : ''}}</view>
 					<view class="info ellipsis">
-						维保人员：{{item.people}}
+						维保人员：{{item.realname}}
 						<text class="point">·</text>
-						{{item.tel}}
+						{{item.phone}}
 					</view>
 					<view class="info ellipsis">电梯地址：{{item.address}}</view>
 				</view>

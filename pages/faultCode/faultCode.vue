@@ -21,6 +21,9 @@
 					/>
 				</van-dropdown-menu>
 			</view>
+			<view class="total">
+				共找到 <text style="color:#4190F5">{{total}}条</text> 数据
+			</view>
 		</view>
 		
 		<!-- 列表 -->
@@ -29,7 +32,7 @@
 				<view class="title">
 					<text>{{item.e_code}}</text>
 					<text class="point">·</text>
-					<text>故障类型</text>
+					<text>{{faultOptions[faultValue].text}}</text>
 				</view>
 				<view class="list-info">电梯型号：{{eleOptions[eleValue].text}}</view>
 				<view class="list-info">故障描述：{{item.fault}}</view>
@@ -51,17 +54,13 @@
 			Empty
 		},
 		data: () => ({
-			faultOptions: [
-				{text: '人为造成', value: 0},
-				{text: '硬件老化', value: 1},
-				{text: '其他', value: 2}
-			],
-			faultValue: 0,
-			faultData: [],
+			faultOptions: [],
+			faultValue: null,
 			eleOptions: [],
-			eleValue: 0,
+			eleValue: null,
 			isEmpty: false,
-			dataSource: []
+			dataSource: [],
+			total: 0
 		}),
 		computed: {
 			showDataList() {
@@ -87,23 +86,34 @@
 			// 设置电梯型号选项
 			var eleList = eleRes.data.map((item, index) => ({
 				text: item.model_name,
-				value: item.model_id
+				value: index,
+				devices_id: item.model_id
 			}))
-			this.eleValue = eleList[0].value
+			this.eleOptions = eleList
+			this.eleValue = 0
 		},
 		watch: {
 			eleValue: async function (newValue, oldValue) {
-				// 故障类型
-				var faultRes = await request.post('/maint/fault_code', {
-					devices_id: newValue,
-				})
-				var faultList = faultRes.data.map((el, index) => ({
-					text: el.fault_id,
-					value: index
-				}))
-				this.faultValue = 0
-				this.faultOptions = faultList
-				this.dataSource = faultRes.data
+				try{
+					var _this_ = this
+					// 请求故障类型
+					var faultRes = await request.post('/maint/fault_code', {
+						devices_id: _this_.eleOptions[newValue].devices_id,
+					})
+					// 故障类型下拉选项
+					this.faultOptions = faultRes.data.map((el, index) => ({
+						text: el.fault_id,
+						value: index
+					}))
+					this.faultValue = 0
+					this.dataSource = faultRes.data
+				}catch(err){
+					console.log(err)
+				}
+			},
+			faultValue: function(newValue, oldValue) {
+				// 总共多少条数据
+				this.total = this.dataSource[newValue].child.length
 			}
 		}
 	}
@@ -123,11 +133,18 @@
 		top: 0;
 		left: 0;
 		background-color: #FFFFFF;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 	.dropdown-container{
 		width: 50%;
 		font-size: 24rpx;
 		color: #000000;
+	}
+	.total{
+		font-size: 24rpx;
+		color: #999999;
 	}
 	
 	.list-container{

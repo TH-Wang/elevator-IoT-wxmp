@@ -151,7 +151,6 @@
 					var res = await request.bind(this.form)
 					console.log(res)
 					
-					if(res.code)
 					if(res.code == -1) {
 						this.feedback = {
 							visible: false
@@ -167,7 +166,7 @@
 					}
 					else {
 						this.feedback = {
-							visible: false,
+							visible: true,
 							title: '登录失败',
 							mode: 'error',
 							tip: res.msg

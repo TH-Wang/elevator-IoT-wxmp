@@ -5,8 +5,8 @@
 			<!-- 故障属性选择器 -->
 				<view class="form-item">
 					<view class="label">故障属性</view>
-					<picker class="picker" :value="porpPickerIndex" :range="propRange" @change="handlePropPickerChange">
-						<text class="pickered-text">{{propRange[porpPickerIndex]}}</text>
+					<picker class="picker" :value="propPickerIndex" :range="propRange" @change="handlePropPickerChange">
+						<text class="pickered-text">{{propRange[propPickerIndex]}}</text>
 						<image class="picker-icon" src="../../static/icon/right.png" />
 					</picker>
 				</view>
@@ -14,8 +14,8 @@
 				<!-- 配件更换选择器 -->
 				<view class="form-item">
 					<view class="label">配件更换</view>
-					<picker class="picker" :value="safePickerIndex" :range="safeRange" @change="handleSafePickerChange">
-						<text class="pickered-text">{{safeRange[safePickerIndex]}}</text>
+					<picker class="picker" :value="replacePickerIndex" :range="replaceRange" @change="handleSafePickerChange">
+						<text class="pickered-text">{{replaceRange[replacePickerIndex]}}</text>
 						<image class="picker-icon" src="../../static/icon/right.png" />
 					</picker>
 				</view>
@@ -23,8 +23,8 @@
 				<!-- 急修建议选择器 -->
 				<view class="form-item">
 					<view class="label">急修建议</view>
-					<picker class="picker" :value="trappedPickerIndex" :range="trappedRange" @change="handleTrappedPickerChange">
-						<text class="pickered-text">{{trappedRange[trappedPickerIndex]}}</text>
+					<picker class="picker" :value="proposePickerIndex" :range="proposeRange" @change="handleTrappedPickerChange">
+						<text class="pickered-text">{{proposeRange[proposePickerIndex]}}</text>
 						<image class="picker-icon" src="../../static/icon/right.png" />
 					</picker>
 				</view>
@@ -45,12 +45,12 @@
 				<view
 					class="image-container"
 					v-for="(video, idx) in videoList"
-					:key="video"
+					:key="video.id"
 					@click="handlePreviewVideo($event, idx)"
 				>
 					<video
-						:id="video"
-						:src="video"
+						:id="video.file_url"
+						:src="'http://' + video.file_url"
 						:controls="videoControl[idx]"
 						:show-center-play-btn="false"
 						@fullscreenchange="handleVideoScreenChange($event, idx)"
@@ -73,15 +73,15 @@
 		
 		<!-- 图片 -->
 		<view class="upload-container">
-			<view class="label" style="margin-right: 30rpx;">视频</view>
+			<view class="label" style="margin-right: 30rpx;">图片</view>
 			<view class="box">
 				<view
 					class="image-container"
 					v-for="(img, idx) in imageList"
-					:key="img"
+					:key="img.id"
 					@click="handlePreview(idx)"
 				>
-					<image class="preview-image" :src="img" mode="aspectFill"></image>
+					<image class="preview-image" :src="'http://' + img.file_url" mode="aspectFill"></image>
 					<image
 						class="remove-button"
 						src="../../static/icon/remove.png"
@@ -95,35 +95,58 @@
 		</view>
 		
 		<!-- 签字确认 -->
-		<view class="picker-container">
-			<view class="text-container">
-				<view class="form-item">
-					<view class="label">签字确认</view>
-				</view>
-				<view class="sing-confirm"></view>
-			</view>
+		<view class="sign-container">
+			<view class="sign-label">签字</view>
+			<SignBoard v-if="waitSign" ref="sign" />
+			<image v-else class="sign-success-image" :src="signImage" mode="scaleToFill" />
 		</view>
 		
 		<!-- 提交按钮 -->
-		<CommonButton text="确认提交" />
+		<CommonButton text="确认提交" @click="handleSubmit" />
 		
+		<!-- 安全人员签字板弹窗 -->
+		<SignBoardModal
+			title="安全人员签字"
+			:visible="safeSignVisible"
+			:showCancel="true"
+			@close="safeSignVisible = false"
+			@save="handleSafeSignFile"
+			@cancel="handleSafeCancel"
+		/>
+		
+		<!-- 物业人员签字板 -->
+		<SignBoardModal
+			title="物业人员签字"
+			:visible="properSignVisible"
+			:showCancel="true"
+			@close="properSignVisible = false"
+			@save="handleProperSignFile"
+			@cancel="handleProperCancel"
+		/>
 	</view>
 </template>
 
 <script>
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
+	import SignBoard from '../../components/SignBoard/SignBoard.vue'
+	import SignBoardModal from '../../components/SignBoardModal/SignBoardModal.vue'
+	import request from '../../service/request.js'
+	import isEmpty from '../../utils/isEmpty.js'
 	
 	export default {
 		components: {
-			CommonButton
+			CommonButton,
+			SignBoard,
+			SignBoardModal
 		},
 		data: () => ({
-			propRange: [],
-			porpPickerIndex: 0,
-			safeRange: ['一级', '二级', '三级', '四级', '五级'],
-			safePickerIndex: 0,
-			trappedRange: ['是', '否'],
-			trappedPickerIndex: 0,
+			orderId: null,
+			attrs: [],
+			propPickerIndex: 0,
+			replaceRange: ['未更换', '更换'],
+			replacePickerIndex: 0,
+			proposeRange: ['停梯', '运行'],
+			proposePickerIndex: 0,
 			describe: '',
 			// 选择图片列表
 			imageList: [],
@@ -132,16 +155,80 @@
 			// 视频实例
 			videoContext: [],
 			// 视频空间是否显示
-			videoControl: []
+			videoControl: [],
+			// 等待签字
+			waitSign: true,
+			// 签字图片
+			signImage: null,
+			// 签字弹窗
+			safeSignVisible: false,
+			properSignVisible: false
 		}),
+		computed: {
+			propRange() {
+				return this.attrs.map(i=>i.name)
+			},
+			propId() {
+				return this.attrs.map(i=>i.id)
+			}
+		},
 		methods: {
+			// 选择故障属性
+			handlePropPickerChange(e) {
+				this.propPickerIndex = e.target.value
+			},
+			// 选择是否更换配件
+			handleSafePickerChange(e) {
+				this.replacePickerIndex = e.target.value
+			},
+			// 选择急修建议
+			handleTrappedPickerChange(e) {
+				this.proposePickerIndex = e.target.value
+			},
 			// 选择图片
 			handleChooseImage() {
 				var _this_ = this
 				uni.chooseImage({
 					count: 1,
 					success(res) {
-						_this_.imageList.push(res.tempFilePaths[0])
+						var filePath = res.tempFilePaths[0]
+						uni.showLoading({title: '正在上传...'})
+						// 上传
+						uni.uploadFile({
+							url: `${_this_.$store.state.request.url}/api/upload_file`,
+							filePath: res.tempFilePaths[0],
+							name: 'file',
+							header: {
+								"token": uni.getStorageSync('token')
+							},
+							formData: {
+								order_id: _this_.orderId,
+								file_type: 3,
+								file_belong: 1
+							},
+							success(res) {
+								var result = JSON.parse(res.data)
+								console.log(result)
+								if(result.code == 1) {
+									_this_.imageList = result.data
+								}
+								else {
+									uni.showModal({
+										title: '上传失败，请稍后重试',
+										showCancel: false
+									})
+								}
+							},
+							fail(err) {
+								uni.showModal({
+									title: '上传失败，请稍后重试',
+									showCancel: false
+								})
+							},
+							complete() {
+								uni.hideLoading()
+							}
+						})
 					}
 				})
 			},
@@ -150,11 +237,13 @@
 				var _this_ = this
 				uni.previewImage({
 					current: idx,
-					urls: _this_.imageList
+					urls: _this_.imageList.map(i=>`http://${i.file_url}`)
 				})
 			},
 			// 删除图片
-			handleImageRemove(e, idx) {
+			handleImageRemove: async function(e, idx) {
+				var id = this.imageList[idx].id
+				await request.post('/upload_file/del', { id })
 				this.imageList.splice(idx, 1)
 			},
 			// 选择视频
@@ -163,9 +252,51 @@
 				uni.chooseVideo({
 					success(res) {
 						var path = res.tempFilePath
-						_this_.videoList.push(path)
-						_this_.videoContext.push(uni.createVideoContext(path))
-						_this_.videoControl.push(false)
+						uni.showLoading({title: '上传中...'})
+						// 上传
+						uni.uploadFile({
+							url: `${_this_.$store.state.request.url}/api/upload_file`,
+							filePath: path,
+							name: 'file',
+							header: {
+								"token": uni.getStorageSync('token')
+							},
+							formData: {
+								order_id: _this_.orderId,
+								file_type: 1,
+								file_belong: 1
+							},
+							success: function(res) {
+								// _this_.videoList.push(res.data[0])
+								// _this_.videoContext.push(uni.createVideoContext(path))
+								// _this_.videoControl.push(false)
+								var result = JSON.parse(res.data)
+								console.log(result)
+								if(result.code == 1){
+									var dataList = result.data
+									_this_.videoList = dataList
+									_this_.videoContext = dataList.map(item => {
+										return uni.createVideoContext(item.file_url)
+									})
+									_this_.videoControl = new Array(dataList.length).fill(false)
+								}
+								else {
+									uni.showModal({
+										title: '上传失败，请稍后重试',
+										showCancel: false
+									})
+								}
+							},
+							fail: function(err) {
+								uni.showModal({
+									title: '上传失败，请稍后重试',
+									showCancel: false
+								})
+							},
+							complete: function() {
+								uni.hideLoading()
+							}
+						})
 					}
 				})
 			},
@@ -192,16 +323,144 @@
 				}
 			},
 			// 删除视频
-			handleVideoRemove(e, idx) {
+			handleVideoRemove: async function(e, idx) {
+				var id = this.videoList[idx].id
+				await request.post('/upload_file/del', { id })
 				this.videoList.splice(idx, 1)
 				this.videoContext.splice(idx, 1)
 				this.videoControl.splice(idx, 1)
+			},
+			// 提交
+			handleSubmit: async function() {
+				var _this_ = this
+				var data = {
+					id: _this_.orderId,
+					content: _this_.describe,
+					type: 4,
+					fault_attr: _this_.propId[_this_.propPickerIndex],
+					is_replace: _this_.replacePickerIndex,
+					suggest: Number(_this_.proposePickerIndex) + 1
+				}
+				var filePath = await this.$refs.sign.finish()
+				console.log(data)
+				var res = await request.upload({
+					url: '/maint/fault_submit',
+					name: 'image',
+					filePath,
+					data
+				})
+				if(res.code == 1) {
+					uni.showToast({
+						title: '提交成功',
+						icon: 'success',
+						mask: true,
+						success() {
+							_this_.waitSign = false
+							_this_.signImage = filePath
+							_this_.safeSignVisible = true
+						}
+					})
+				} else {
+					console.log('----收到response----')
+					uni.showModal({
+						showCancel: false,
+						title: '提交失败，请稍后重试'
+					})
+				}
+			},
+			// 安全人员签字
+			handleSafeSignFile: async function (filePath) {
+				var _this_ = this
+				try{
+					var res = await request.upload({
+						url: "/maint/fault_signature",
+						name: "image",
+						filePath,
+						data: {
+							id: _this_.orderId,
+							type: 1
+						}
+					})
+					uni.showToast({
+						mask: true,
+						title: '签字成功',
+						icon: 'success'
+					})
+					_this_.safeSignVisible = false
+					_this_.properSignVisible = true
+				} catch(e) {
+					uni.showToast({ title: '签字失败，请重试！', icon: 'none' })
+				}
+			},
+			// 物业人员签字
+			handleProperSignFile: async function(filePath) {
+				var _this_ = this
+				try{
+					var res = await request.upload({
+						url: "/maint/fault_signature",
+						name: "image",
+						filePath,
+						data: {
+							id: _this_.orderId,
+							type: 3
+						}
+					})
+					uni.showToast({
+						mask: true,
+						title: '签字成功',
+						icon: 'success'
+					})
+					_this_.properSignVisible = false
+					_this_.handleRedirectTo()
+				} catch(e) {
+					uni.showToast({ title: '签字失败，请重试！', icon: 'none' })
+				}
+			},
+			// 跳转页面
+			handleRedirectTo() {
+				var _this_ = this
+				try{
+					uni.navigateBack({
+						delta: 1,
+						success: async function() {
+							// 变更故障列表中数据的状态
+							if(!isEmpty(_this_.$store.state.repair.list)) {
+								_this_.$store.commit('updateRepairState', {
+									id: _this_.orderId,
+									oldType: 3,
+									newType: 4
+								})
+							}
+							// 变更待办事项中故障工单的状态
+							_this_.$store.commit('todoListUpdateRepair', {
+								id: _this_.orderId,
+								type: 4
+							})
+						}
+					})
+				}catch(e){
+					console.log(e)
+				}
+			},
+			// 安全人员取消签字
+			handleSafeCancel() {
+				this.safeSignVisible = false
+				this.properSignVisible = true
+			},
+			// 物业人员取消签字
+			handleProperCancel() {
+				this.properSignVisible = false
+				this.handleRedirectTo()
 			}
 		},
-		onLoad: async function() {
+		onLoad: async function(option) {
+			// 拿到工单id
+			var { id } = option
+			this.orderId = id
+			
+			// 请求故障属性
 			var res = await request.post('/maint/fault_attr')
-			console.log(res)
-			this.propRange = res.data.map(item => item.name)
+			this.attrs = res.data
 		}
 	}
 </script>
@@ -209,8 +468,6 @@
 <style scoped>
 	.container{
 		background-color: #F9F9F9;
-		height: 100vh;
-		overflow-y: scroll;
 	}
 	
 	.picker-container{
@@ -244,7 +501,7 @@
 	.label{
 		flex-shrink: 0;
 	}
-	.label, .pickered-text{
+	.label, .pickered-text, .sign-label{
 		font-size: 24rpx;
 		color: #000000;
 	}
@@ -351,6 +608,22 @@
 		top: -14rpx;
 		right: -14rpx;
 		z-index: 2000;
+	}
+	
+	.sign-container{
+		margin-top: 20rpx;
+		padding: 30rpx;
+		box-sizing: border-box;
+		background-color: #FFFFFF;
+	}
+	.sign-label{
+		height: 80rpx;
+		line-height: 80rpx;
+	}
+	
+	.sign-success-image{
+		width: 100%;
+		height: 294rpx;
 	}
 </style>
 

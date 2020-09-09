@@ -3,7 +3,7 @@
 		
 		<scroll-view
 			class="hidden-scroll"
-			:style="height"
+			style="height: 100vh;"
 			:scroll-y="true"
 			:show-scrollbar="false"
 			upper-threshold="5"
@@ -24,17 +24,39 @@
 			<Tabs :tabs="tabs" :active="active" @switch="handleTabsSwitch" />
 			
 			<swiper
-				v-if="false"
 				:current="active"
 				:duration="300"
-				:style="mainheight"
+				style="height: calc(100vh - 100rpx);"
 				@change="handleSwiperChange"
 			>
-				<swiper-item v-for="(tab, index) in tabs" :key="index">
+				<swiper-item>
+					<Empty v-if="maintList.length == 0" title="暂无数据" />
+					<!-- 维保 -->
 					<scroll-view class="list-container" :scroll-y="listScroll">
-						<view v-for="item in dataSource" :key="item.id">
-							<RepairCard :record="item" />
+						<view v-for="maint in maintList" :key="maint.id">
+							<RepairCard :record="maint" type="maint" detailAddress />
 						</view>
+						<view style="height: 30rpx" />
+					</scroll-view>
+				</swiper-item>
+				<swiper-item>
+					<Empty v-if="repairList.length == 0" title="暂无数据" />
+					<!-- 急修 -->
+					<scroll-view class="list-container" :scroll-y="listScroll">
+						<view v-for="repair in repairList" :key="repair.repair_id">
+							<RepairCard :record="repair" type="repair" detailAddress />
+						</view>
+						<view style="height: 30rpx" />
+					</scroll-view>
+				</swiper-item>
+				<swiper-item>
+					<Empty v-if="reportList.length == 0" title="暂无数据" />
+					<!-- 上报 -->
+					<scroll-view class="list-container" :scroll-y="listScroll">
+						<view v-for="(report, index) in reportList" :key="index">
+							<ReportCard :record="report" />
+						</view>
+						<view style="height: 30rpx" />
 					</scroll-view>
 				</swiper-item>
 			</swiper>
@@ -49,22 +71,27 @@
 	import PersonCard from '../../components/PersonCard/PersonCard.vue'
 	import Tabs from '../../components/Tabs/Tabs.vue'
 	import RepairCard from '../../components/RepairCard/RepairCard.vue'
-	// import repairData from '../../data/repair.js'
+	import ReportCard from '../../components/ReportCard/ReportCard.vue'
+	import Empty from '../../components/Empty/Empty.vue'
 	import pageScrollMixin from '../../mixin/pageScroll.js'
 	import request from '../../service/request.js'
 	
 	export default {
 		components: {
 			NavHeader,
-			PersonCard,
 			Tabs,
-			RepairCard
+			PersonCard,
+			RepairCard,
+			ReportCard,
+			Empty
 		},
 		mixins: [pageScrollMixin],
 		data: () => ({
 			tabs: ['维保工单', '急修工单', '上报故障'],
 			dataSource: {},
-			// record
+			maintList: {},
+			repairList: {},
+			reportList: {}
 		}),
 		methods: {
 			handleTabsSwitch(idx) {
@@ -76,8 +103,22 @@
 		},
 		onLoad: async function(option) {
 			var { id } = option
-			var res = await request.post('/users/one_info', { id })
-			this.dataSource = res.data
+			var options = {
+				limit: 100,
+				page: 1,
+				user_id: id
+			}
+			var res = await Promise.all([
+				request.post('/users/one_info', {id}),
+				request.post('/users/user_maint', options),
+				request.post('/users/user_repair', options),
+				request.post('/users/user_repair_push', options)
+			])
+			console.log(res)
+			this.dataSource = res[0].data
+			this.maintList = res[1].data
+			this.repairList = res[2].data
+			this.reportList = res[3].data
 		}
 	}
 </script>
@@ -88,5 +129,9 @@
 		width: 0;
 		height: 0;
 		color: transparent;
+	}
+	.list-container{
+		padding: 1px 0 30rpx 0;
+		background-color: #FFFFFF;
 	}
 </style>

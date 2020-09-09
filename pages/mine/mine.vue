@@ -1,36 +1,35 @@
 <template>
-	<!-- <TabbarPage :header="{title: '我的', hasBack: false}" :tabbar="{active: 3}"> -->
-		<scroll-view :scroll-y="true" class="main">
-			<!-- 用户信息卡片 -->
-			<PersonCard allowEidt :user="user" />
-			
-			<!-- 功能列表 -->
-			<view class="list-container">
-				<view
-					class="list-item"
-					v-for="(item, index) in list"
-					:key="index"
-					:style="item.space ? 'margin-top:20rpx' : ''"
-					@click="handleLink(item.path)"
-				>
-					<view class="list-item-box">
-						<view class="icon-box">
-							<image class="icon-image" :src="item.iconImage" />
-						</view>
-						<text class="text">{{item.label}}</text>
-						<image class="arrow-right" src="../../static/icon/right.png" />
+	<view>
+		<!-- 用户信息卡片 -->
+		<PersonCard allowEidt :user="user" />
+		
+		<!-- 功能列表 -->
+		<view class="list-container">
+			<view
+				class="list-item"
+				v-for="(item, index) in list"
+				:key="index"
+				:style="item.space ? 'margin-top:20rpx' : ''"
+				@click="handleLink(item.path)"
+			>
+				<view class="list-item-box">
+					<view class="icon-box">
+						<image class="icon-image" :src="item.iconImage" />
 					</view>
+					<text class="text">{{item.label}}</text>
+					<image class="arrow-right" src="../../static/icon/right.png" />
 				</view>
-				
-				<!-- 退出登录按钮 -->
-				<CommonButton
-					class="singout-button"
-					text="退出登录"
-					@click="handleClickSingOutBtn"
-				/>
 			</view>
-		</scroll-view>
-	<!-- </TabbarPage> -->
+			
+			<!-- 退出登录按钮 -->
+			<CommonButton
+				class="singout-button"
+				text="退出登录"
+				@click="handleClickSingOutBtn"
+			/>
+		</view>
+		
+	</view>
 </template>
 
 <script>
@@ -38,6 +37,7 @@
 	import PersonCard from '../../components/PersonCard/PersonCard.vue'
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
 	import listConfig from './listConfig.js'
+	import request from '../../service/request.js'
 	
 	export default {
 		components: {
@@ -57,8 +57,19 @@
 			}
 		},
 		methods: {
-			handleClickSingOutBtn() {
-				console.log('退出登录')
+			async handleClickSingOutBtn() {
+				var res = await request.post('/logins/ontlogin')
+				console.log(res)
+				if(res.code == 1) {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+				} else {
+					uni.showModal({
+						title: '退出失败，请稍后再试',
+						showCancel: false
+					})
+				}
 			},
 			handleLink(path) {
 				uni.navigateTo({
@@ -71,7 +82,6 @@
 
 <style scoped>	
 	.list-container{
-		height: auto;
 		background-color: #F9F9F9;
 		padding-bottom: 1px;
 	}
