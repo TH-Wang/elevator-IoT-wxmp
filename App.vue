@@ -8,11 +8,11 @@ export default {
 		isHeader: false
 	},
 	onLaunch: async function() {
-		uni.getSystemInfo({
-			success: ({statusBarHeight}) => {
-				this.$store.commit("setStatusBarHeight", statusBarHeight)
-			}
-		})
+		// uni.getSystemInfo({
+		// 	success: ({statusBarHeight}) => {
+		// 		this.$store.commit("setStatusBarHeight", statusBarHeight)
+		// 	}
+		// })
 	},
 	onShow: function() {
 		console.log('App Show');

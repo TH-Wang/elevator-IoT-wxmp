@@ -61,7 +61,7 @@
 							</view>
 							<!-- 操作按钮 -->
 							<view class="handle-button-container">
-								<view class="device-debug-button">设备调试</view>
+								<view class="device-debug-button" @click="handleLinkEleInfo($event, lift)">设备调试</view>
 								<view class="data-release-button">数据下达</view>
 							</view>
 						</view>
@@ -118,10 +118,17 @@
 					return item
 				})
 			},
+			// 跳转到电梯调试页面
+			handleLinkEleInfo(e, lift) {
+				var item = encodeURIComponent(JSON.stringify(lift))
+				uni.navigateTo({
+					url: '/pages/eleInfo/eleInfo?item=' + item
+				})
+			},
 			// 关闭弹窗
 			handleClose(e) {
 				if(e.target.id === 'box') this.$emit('close')
-			},
+			}
 		}
 	}
 </script>

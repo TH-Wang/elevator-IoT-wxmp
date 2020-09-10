@@ -15,7 +15,10 @@
 		<view class="bt-list">
 			<view class="search-loading">
 				<text>搜索到的设备</text>
-				<image v-show="searching" src="../../static/icon/feedback/loading.png" />
+				<view v-if="searching">
+					<text class="loading-text">扫描中</text>
+					<image class="loading-icon" src="../../static/icon/feedback/loading.png" />
+				</view>
 			</view>
 			
 			<!-- 搜索到蓝牙设备 -->
@@ -27,7 +30,7 @@
 				</view>
 				<!-- 待链接设备 -->
 				<view
-					v-if="deviceConnectId !== device.deviceId"
+					v-if="deviceId !== device.deviceId"
 					class="bt-bind-button"
 					@click="connectBluetooth(device.deviceId)"
 					:style="'background-color:' + (connectingId == device.deviceId ? 'rgba(65, 144, 245, 0.4)' : '')"
@@ -36,12 +39,12 @@
 				</view>
 				<!-- 已连接设备 -->
 				<view
-					v-if="deviceConnectId == device.deviceId"
+					v-if="deviceId == device.deviceId"
 					class="bt-close-button"
 					@click="handleBreakConnect"
 				>断开</view>
 				<view
-					v-if="deviceConnectId == device.deviceId"
+					v-if="deviceId == device.deviceId"
 					class="bt-bind-button"
 					@click="modalVisible=true"
 				>绑定</view>
@@ -71,13 +74,14 @@
 		},
 		data: () => ({
 			value: '',
+			gotoDebugger: false,
 			deviceList: [],
 			// 正在扫描
 			searching: false,
 			// 正在连接的设备
 			connectingId: null,
-			// 连接设备id
-			deviceConnectId: null,
+			// 已连接设备id
+			deviceId: null,
 			// 服务id
 			serviceId: "0000FFE0-0000-1000-8000-00805F9B34FB",
 			// 特征值id
@@ -87,10 +91,9 @@
 			resData: null,
 			modalVisible: false,
 		}),
-		computed: {
-			
-		},
 		methods: {
+			// 授权位置信息
+			
 			// 1.初始化蓝牙模块
 			async bluetooth() {
 				var _this_ = this
@@ -100,17 +103,22 @@
 				console.log('-----开始搜索蓝牙-----')
 				uni.onBluetoothDeviceFound(function(res){
 					var device = res.devices[0]
+					// 如果是第一个扫描到的，就自动连接
+					if(_this_.deviceList.length == 0) {
+						console.log('当前为第一个设备', device)
+						_this_.connectBluetooth(device.deviceId)
+					}
 					var notexist = _this_.deviceList.findIndex(i=>i.deviceId===device.deviceId) === -1
 					if(notexist) _this_.deviceList.push(device)
 				})
 				setTimeout(() => {
 					if(_this_.deviceList.length === 0){
 						uni.showModal({
-							title: '提示',
-							content: '请检查是否蓝牙和定位服务是否打开!'
+							title: '打开服务',
+							content: '如果蓝牙功能已经打开，请尝试打开定位服务再重试！'
 						})
 					}
-				}, 5000)
+				}, 10000)
 			},
 			// 2.连接设备
 			connectBluetooth(deviceId) {
@@ -122,8 +130,20 @@
 						console.log(`${deviceId}设备连接成功`)
 						console.log(res)
 						_this_.deviceId = deviceId
-						_this_.getBLEDeviceServices()
 						_this_.connectingId = null
+						
+						// 如果要前往调试器页面
+						if(_this_.gotoDebugger) {
+							uni.navigateTo({url: '/pages/debugger/debugger?deviceId=' + deviceId})
+						}
+						// 否则继续进行下面的操作
+						else {
+							// 显示绑定电梯弹窗
+							_this_.modalVisible = true
+							// 获取该蓝牙设备的所有服务
+							_this_.getBLEDeviceServices()
+						}
+						
 						// 停止搜索
 						uni.startBluetoothDevicesDiscovery({
 							success(res) {
@@ -209,16 +229,11 @@
 			// 7.发送数据到蓝牙设备
 			writeBLECharacteristicValue() {
 				var _this_ = this
-				var buffer = new ArrayBuffer(1)
-				var dataView = new DataView(buffer)
-				dataView.setUint8(0, )
-				console.log('-----二进制数据-----')
-				console.log(buffer)
 				uni.writeBLECharacteristicValue({
 					deviceId: _this_.deviceId,
 					serviceId: _this_.serviceId,
 					characteristicId: _this_.characteristicId,
-					value: _this_.toHEX(_this_.value),
+					value: _this_.strToBuffer(_this_.value),
 					success(res) {
 						console.log('-----写入数据成功-----')
 						console.log(_this_.toHEX(_this_.value))
@@ -236,6 +251,8 @@
 				uni.closeBLEConnection({
 					deviceId: _this_.deviceId,
 					success() {
+						// 清除已连接的设备id
+						_this_.deviceId = null
 						uni.showToast({
 							title: '蓝牙已断开',
 							icon: 'none'
@@ -244,11 +261,33 @@
 				})
 			},
 			
+			// String 转 ArrayBuffer
+			strToBuffer(str) {
+				var buffer = new ArrayBuffer(str.length)
+				var dataView = new DataView(buffer)
+				for (var i = 0; i < str.length; i++) {
+					dataView.setUint8(i, str.charAt(i).charCodeAt())
+				}
+				console.log(buffer)
+				return buffer
+			},
+			// ArrayBuffer 转 String
+			bufferToString(buffer) {
+				return String.fromCharCode.apply(null, new Uint8Array(buffer));
+			},
 			// 转16进制
 			toHEX(value) {
-				var typedArray = new Uint8Array(value.match(/[\da-f]{2}/gi).map(function (h) {
+				// string 转 hex
+				var hexCharCode = [];
+				hexCharCode.push("0x");
+				for(var i = 0; i < value.length; i++) {
+					hexCharCode.push((value.charCodeAt(i)).toString(16));
+				}
+				var hexArray = hexCharCode.join("").match(/[\da-f]{2}/gi);
+				// Hex 转 ArrayBuffer
+				var typedArray = new Uint8Array(hexArray).map(function (h) {
 				  return parseInt(h, 16)
-				}))
+				})
 				console.log("hextobyte ", typedArray)
 				return typedArray.buffer
 			},
@@ -262,7 +301,9 @@
 			  return hexArr.join('')
 			}
 		},
-		onLoad() {
+		onLoad(option) {
+			var { type } = option
+			if(type && type == 'debug') this.gotoDebugger = true
 			this.bluetooth()
 		}
 	}
@@ -330,15 +371,21 @@
 		font-size: 20rpx;
 		color: #666666;
 	}
-	.search-loading image{
+	.loading-icon{
 		width: 26rpx;
-		animation: loading 1000ms forwards infinite linear;
 		height: 26rpx;
+		margin-left: 5rpx;
+		animation: loading 1000ms forwards infinite linear;
 	}
 	
 	.bt-list{
 		margin-top: 20rpx;
 		background-color: #FFFFFF;
+	}
+	..bt-list image{
+		width: 68rpx;
+		height: 68rpx;
+		border-radius: 14rpx;
 	}
 	.bt-item{
 		margin: 0 30rpx;
@@ -347,11 +394,6 @@
 		border-bottom: solid 1px #F9F9F9;
 		display: flex;
 		align-items: center;
-	}
-	.bt-item image{
-		width: 68rpx;
-		height: 68rpx;
-		border-radius: 14rpx;
 	}
 	.bt-info{
 		flex: 1;

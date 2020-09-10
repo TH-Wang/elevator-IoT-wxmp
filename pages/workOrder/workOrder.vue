@@ -249,23 +249,6 @@
 				var type = Number(e.detail.value) + 1
 				await this.handleSubmitProject(id, type, pill_remark)
 			},
-			// 修改维保项目的备注信息
-			handleEditRemark: async function(e, {id, pill_type, pill_remark}) {
-				var _this_ = this
-				var res = await request.post('/maint/present', {
-					id: id,
-					bill_id: _this_.maintId,
-					pill_type,
-					pill_remark,
-					is_qualified: 2
-				})
-				if(res.code == 1) {
-					uni.showToast({
-						title: '已提交',
-						icon: 'success'
-					})
-				}
-			},
 			// 提交维保项目
 			handleSubmitProject: async function(id, pill_type, pill_remark) {
 				var _this_ = this
@@ -273,8 +256,7 @@
 					id: id,
 					bill_id: _this_.maintId,
 					pill_type,
-					pill_remark,
-					is_qualified: 2
+					pill_remark
 				})
 				this.dataList = this.dataList.map(item => {
 					if(item.id == id) {
@@ -283,6 +265,22 @@
 					}
 					return item
 				})
+			},
+			// 修改维保项目的备注信息
+			handleEditRemark: async function(e, {id, pill_type, pill_remark}) {
+				var _this_ = this
+				var res = await request.post('/maint/present', {
+					id: id,
+					bill_id: _this_.maintId,
+					pill_type,
+					pill_remark
+				})
+				if(res.code == 1) {
+					uni.showToast({
+						title: '已提交',
+						icon: 'success'
+					})
+				}
 			},
 			// 展开图片列表
 			handleToggleImageBox(e, index) {

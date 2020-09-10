@@ -45,20 +45,20 @@
     },
     "quickapp" : {},
     "mp-weixin" : {
-        "appid" : "wx2baa2da793db8260",
-        "setting" : {
-            "urlCheck" : true,
-            "es6" : true,
-            "minified" : true
-        },
-        "uniStatistics" : {
-            "enable" : false
-        },
-		"permission": {
-			"scope.userLocation": {
-				"desc": "你的位置信息将用于小程序位置接口的效果展示"
+			"appid" : "wx2baa2da793db8260",
+			"setting" : {
+					"urlCheck" : true,
+					"es6" : true,
+					"minified" : true
+			},
+			"uniStatistics" : {
+					"enable" : false
+			},
+			"permission": {
+				"scope.userLocation": {
+					"desc": "你的位置信息将用于小程序位置接口的效果展示"
+				}
 			}
-		}
     },
     "uniStatistics" : {
         "enable" : false

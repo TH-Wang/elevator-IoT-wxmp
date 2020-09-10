@@ -3,7 +3,7 @@
 		<!-- 头部 -->
 		<view class="header">
 			<view v-if="hasTag" :class="'header-tag ' + 'tag-' + type">{{getHeaderTagText()}}</view>
-			<text class="title ellipsis">{{record.ele_name}}</text>
+			<text class="title ellipsis">{{record.ele_name || record.name}}</text>
 			<text class="time">{{timeText()}}</text>
 		</view>
 		
@@ -13,7 +13,7 @@
 		</view>
 		<!-- 急修 -->
 		<view v-else-if="type == 'repair'" class="detail ellipsis">
-			<text>{{record.fault_code}}</text>
+			<text>{{record.fault_code || record.e_code}}</text>
 			<text class="space-point">·</text>
 			<text class="ellipsis">{{record.fault_syn}}</text>
 		</view>
@@ -111,9 +111,9 @@
 			getAddress() {
 				if(this.detailAddress) {
 					var { p_name, c_name, a_name, address } = this.record
-					return `${p_name}${c_name}${a_name}${address}`
+					return `${p_name || ''}${c_name || ''}${a_name || ''}${address || ''}`
 				} else {
-					return this.record.address
+					return this.record.address || ''
 				}
 			},
 			computeButtonClass() {

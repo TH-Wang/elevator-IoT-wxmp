@@ -150,7 +150,9 @@
 				})
 			},
 			handleLinkMaint(e, id) {
-				console.log('跳转维保工单详情页面: ' + id)
+				uni.navigateTo({
+					url: '/pages/workdel/workdel?id=' + id
+				})
 			},
 			// 请求banner
 			async requestBanner() {

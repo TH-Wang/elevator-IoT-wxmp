@@ -1,18 +1,18 @@
 export default [
 	{
-		path: '',
+		path: '/pages/mineMessage/mineMessage',
 		iconImage: '../../static/icon/mine/notice.png',
 		label: '我的消息'
 	}, {
-		path: '',
+		path: '/pages/mineMaint/mineMaint',
 		iconImage: '../../static/icon/mine/maintain.png',
 		label: '我的维保'
 	}, {
-		path: '',
+		path: '/pages/mineRepair/mineRepair',
 		iconImage: '../../static/icon/mine/repair.png',
 		label: '我的急修'
 	}, {
-		path: '',
+		path: '/pages/bluetoothConnect/bluetoothConnect?type=debug',
 		iconImage: '../../static/icon/mine/device.png',
 		label: '调试工具'
 	}, {

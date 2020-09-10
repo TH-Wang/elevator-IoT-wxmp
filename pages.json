@@ -124,9 +124,37 @@
 			"style": { "navigationBarTitleText": "我的" }
 		},
 		{
+			"path": "pages/debugger/debugger",
+			"style": {
+				"navigationBarTitleText": "调试工具",
+				"navigationBarBackgroundColor": "#000000",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/mineMessage/mineMessage",
+			"style": { "navigationBarTitleText": "我的消息" }
+		},
+		{
+			"path": "pages/mineRepair/mineRepair",
+			"style": { "navigationBarTitleText": "我的急修" }
+		},
+		{
+			"path": "pages/mineMaint/mineMaint",
+			"style": { "navigationBarTitleText": "我的维保" }
+		},
+		{
 			"path": "pages/editInfo/editInfo",
 			"style": { "navigationBarTitleText": "编辑资料" }
 		},
+		// {
+		// 	"path": "pages/debugger/debugger",
+		// 	"style": {
+		// 		"navigationBarTitleText": "调试工具",
+		// 		"navigationBarBackgroundColor": "#000000",
+		// 		"navigationBarTextStyle": "white"
+		// 	}
+		// },
 		{
 			"path": "pages/updatePassword/updatePassword",		//修改密码
 			"style": { "navigationBarTitleText": "修改密码" }

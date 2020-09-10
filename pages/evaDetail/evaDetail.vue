@@ -45,14 +45,14 @@
 				</view>
 			</view> -->
 			<!-- 维保 -->
-			<view v-show="active == 2">
+			<view v-show="active == 1">
 				<view class="item" v-for="(item, index) in dataConfig.maint" :key="index">
 					<text class="item-label">{{item.label}}</text>
 					<text>{{dataSource[item.key]}}</text>
 				</view>
 			</view>
 			<!-- 故障记录 -->
-			<view v-show="active == 3">
+			<view v-show="active == 2">
 				<view class="item" v-for="(item, index) in faultList" :key="index">
 					<text class="item-label">{{item.fault_syn}}</text>
 					<text>{{item.fault_start_time}}</text>

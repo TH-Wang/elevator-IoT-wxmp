@@ -126,10 +126,32 @@
 			}
 		},
 		onLoad() {
-			uni.switchTab({
-				url: '/pages/mine/mine',
+			uni.getSetting({
 				success(res) {
 					console.log(res)
+					uni.authorize({
+						scope: 'scope.userLocation',
+						success(res) {
+							console.log(res)
+							uni.showModal({
+								title: '去设置',
+								content: '需要打开你的定位服务',
+								success() {
+									uni.openSetting({
+										success(res) {
+											console.log(res)
+										},
+										fail(err) {
+											console.log(err)
+										}
+									})
+								}
+							})
+						},
+						fail(err) {
+							console.log(err)
+						}
+					})
 				}
 			})
 		}

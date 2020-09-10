@@ -13,7 +13,7 @@ function openBluetoothAdapter() {
 				console.log(err)
 				uni.showModal({
 					title: '扫描失败',
-					content: '请打开蓝牙功能，然后点击上方立即扫描按钮'
+					content: '请打开蓝牙功能，然后点击上方重新扫描按钮'
 				})
 			}
 		})
