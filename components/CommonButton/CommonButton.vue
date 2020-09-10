@@ -2,7 +2,7 @@
 	<view
 		:class="viewClass"
 		:style="margin ? 'margin: 80rpx auto 30rpx auto;' : ''"
-		@click="$emit('click')"
+		@click="handleClick"
 	>
 		{{text}}
 	</view>
@@ -22,11 +22,21 @@
 			margin: {
 				type: Boolean,
 				default: true
+			},
+			disabled: {
+				type: Boolean,
+				default: false
 			}
 		},
 		computed: {
 			viewClass() {
-				return 'button ' + 'button-' + this.size
+				return 'button' + ' button-' + this.size + (this.disabled ? ' disabled' : '')
+			}
+		},
+		methods: {
+			handleClick() {
+				if(this.disabled) return
+				this.$emit('click')
 			}
 		}
 	}
@@ -51,5 +61,10 @@
 		height: 70rpx;
 		line-height: 70rpx;
 		font-size: 24rpx;
+	}
+	
+	.disabled{
+		background-color: #EEEEEE;
+		color: #999999;
 	}
 </style>

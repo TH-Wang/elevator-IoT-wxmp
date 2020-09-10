@@ -9,7 +9,7 @@
 		
 		<!-- 维保 -->
 		<view v-if="type == 'maint'" class="detail ellipsis">
-			电梯编码: {{record.elevator_number}}
+			电梯编码: {{record.elevator_number || record.unmber}}
 		</view>
 		<!-- 急修 -->
 		<view v-else-if="type == 'repair'" class="detail ellipsis">

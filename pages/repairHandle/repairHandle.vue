@@ -54,7 +54,7 @@
 						:controls="videoControl[idx]"
 						:show-center-play-btn="false"
 						@fullscreenchange="handleVideoScreenChange($event, idx)"
-					></video>
+					/>
 					<view class="mask">
 						<image src="../../static/icon/play-video.png" />
 					</view>
@@ -302,7 +302,7 @@
 			},
 			// 预览视频
 			handlePreviewVideo(e, idx) {
-				this.videoContext[idx].requestFullScreen()
+				this.videoContext[idx].requestFullScreen({direction: 0})
 			},
 			// 视频全屏切换事件
 			handleVideoScreenChange(e, idx) {

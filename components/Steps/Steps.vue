@@ -29,7 +29,9 @@
 				class="info-item"
 			>
 				<view :class="idx <= active ? 'title-active' : 'title'">{{step.title}}</view>
-				<view class="time">{{idx <= active ? step.time : '&nbsp;'}}</view>
+				<view :class="'time' + (isLesser ? ' less-time' : '')">
+					{{idx <= active ? step.time : '&nbsp;'}}
+				</view>
 			</view>
 		</view>
 	</view>
@@ -55,6 +57,9 @@
 			},
 			lines() {
 				return [...this.steps.map((e,i)=>i)]
+			},
+			isLesser() {
+				return this.steps.length <= 3
 			}
 		},
 		methods: {
@@ -135,6 +140,11 @@
 		font-size: 24rpx;
 		color: #000000;
 		text-align: center;
+	}
+	
+	.less-time{
+		width: 60%;
+		margin: 0 auto;
 	}
 	.time{
 		margin-top: 6rpx;
