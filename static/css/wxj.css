@@ -610,9 +610,12 @@
 		flex: 1;
 		font-size: 26rpx;
 		color: #333;
-		overflow:hidden;
-		text-overflow:ellipsis; 
-		white-space:nowrap; 
+		overflow: hidden;
+		text-overflow:ellipsis;
+		white-space: nowrap;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 	.menu-cs-list4-li-btn{
 		margin-left: 40rpx;
@@ -749,12 +752,6 @@
 		flex-wrap: wrap;
 	}
 	
-	/* 补充 */
-	.menu-cs-list4-li-title{
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
 	.menu-cs-list5-li-title{
 		display: flex;
 		justify-content: space-between;
