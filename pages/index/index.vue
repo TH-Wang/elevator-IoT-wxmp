@@ -167,7 +167,7 @@
 			// 请求公告
 			async requestNotice() {
 				var res = await request.post('/jobs/lists', {
-					limit: 100,
+					limit: 5,
 					page: 1,
 					type: 0
 				})

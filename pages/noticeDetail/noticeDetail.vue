@@ -1,18 +1,17 @@
 <template>
 	<view>
-			
-			<view class="header">
-				<view class="title ellipsis-twolines">
-					{{dataSource.title}}
-				</view>
-				<view class="time">
-					{{dataSource.add_time}}
-				</view>
+		<view class="header">
+			<view class="title ellipsis-twolines">
+				{{dataSource.title}}
 			</view>
-			
-			<view class="content">
-				<rich-text nodes="<p>这是一个段落</p>"></rich-text>
+			<view class="time">
+				{{dataSource.add_time}}
 			</view>
+		</view>
+		
+		<view class="content">
+			<rich-text :nodes="dataSource.content">电梯物联网系统</a>"></rich-text>
+		</view>
 	</view>
 </template>
 

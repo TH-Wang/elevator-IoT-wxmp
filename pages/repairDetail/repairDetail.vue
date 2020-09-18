@@ -1,5 +1,9 @@
 <template>
 	<view class="container">
+		<!-- 如果该工单不存在 -->
+		<Empty v-if="notExist" title="该工单不存在" />
+			
+		<view v-else>
 			<!-- 步骤条 -->
 			<Steps :steps="steps" :type="record.repair_type" />
 			
@@ -34,6 +38,7 @@
 					<view
 						v-if="authority && record.repair_type <= 2"
 						class="button secondary"
+						@click="handleOpenLocation"
 					>导航</view>
 				</view>
 			</view>
@@ -85,6 +90,8 @@
 			
 			<!-- 签到成功弹窗 -->
 			<SignInModal :visible="signInSuccess" @close="signInSuccess = false" />
+			
+		</view>
 	</view>
 </template>
 
@@ -93,7 +100,7 @@
 	import Steps from '../../components/Steps/Steps.vue'
 	import CommonButton from '../../components/CommonButton/CommonButton.vue'
 	import SignInModal from '../../components/SignInModal/SignInModal.vue'
-	import repairData from '../../data/repair.js'
+	import Empty from '../../components/Empty/Empty.vue'
 	import request from '../../service/request.js'
 	import formatDate from '../../utils/formatDate.js'
 	import isEmpty from '../../utils/isEmpty.js'
@@ -103,9 +110,11 @@
 			NavHeader,
 			Steps,
 			CommonButton,
-			SignInModal
+			SignInModal,
+			Empty
 		},
 		data: () => ({
+			notExist: false,
 			orderId: null,
 			steps: [
 				{
@@ -158,6 +167,13 @@
 					url: `/pages/repairSubmitInfo/repairSubmitInfo?id=${id}`
 				})
 			},
+			// 导航
+			handleOpenLocation() {
+				var _this_ = this
+				// uni.openLocation({
+				// 	latitude: _this_.
+				// })
+			},
 			// 点击接警 --> 2
 			async handleAlarm() {
 				await this.updateTicketState(2)
@@ -206,13 +222,18 @@
 			handleLoadData: async function(id) {
 				var _this_ = this
 				var res = await request.post('/maint/fault_one', {id})
-				this.record = res.data.repair
-				this.ele = res.data.ele
-				this.steps = this.steps.map(item => {
-					var hasTime = res.data.repair.log_time.reverse().find(i=>i.type==item.type)
-					if(hasTime) item.time = hasTime.time
-					return item
-				})
+				if(res.code == 1) {
+					this.record = res.data.repair
+					this.ele = res.data.ele
+					this.steps = this.steps.map(item => {
+						var hasTime = res.data.repair.log_time.reverse().find(i=>i.type==item.type)
+						if(hasTime) item.time = hasTime.time
+						return item
+					})
+				}
+				else if(res.code == 3) {
+					this.notExist = true
+				}
 			}
 		},
 		onLoad: function(option) {

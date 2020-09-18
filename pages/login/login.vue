@@ -68,7 +68,7 @@
 		
 		<button type="primary" class="submit-button" @click="handleBind">绑定</button>
 		
-		<view class="scan-button">
+		<view class="scan-button" @click="handleScan">
 			<image src="../../static/icon/login/scan.png" mode=""></image>
 		</view>
 		<view class="scan-text">
@@ -131,6 +131,29 @@
 					url: '../findPass/findPass'
 				})
 			},
+			// 扫一扫
+			handleScan() {
+				uni.scanCode({
+					success(res) {
+						console.log('扫码内容:' + res.result)
+						console.log('所扫码类型:' + res.scanTyep)
+						console.log('扫码字符集:' + res.charSet)
+						console.log('合法二维码路径:' + res.path)
+						uni.vibrateShort({
+							success() {
+								uni.showModal({
+									title: '扫描成功',
+									content: res.result
+								})
+							},
+							fail(err) {
+								console.log(err)
+							}
+						})
+					}
+				})
+			},
+			// 提交
 			async handleBind() {
 				try{
 					// 表单校验
@@ -364,8 +387,9 @@
 	.scan-button{
 		width: 56rpx;
 		height: 56rpx;
+		padding: 30rpx;
 		margin: 0 auto;
-		margin-top: 88rpx;
+		margin-top: 58rpx;
 	}
 	.scan-button image{
 		width: 100%;
@@ -374,7 +398,6 @@
 	.scan-text{
 		width: 100%;
 		text-align: center;
-		margin-top: 30rpx;
 		margin-bottom: 30rpx;
 		font-size: 24rpx;
 		color: #666666;

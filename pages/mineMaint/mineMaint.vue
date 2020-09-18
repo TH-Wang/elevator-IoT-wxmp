@@ -14,6 +14,7 @@
 				:key="record.id"
 				:record="record"
 				type="maint"
+				hasButton
 				@click="handleLinkDetail($event, record.id)"
 			/>
 		</scroll-view>

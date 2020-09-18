@@ -31,6 +31,7 @@
 		<view class="upload-container">
 			<view class="label" style="margin-right: 30rpx;">视频</view>
 			<view class="box">
+				<text v-if="videoList.length == 0">无</text>
 				<view
 					class="image-container"
 					v-for="(video, idx) in videoList"
@@ -55,6 +56,7 @@
 		<view class="upload-container">
 			<view class="label" style="margin-right: 30rpx;">图片</view>
 			<view class="box">
+				<text v-if="imageList.length == 0">无</text>
 				<view
 					class="image-container"
 					v-for="(img, idx) in imageList"
@@ -287,7 +289,7 @@
 	
 	.form-item{
 		width: 100%;
-		height: 90rpx;
+		padding: 30rpx 0;
 		box-sizing: border-box;
 		display: flex;
 		justify-content: space-between;
@@ -370,6 +372,8 @@
 		align-items: center;
 		justify-content: flex-end;
 		width: 100%;
+		color: #999999;
+		font-size: 20rpx;
 	}
 	.media-container, .image-container{
 		margin: 0 0 20rpx 20rpx;
