@@ -337,13 +337,17 @@
 												<view class="menu-cs-list4-li-title">
 													{{ j.argu_name }}
 												</view>
-												<view class="menu-cs-list-tile-right">
+												<view class="menu-cs-list-tile-right" v-if="j.is_node == 1">
 													<image :class="threeCs == item.id?'xz':''" src="../../static/image/wxj/up.png" mode=""></image>
+												</view>
+												<view class="menu-cs-list4-li-btn" v-else>
+													<view class="menu-cs-list4-li-btn-num">{{ j.argu_value || 0}}</view>
+													<view class="menu-cs-list4-li-btn-text">下达</view>
 												</view>
 											</view>
 											
 											<view class="menu-cs-list5" v-if="j.is_node == 1 && threeCs == j.id">
-												<view class="menu-cs-list5-li-title" v-for="(k,index) in dtCsArrListThree" :key="k.argu_name">
+												<view class="menu-cs-list5-li-title" v-for="(k,index) in dtCsArrListThree" :key="k.argu_value">
 													<view class="menu-cs-list4-li-title">
 														{{ k.argu_name }}
 													</view>
@@ -431,7 +435,7 @@
 							<view class="menu-yx-oi-li-top-img"><image :class="OiId == item.type?'xz':''" src="../../static/image/wxj/up.png" mode=""></image></view>
 						</view>
 						<view class="menu-yx-oi-li-cont" v-if="OiId == item.type">
-							<view class="menu-yx-oi-li-cont-li" v-for="(i,index) in item.child" :key="i.b_name"><text :class="1 == 1?'textA':'textB'">{{ i.b_name }}</text>{{ i.name }}</view>
+							<view class="menu-yx-oi-li-cont-li" v-show="i.name" v-for="(i,index) in item.child" :key="i.b_name"><text :class="1 == 1?'textA':'textB'">{{ i.b_name }}</text>{{ i.name }}</view>
 						</view>
 					</view>
 				</view>
@@ -879,8 +883,15 @@
 				request.post('/Com/parameter',data).then((res) =>{
 					uni.hideLoading()
 					if(res.code == 1){
-						that.newTime = res.data.time;
-						that.dtCsArrList = res.data.array;
+						if(res.data){
+							that.newTime = res.data.time;
+							that.dtCsArrList = res.data.array;
+						}else{
+							uni.showToast({
+								title: '没有数据',
+								icon:'none'
+							})
+						}
 					}
 				})
 			},
@@ -904,6 +915,7 @@
 			// 获取第三级电梯参数
 			getDtXjThree(code,id){
 				let that = this;
+				that.dtCsArrListThree = []
 				uni.showLoading({
 					title: '加载中...'
 				})
@@ -914,7 +926,16 @@
 				request.post('/Com/child_parameter',data).then((res)=>{
 					uni.hideLoading()
 					if(res.code == 1){
-						that.dtCsArrListThree = res.data
+						if(res.data.length > 0){
+							that.dtCsArrListThree = res.data
+							console.log(res.data)
+							console.log(that.dtCsArrListThree)
+						}else{
+							uni.showToast({
+								title:'没有数据,且s_id状态出错',
+								icon:'none'
+							})
+						}
 					}
 				})
 			},
