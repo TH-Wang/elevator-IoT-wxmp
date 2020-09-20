@@ -1,7 +1,7 @@
 <template>
 	<view class="main">
 		<!-- 搜索框 -->
-		<Search button placeholder="搜索保养工单" />
+		<Search button @click-button="handleClickButton" @change="handleSearchChange" placeholder="搜索保养工单" />
 		
 		<!-- 分类导航栏 -->
 		<Tabs
@@ -100,6 +100,11 @@
 			}
 		},
 		methods: {
+			handleClickButton() {
+				uni.navigateTo({
+					url: '/pages/searchPage/searchPage'
+				})
+			},
 			handleSwitchTab(idx) {
 				this.active = idx
 			},
