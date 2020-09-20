@@ -2,7 +2,7 @@
 	<view class="container">
 		<Empty v-if="dataSource.length === 0" title="暂无公告" />
 		
-		<view v-else class="list-container">
+		<scroll-view v-else class="list-container" :lower-threshold="100" @scrolltolower="handleScrollToLower">
 			<view
 				class="card"
 				v-for="item in dataSource"
@@ -13,7 +13,7 @@
 				<view class="content ellipsis-twolines">{{item.content}}</view>
 				<view class="time">系统公告 | {{item.add_time}}</view>
 			</view>
-		</view>
+		</scroll-view>
 	</view>
 </template>
 
@@ -34,21 +34,33 @@
 			}
 		},
 		data: () => ({
-			dataSource: noticeData
+			page: 1,
+			limit: 20,
+			dataSource: []
 		}),
 		methods: {
 			handleLinkDetail(id) {
 				var url = '/pages/noticeDetail/noticeDetail?id=' + id
 				uni.navigateTo({ url })
+			},
+			requestList: async function() {
+				var _this_ = this
+				var res = await request.post('/jobs/lists', {
+					limit: _this_.limit,
+					page: _this_.page,
+					type: 0,
+				})
+				if(res.code == 1) {
+					this.dataSource = res.data
+					this.page = this.page + 1 
+				}
+			},
+			handleScrollToLower: async function() {
+				await this.requestList()
 			}
 		},
 		onLoad: async function() {
-			// var res = await request.post('/jobs/lists', {
-			// 	limit: 10,
-			// 	page: 1,
-			// 	type: 0
-			// })
-			// this.dataSource = res.data
+			await this.requestList()
 		}
 	}
 </script>
@@ -66,6 +78,7 @@
 	}
 	
 	.list-container{
+		height: 100vh;
 		padding: 1rpx 30rpx 30rpx 30rpx;
 		background-color: #F9F9F9;
 		box-sizing: border-box;

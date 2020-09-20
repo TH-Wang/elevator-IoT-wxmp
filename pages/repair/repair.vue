@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<!-- 搜索框 -->
-		<Search button />
+		<Search button placeholder="搜索急修工单" />
 		
 		<!-- 分类导航栏 -->
 		<Tabs

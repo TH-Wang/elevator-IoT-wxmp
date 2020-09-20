@@ -45,7 +45,7 @@
 					</radio-group>
 				</FormItem>
 				<FormItem label="电话" >
-					<input class="input" type="text" v-model="phone" placeholder="请输入"/>
+					<input class="input" type="number" v-model="phone" placeholder="请输入"/>
 				</FormItem>
 				<FormItem label="邮箱" >
 					<input class="input" type="text" v-model="email" placeholder="请输入"/>
