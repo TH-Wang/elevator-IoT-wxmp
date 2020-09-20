@@ -10,18 +10,18 @@
 		</view>
 		
 		<view class="content">
-			<rich-text :nodes="dataSource.content">电梯物联网系统</a>"></rich-text>
+			<uParse :content="dataSource.content" noData=" "></uParse>
 		</view>
 	</view>
 </template>
 
 <script>
-	import NavHeader from '../../components/NavHeader/NavHeader.vue'
+	import uParse from '../../components/u-parse/u-parse.vue'
 	import request from '../../service/request.js'
 	
 	export default {
 		components: {
-			NavHeader
+			uParse
 		},
 		computed: {
 			height() {

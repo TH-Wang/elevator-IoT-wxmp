@@ -105,7 +105,12 @@
 				}
 			}
 		},
-		
+		{
+			"path": "pages/searchOrder/searchOrder",
+			"style": {
+				"navigationBarTitleText": "搜索工单"
+			}
+		},
 		{
 			"path": "pages/deviceDebug/deviceDebug",
 			"style": {
@@ -126,7 +131,8 @@
 		{
 			"path": "pages/debugger/debugger",
 			"style": {
-				"navigationBarTitleText": "调试工具",
+				// "navigationBarTitleText": "调试工具",
+				"navigationStyle": "custom",
 				"navigationBarBackgroundColor": "#000000",
 				"navigationBarTextStyle": "white"
 			}
@@ -169,7 +175,10 @@
 		},
 		{
 			"path": "pages/contract/contract",	//合同管理
-			"style": { "navigationBarTitleText": "合同管理" }
+			"style": {
+				"navigationBarTitleText": "合同管理",
+				"enablePullDownRefresh": true
+			}
 		},
 		{
 			"path": "pages/contractDetail/contractDetail",		//合同详情
@@ -226,7 +235,10 @@
 		},
 		{
 			"path": "pages/notice/notice",		//公告
-			"style": { "navigationBarTitleText": "系统公告" }
+			"style": {
+				"navigationBarTitleText": "系统公告",
+				"enablePullDownRefresh": true
+			}
 		},
 		{
 			"path": "pages/noticeDetail/noticeDetail",		//公告详情、工作规范详情
@@ -234,7 +246,10 @@
 		},
 		{
 			"path": "pages/evaFiles/evaFiles",			//电梯档案
-			"style": { "navigationBarTitleText": "电梯档案" }
+			"style": {
+				"navigationBarTitleText": "电梯档案",
+				"enablePullDownRefresh": true
+			}
 		},
 		{
 			"path": "pages/evaDetail/evaDetail",		//电梯详细信息
@@ -242,7 +257,9 @@
 		},
 		{
 			"path": "pages/peopleFiles/peopleFiles",			//人员档案
-			"style": { "navigationBarTitleText": "人员档案" }
+			"style": {
+				"navigationBarTitleText": "人员档案"
+			}
 		},
 		{
 			"path" : "pages/peopleDetail/peopleDetail",	//人员详细信息
@@ -260,7 +277,10 @@
 		},
 		{
 			"path": "pages/worknorm/worknorm",		//工作规范
-			"style": { "navigationBarTitleText": "工作规范" }
+			"style": {
+				"navigationBarTitleText": "工作规范",
+				"enablePullDownRefresh": true
+			}
 		},
 		{
 			"path": "pages/null/null",		//空页面

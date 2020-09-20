@@ -4,7 +4,7 @@
 		<Search paddingBottom @search="handleSearch" />
 		
 		<!-- 列表 -->
-		<scroll-view :scroll-y="true" class="card-container">
+		<scroll-view :scroll-y="true" class="card-container" :lower-threshold="100" @scrolltolower="handleScrollLower">
 			<view style="height: 30rpx" />
 			<view
 				class="card"
@@ -64,6 +64,8 @@
 			Search
 		},
 		data: () => ({
+			page: 1,
+			limit: 20,
 			dataSource: []
 		}),
 		computed: {
@@ -83,14 +85,32 @@
 					page: 1
 				})
 				this.dataSource = res.data
+			},
+			requestList: async function(type) {
+				var _this_ = this
+				if(type && type == 'refresh') this.page = 1
+				if(this.dataSource % this.limit > 0) return
+				var res = await request.post('/lift/list_info', {
+					limit: _this_.limit,
+					page: _this_.page
+				})
+				this.page = this.page + 1
+				if(type == 'refresh') {
+					this.dataSource = res.data
+				} else {
+					this.dataSource.push(...res.data)
+				}
+			},
+			handleScrollLower: async function() {
+				await this.requestList()
 			}
 		},
 		onLoad: async function() {
-			var res = await request.post('/lift/list_info', {
-				limit: 100,
-				page: 1
-			})
-			this.dataSource = res.data
+			await this.requestList()
+		},
+		onPullDownRefresh: async function() {
+			await this.requestList('refresh')
+			uni.stopPullDownRefresh()
 		}
 	}
 </script>

@@ -4,9 +4,9 @@
 		<!-- 顶部搜索框、按钮 -->
 		<view class="header">
 			<view class="search-box">
-				<ModalSearch placeholder="SIM-IEMI、电梯编码" @search="handleSearch" />
+				<ModalSearch placeholder="SIM-IEMI、电梯编码" @search="handleSearch" @input="handleSearchInput" />
 			</view>
-			<view class="scan-button">
+			<view class="scan-button" @click="handleLinkMonitor">
 				<image class="header-icon" src="../../static/icon/device/monitor.png" />
 			</view>
 			<view class="bluetooth-button" @click="handleLinkBluetooth">
@@ -105,12 +105,10 @@
 			Tabs,
 			Empty
 		},
-		props: {
-			
-		},
 		data: () => ({
 			active: 0,
 			tabs: ['当前数据', '设备连接', '服务器连接'],
+			searchValue: '',
 			dataSource: deviceData,
 			deviceData: null,
 			serverData: null
@@ -119,6 +117,27 @@
 			
 		},
 		methods: {
+			// 跳转电梯监控
+			handleLinkMonitor: async function() {
+				var _this_ = this
+				if(!Boolean(this.searchValue)){
+					uni.showToast({title: '请输入SIM-IEMI码或电梯编码', icon: 'none'})
+				} else {
+					var res = await request.post('/lift/list_info', {
+						limit: 1,
+						page: 1,
+						lift_name: _this_.searchValue
+					})
+					if(res.data.length == 0){
+						uni.showToast({title: '未搜索到电梯，请重试！', icon: 'none'})
+					} else {
+						var item = encodeURIComponent(JSON.stringify(res.data[0]))
+						uni.navigateTo({
+							url: '/pages/eleInfo/eleInfo?item=' + item
+						})
+					}
+				}
+			},
 			handleLinkBluetooth() {
 				uni.navigateTo({
 					url: '/pages/bluetoothConnect/bluetoothConnect'
@@ -129,6 +148,9 @@
 			},
 			handleSwiperChange(e) {
 				this.active = e.detail.current
+			},
+			handleSearchInput(value) {
+				this.searchValue = value
 			},
 			async handleSearch(value) {
 				var option = { limit: 100, page: 1, id: value}

@@ -119,14 +119,19 @@
 			// 4.监听蓝牙发送的数据
 			onBLECharacteristicValueChange: function() {
 				var _this_ = this
-				uni.onBLECharacteristicValueChange(function(res){
-					console.log('-----接收数据-----')
-					console.log(_this_.bufferToString(res.value))
-					_this_.resData.push({
-						time: Date.now(),
-						value: _this_.bufferToString(res.value)
+				try{
+					uni.onBLECharacteristicValueChange(function(res){
+						console.log('-----接收数据-----')
+						console.log(_this_.bufferToString(res.value))
+						_this_.resData.push({
+							time: Date.now(),
+							value: _this_.bufferToString(res.value)
+						})
 					})
-				})
+				}catch(e){
+					console.log('[接收数据发生错误]')
+					console.log(e)
+				}
 			},
 			// 5.发送数据到蓝牙设备
 			writeBLECharacteristicValue: function(e, value) {
@@ -167,6 +172,16 @@
 		onLoad(option) {
 			var { deviceId } = option
 			this.deviceId = deviceId
+		},
+		onHide() {
+			var _this_ = this
+			uni.closeBLEConnection({
+				deviceId: _this_.deviceId,
+				success() {
+					// 清除已连接的设备id
+					_this_.deviceId = null
+				}
+			})
 		}
 	}
 </script>

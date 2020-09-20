@@ -28,7 +28,7 @@
 					<text class="bt-name">{{device.name == '' ? '未知设备' : device.name}}</text>
 					<text class="bt-mac">{{device.deviceId}}</text>
 				</view>
-				<!-- 待链接设备 -->
+				<!-- 待连接设备 -->
 				<view
 					v-if="deviceId !== device.deviceId"
 					class="bt-bind-button"
@@ -38,16 +38,22 @@
 					{{connectingId == device.deviceId ? '连接中...' : '连接'}}
 				</view>
 				<!-- 已连接设备 -->
-				<view
-					v-if="deviceId == device.deviceId"
-					class="bt-close-button"
-					@click="handleBreakConnect"
-				>断开</view>
-				<view
-					v-if="deviceId == device.deviceId"
-					class="bt-bind-button"
-					@click="modalVisible=true"
-				>绑定</view>
+				<view v-else>
+					<view
+						class="bt-close-button"
+						@click="handleBreakConnect"
+					>断开</view>
+					<!-- 设备调试页面 -->
+					<view
+						v-if="!gotoDebugger"
+						class="bt-bind-button"
+						@click="modalVisible=true"
+					>绑定</view>
+					<!-- 调试工具页面 -->
+					<view class="bt-bind-button" @click="handleLinkDebugger">
+						调试
+					</view>
+				</view>
 			</view>
 		</view>
 		
@@ -145,7 +151,7 @@
 						}
 						
 						// 停止搜索
-						uni.startBluetoothDevicesDiscovery({
+						uni.stopBluetoothDevicesDiscovery({
 							success(res) {
 								console.log('-----停止搜索附近蓝牙设备-----')
 								console.log(res)
@@ -275,6 +281,14 @@
 			bufferToString(buffer) {
 				return String.fromCharCode.apply(null, new Uint8Array(buffer));
 			},
+			
+			// 跳转到调试器页面
+			handleLinkDebugger() {
+				var deviceId = this.deviceId
+				uni.navigateTo({
+					url: '/pages/debugger/debugger?deviceId=' + deviceId,
+				})
+			},
 			// 转16进制
 			toHEX(value) {
 				// string 转 hex
@@ -305,6 +319,13 @@
 			var { type } = option
 			if(type && type == 'debug') this.gotoDebugger = true
 			this.bluetooth()
+		},
+		onHide() {
+			// 停止搜索蓝牙设备
+			uni.stopBluetoothDevicesDiscovery({
+				success:()=>{console.log('[已停止搜索蓝牙设备]')}
+			})
+			this.deviceId = null
 		}
 	}
 </script>

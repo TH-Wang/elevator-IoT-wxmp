@@ -104,6 +104,7 @@
 	import request from '../../service/request.js'
 	import formatDate from '../../utils/formatDate.js'
 	import isEmpty from '../../utils/isEmpty.js'
+	import trans from '../../utils/bMapToQQMap.js'
 	
 	export default {
 		components: {
@@ -170,9 +171,16 @@
 			// 导航
 			handleOpenLocation() {
 				var _this_ = this
-				// uni.openLocation({
-				// 	latitude: _this_.
-				// })
+				var { lat, lng } = trans(Number(_this_.ele.latitude), Number(_this_.ele.longitude))
+				uni.openLocation({
+					latitude: lat,
+					longitude: lng,
+					name: '电梯位置',
+					address: _this_.ele.address,
+					fail(err) {
+						console.log(err)
+					}
+				})
 			},
 			// 点击接警 --> 2
 			async handleAlarm() {
@@ -265,6 +273,7 @@
 		flex: 1;
 	}
 	.title{
+		width: 80%;
 		font-size: 28rpx;
 		color: #000000;
 		font-weight: bold;
@@ -274,15 +283,21 @@
 		font-size: 24rpx;
 		color: #000000;
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 	}
 	.info image{
 		width: 28rpx;
 		height: 28rpx;
 		margin-right: 10rpx;
+		flex-shrink: 1;
+	}
+	.info text{
+		flex: 1;
+		line-height: 30rpx;
 	}
 	
 	.handle-button{
+		margin-left: 20rpx;
 		height: 100%;
 		display: flex;
 		flex-direction: column;

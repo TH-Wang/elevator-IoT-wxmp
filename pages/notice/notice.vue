@@ -10,7 +10,7 @@
 				@click="handleLinkDetail(item.id)"
 			>
 				<view class="title">{{item.title}}</view>
-				<view class="content ellipsis-twolines">{{item.content}}</view>
+				<uParse className="content ellipsis-twolines" :content="item.content" noData=" "></uParse>
 				<view class="time">系统公告 | {{item.add_time}}</view>
 			</view>
 		</scroll-view>
@@ -18,15 +18,15 @@
 </template>
 
 <script>
-	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Empty from '../../components/Empty/Empty.vue'
+	import uParse from '../../components/u-parse/u-parse.vue'
 	import noticeData from '../../data/notice.js'
 	import request from '../../service/request.js'
 	
 	export default {
 		components: {
-			NavHeader,
-			Empty
+			Empty,
+			uParse
 		},
 		computed: {
 			height() {
@@ -43,15 +43,21 @@
 				var url = '/pages/noticeDetail/noticeDetail?id=' + id
 				uni.navigateTo({ url })
 			},
-			requestList: async function() {
+			requestList: async function(type) {
 				var _this_ = this
+				if(type && type == 'refresh') this.page = 1
+				if(this.dataSource % this.limit > 0) return
 				var res = await request.post('/jobs/lists', {
 					limit: _this_.limit,
 					page: _this_.page,
 					type: 0,
 				})
 				if(res.code == 1) {
-					this.dataSource = res.data
+					if(type == 'refresh') {
+						this.dataSource = res.data
+					} else {
+						this.dataSource.push(...res.data)
+					}
 					this.page = this.page + 1 
 				}
 			},
@@ -61,6 +67,10 @@
 		},
 		onLoad: async function() {
 			await this.requestList()
+		},
+		onPullDownRefresh: async function() {
+			await this.requestList('refresh')
+			uni.stopPullDownRefresh()
 		}
 	}
 </script>

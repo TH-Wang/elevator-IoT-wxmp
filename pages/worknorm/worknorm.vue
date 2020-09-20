@@ -17,7 +17,7 @@
 					<text class="time">{{item.time}}</text>
 				</view>
 				
-				<view class="content ellipsis-twolines">{{item.content}}</view>
+				<uParse className="content ellipsis-twolines" :content="item.content" noData=" "></uParse>
 			</view>
 		</view>
 	</view>
@@ -27,16 +27,19 @@
 	import NavHeader from '../../components/NavHeader/NavHeader.vue'
 	import Search from '../../components/Search/Search.vue'
 	import Empty from '../../components/Empty/Empty.vue'
-	import worknormData from '../../data/worknorm'
+	import uParse from '../../components/u-parse/u-parse.vue'
 	import request from '../../service/request.js'
 	
 	export default {
 		components: {
 			NavHeader,
 			Search,
-			Empty
+			Empty,
+			uParse
 		},
 		data: () => ({
+			page: 1,
+			limit: 20,
 			dataSource: []
 		}),
 		computed: {
@@ -48,16 +51,35 @@
 			handleLinkDetail(id) {
 				var url = '/pages/noticeDetail/noticeDetail?id=' + id
 				uni.navigateTo({ url })
-			}
+			},
+			requestList: async function(type) {
+				var _this_ = this
+				if(type && type == 'refresh') this.page = 1
+				if(this.dataSource % this.limit > 0) return
+				var res = await request.post('/jobs/lists', {
+					limit: _this_.limit,
+					page: _this_.page,
+					type: 1
+				})
+				this.page = this.page + 1
+				if(type == 'refresh') {
+					this.dataSource = res.data
+				} else {
+					this.dataSource.push(...res.data)
+				}
+			},
 		},
 		onLoad: async function() {
-			var res = request.post('/jobs/lists', {
-				limit: 10,
-				page: 1,
-				type: 1
-			})
-			this.dataSource = res.data
+			await this.requestList()
+		},
+		onReachBottom: async function() {
+			await this.requestList()
+		},
+		onPullDownRefresh: async function() {
+			await this.requestList('refresh')
+			uni.stopPullDownRefresh()
 		}
+		
 	}
 </script>
 

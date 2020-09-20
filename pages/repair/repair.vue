@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<!-- 搜索框 -->
-		<Search button placeholder="搜索急修工单" />
+		<Search button placeholder="搜索急修工单" @click-button="handleLinkSearch" />
 		
 		<!-- 分类导航栏 -->
 		<Tabs
@@ -93,6 +93,14 @@
 			}
 		},
 		methods: {
+			// 跳转搜索页面
+			handleLinkSearch() {
+				uni.navigateTo({
+					animationType: 'fade-in',
+					animationDuration: 200,
+					url: '/pages/searchOrder/searchOrder?mode=repair'
+				})
+			},
 			handleSwitchTab(idx) {
 				this.active = idx
 			},
